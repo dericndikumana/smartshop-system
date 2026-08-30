@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import prisma from "@/lib/prisma"
 import { InventoryClient } from "@/app/(dashboard)/inventory/inventory-client"
+import { Product } from "@prisma/client"
 
 export const dynamic = 'force-dynamic'
 
@@ -18,7 +19,7 @@ export default async function InventoryPage() {
       orderBy: { createdAt: 'desc' }
     })
 
-    const serializedProducts = products.map((p: any) => ({
+    const serializedProducts = products.map((p: Product) => ({
       id: p.id,
       name: p.name || "Unknown",
       sellingPrice: Number(p.sellingPrice || 0),

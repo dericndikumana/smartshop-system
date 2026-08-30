@@ -3,6 +3,9 @@ import { redirect } from "next/navigation"
 import prisma from "@/lib/prisma"
 import { CashierDashboard } from "./cashier-dashboard"
 import { ShopAdminDashboard } from "./shop-admin-dashboard"
+import { Sale, SaleItem } from "@prisma/client"
+
+type SaleWithItems = Sale & { items: SaleItem[] }
 
 export const dynamic = 'force-dynamic'
 
@@ -48,8 +51,8 @@ export default async function DashboardPage() {
     let totalItemsSold = 0
     const revenueByCurrency: Record<string, number> = {}
 
-    cashierSales.forEach((sale: any) => {
-      sale.items.forEach((item: any) => {
+    cashierSales.forEach((sale: SaleWithItems) => {
+      sale.items.forEach((item: SaleItem) => {
         totalItemsSold += item.quantity
         const itemSubtotalWithVat = item.subtotal + (item.subtotal * (sale.vatRate / 100))
         revenueByCurrency[item.currency] = (revenueByCurrency[item.currency] || 0) + itemSubtotalWithVat
@@ -87,11 +90,11 @@ export default async function DashboardPage() {
 
     // Calculate revenue grouped by currency
     const revenueByCurrency: Record<string, number> = {}
-    todaySalesData.forEach((sale: any) => {
+    todaySalesData.forEach((sale: SaleWithItems) => {
       // It's safer to sum from items directly to respect multiple currencies if any exist
       // But sale.currency holds the primary currency for the sale
       // Let's use items to accurately group
-      sale.items.forEach((item: any) => {
+      sale.items.forEach((item: SaleItem) => {
         const itemSubtotalWithVat = item.subtotal + (item.subtotal * (sale.vatRate / 100))
         revenueByCurrency[item.currency] = (revenueByCurrency[item.currency] || 0) + itemSubtotalWithVat
       })
