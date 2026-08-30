@@ -1,32 +1,19 @@
 "use client"
 
-import { Receipt, DollarSign, Package, Users, Activity, TrendingUp } from "lucide-react"
+import { Receipt, DollarSign, Package, Users, Activity } from "lucide-react"
 
 interface ShopAdminDashboardProps {
   stats: {
     totalProducts: number
     totalCustomers: number
-    todaySalesTotal: number
     todaySalesCount: number
   }
-  recentSales: {
-    id: string
-    receiptNumber: string
-    totalAmount: number
-    currency: string
-    createdAt: Date
-    cashierName: string
-    items: number
-  }[]
-  cashierSales: {
-    cashierName: string
-    salesTotal: number
-    salesCount: number
-    currency: string
-  }[]
+  revenueByCurrency: Record<string, number>
 }
 
-export function ShopAdminDashboard({ stats, recentSales, cashierSales }: ShopAdminDashboardProps) {
+export function ShopAdminDashboard({ stats, revenueByCurrency }: ShopAdminDashboardProps) {
+  const currencies = Object.keys(revenueByCurrency)
+
   return (
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div>
@@ -36,15 +23,8 @@ export function ShopAdminDashboard({ stats, recentSales, cashierSales }: ShopAdm
         </p>
       </div>
       
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-6 flex flex-col gap-2">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <DollarSign className="h-5 w-5 text-primary" />
-            <h3 className="font-medium text-sm">Today&apos;s Revenue</h3>
-          </div>
-          <p className="text-2xl font-bold">{stats.todaySalesTotal.toLocaleString()}</p>
-        </div>
-        
+      {/* Top Stats */}
+      <div className="grid gap-6 md:grid-cols-3">
         <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-6 flex flex-col gap-2">
           <div className="flex items-center gap-2 text-muted-foreground">
             <Receipt className="h-5 w-5 text-primary" />
@@ -70,89 +50,44 @@ export function ShopAdminDashboard({ stats, recentSales, cashierSales }: ShopAdm
         </div>
       </div>
       
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Cashier Performance */}
-        <div className="rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden">
-          <div className="p-4 border-b bg-muted/10">
-            <h2 className="font-semibold flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-primary" />
-              Cashier Performance (Today)
-            </h2>
+      {/* Revenue Breakdown */}
+      <h2 className="text-xl font-bold mt-4 border-b pb-2">Revenue Breakdown (Today)</h2>
+      
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        {currencies.map(currency => (
+          <div key={currency} className="rounded-xl border bg-card text-card-foreground shadow-sm p-6 flex flex-col gap-2">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <DollarSign className="h-5 w-5 text-primary" />
+              <h3 className="font-medium text-sm">{currency} Sales Total</h3>
+            </div>
+            <p className="text-2xl font-bold text-primary">{currency} {revenueByCurrency[currency].toLocaleString()}</p>
           </div>
-          <div className="p-0 overflow-x-auto max-h-[300px] overflow-y-auto">
-            {cashierSales.length === 0 ? (
-              <div className="p-8 text-center text-muted-foreground">
-                No sales recorded today.
-              </div>
-            ) : (
-              <table className="w-full text-sm text-left">
-                <thead className="bg-muted/50 text-muted-foreground text-xs uppercase">
-                  <tr>
-                    <th className="px-6 py-4 font-medium">Cashier Name</th>
-                    <th className="px-6 py-4 font-medium">Sales Count</th>
-                    <th className="px-6 py-4 font-medium text-right">Revenue</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/50">
-                  {cashierSales.map((cashier, idx) => (
-                    <tr key={idx} className="hover:bg-muted/30 transition-colors">
-                      <td className="px-6 py-4 font-medium flex items-center gap-2">
-                        <div className="h-6 w-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-xs font-bold">
-                          {cashier.cashierName.charAt(0)}
-                        </div>
-                        {cashier.cashierName}
-                      </td>
-                      <td className="px-6 py-4">{cashier.salesCount}</td>
-                      <td className="px-6 py-4 text-right font-bold text-primary">
-                        {cashier.currency} {cashier.salesTotal.toLocaleString()}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+        ))}
+        
+        {currencies.length === 0 && (
+          <div className="rounded-xl border border-dashed bg-muted/20 text-muted-foreground p-6 flex items-center justify-center col-span-full">
+            No sales recorded today.
           </div>
-        </div>
+        )}
+      </div>
 
-        {/* Recent Sales */}
-        <div className="rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden">
-          <div className="p-4 border-b bg-muted/10">
-            <h2 className="font-semibold flex items-center gap-2">
-              <Activity className="h-5 w-5 text-primary" />
-              Recent Transactions
-            </h2>
-          </div>
-          <div className="p-0 overflow-x-auto max-h-[300px] overflow-y-auto">
-            {recentSales.length === 0 ? (
-              <div className="p-8 text-center text-muted-foreground">
-                No recent transactions.
+      {/* System Total Money (Aggregated visually but separated by currency since rates vary) */}
+      <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-6 mt-4 max-w-md bg-primary/5 border-primary/20">
+        <div className="flex items-center gap-2 text-muted-foreground mb-4 border-b border-primary/10 pb-2">
+          <Activity className="h-5 w-5 text-primary" />
+          <h3 className="font-bold text-sm text-primary">System Total Money</h3>
+        </div>
+        <div className="flex flex-col gap-3">
+          {currencies.length > 0 ? (
+            currencies.map(currency => (
+              <div key={`total-${currency}`} className="flex justify-between items-center">
+                <span className="font-medium text-muted-foreground">{currency} Total</span>
+                <span className="text-xl font-bold">{revenueByCurrency[currency].toLocaleString()}</span>
               </div>
-            ) : (
-              <table className="w-full text-sm text-left">
-                <thead className="bg-muted/50 text-muted-foreground text-xs uppercase">
-                  <tr>
-                    <th className="px-6 py-4 font-medium">Receipt</th>
-                    <th className="px-6 py-4 font-medium">Time / Cashier</th>
-                    <th className="px-6 py-4 font-medium text-right">Amount</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/50">
-                  {recentSales.map(sale => (
-                    <tr key={sale.id} className="hover:bg-muted/30 transition-colors">
-                      <td className="px-6 py-4 font-medium">{sale.receiptNumber}</td>
-                      <td className="px-6 py-4">
-                        <div>{new Date(sale.createdAt).toLocaleTimeString()}</div>
-                        <div className="text-xs text-muted-foreground">{sale.cashierName}</div>
-                      </td>
-                      <td className="px-6 py-4 text-right font-bold text-primary">
-                        {sale.currency} {sale.totalAmount.toLocaleString()}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
+            ))
+          ) : (
+            <span className="text-sm text-muted-foreground italic">No revenue yet</span>
+          )}
         </div>
       </div>
     </div>

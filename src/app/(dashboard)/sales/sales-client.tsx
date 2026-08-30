@@ -82,10 +82,10 @@ export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
           <table className="w-full text-sm text-left">
             <thead className="bg-muted/50 text-muted-foreground uppercase text-xs">
               <tr>
-                <th className="px-6 py-4 font-medium">Receipt #</th>
-                <th className="px-6 py-4 font-medium">Date & Time</th>
+                <th className="px-6 py-4 font-medium">Receipt No</th>
+                <th className="px-6 py-4 font-medium">Customer Name</th>
+                <th className="px-6 py-4 font-medium">Date</th>
                 <th className="px-6 py-4 font-medium">Cashier</th>
-                <th className="px-6 py-4 font-medium">Customer</th>
                 <th className="px-6 py-4 font-medium text-right">Actions</th>
               </tr>
             </thead>
@@ -104,18 +104,6 @@ export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
                       {sale.receiptNumber}
                     </td>
                     <td className="px-6 py-4 text-muted-foreground">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
-                        {new Date(sale.createdAt).toLocaleString()}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-muted-foreground">
-                      <div className="flex items-center gap-2">
-                        <User className="h-4 w-4" />
-                        {sale.cashierName}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-muted-foreground">
                       {sale.customerName ? (
                         <div className="flex items-center gap-2">
                           <User className="h-4 w-4" />
@@ -124,6 +112,18 @@ export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
                       ) : (
                         <span className="italic opacity-50">Walk-in</span>
                       )}
+                    </td>
+                    <td className="px-6 py-4 text-muted-foreground">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4" />
+                        {new Date(sale.createdAt).toLocaleDateString()}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-muted-foreground">
+                      <div className="flex items-center gap-2">
+                        <User className="h-4 w-4" />
+                        {sale.cashierName}
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-right">
                       <button

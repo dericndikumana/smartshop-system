@@ -1,8 +1,9 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { Search, ShoppingCart, Minus, Plus, Trash2, CreditCard, User } from "lucide-react"
+import { Search, ShoppingCart, Minus, Plus, Trash2, CreditCard, User, Clock, X, Save } from "lucide-react"
 import { checkoutAction } from "@/app/actions/pos"
+import { holdCartAction, deleteHeldCartAction } from "@/app/actions/held-cart"
 import { toast } from "sonner"
 
 interface Product {
@@ -22,7 +23,21 @@ interface CartItem extends Product {
   cartQuantity: number
 }
 
-export function POSClient({ products, customers, vatRate }: { products: Product[], customers: Customer[], vatRate: number }) {
+interface HeldCart {
+  id: string
+  name: string
+  createdAt: string
+  items: {
+    id: string
+    productId: string
+    productName: string
+    quantity: number
+    unitPrice: number
+    currency: string
+  }[]
+}
+
+export function POSClient({ products, customers, vatRate, heldCarts = [] }: { products: Product[], customers: Customer[], vatRate: number, heldCarts?: HeldCart[] }) {
   const [searchTerm, setSearchTerm] = useState("")
   const [cart, setCart] = useState<CartItem[]>([])
   const [isCheckingOut, setIsCheckingOut] = useState(false)
@@ -31,6 +46,10 @@ export function POSClient({ products, customers, vatRate }: { products: Product[
   const [customerSearch, setCustomerSearch] = useState("")
   const [showCustomerDropdown, setShowCustomerDropdown] = useState(false)
   const customerDropdownRef = useRef<HTMLDivElement>(null)
+
+  // Held Cart states
+  const [showHeldCarts, setShowHeldCarts] = useState(false)
+  const [isHolding, setIsHolding] = useState(false)
 
   const filteredProducts = products.filter(p => 
     p.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -86,6 +105,63 @@ export function POSClient({ products, customers, vatRate }: { products: Product[
     acc[item.currency] = (acc[item.currency] || 0) + subtotal
     return acc
   }, {} as Record<string, number>)
+
+  const handleHoldCart = async () => {
+    if (cart.length === 0) return
+    setIsHolding(true)
+
+    const payload = {
+      items: cart.map(item => ({
+        productId: item.id,
+        quantity: item.cartQuantity,
+        unitPrice: item.sellingPrice,
+        currency: item.currency
+      })),
+      customerName: customerSearch.trim() || undefined
+    }
+
+    const result = await holdCartAction(payload)
+    if (result.error) {
+      toast.error(result.error)
+    } else {
+      setCart([])
+      setCustomerSearch("")
+      toast.success("Order placed on hold.")
+    }
+    
+    setIsHolding(false)
+  }
+
+  const handleResumeCart = async (heldCart: HeldCart) => {
+    // Attempt to map held items back into standard products
+    const restoredCart: CartItem[] = []
+    
+    for (const hItem of heldCart.items) {
+      const p = products.find(prod => prod.id === hItem.productId)
+      if (p) {
+        restoredCart.push({
+          ...p,
+          cartQuantity: hItem.quantity
+        })
+      }
+    }
+
+    if (restoredCart.length > 0) {
+      setCart(restoredCart)
+      
+      // Try to extract customer name if exists in name string
+      const match = heldCart.name.match(/^(.*?)\s*\(\d+ item/)
+      if (match && match[1] && match[1] !== "Walk-in") {
+        setCustomerSearch(match[1])
+      }
+
+      await deleteHeldCartAction(heldCart.id)
+      setShowHeldCarts(false)
+      toast.success("Order resumed successfully.")
+    } else {
+      toast.error("Could not resume order: products may no longer be available.")
+    }
+  }
 
   const handleCheckout = async () => {
     if (cart.length === 0) return
@@ -181,9 +257,20 @@ export function POSClient({ products, customers, vatRate }: { products: Product[
             <ShoppingCart className="h-5 w-5 text-primary" />
             Current Order
           </h2>
-          <span className="bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded-full">
-            {cart.reduce((sum, item) => sum + item.cartQuantity, 0)} items
-          </span>
+          <div className="flex items-center gap-3">
+            {heldCarts.length > 0 && (
+              <button 
+                onClick={() => setShowHeldCarts(true)}
+                className="text-xs font-bold text-primary flex items-center gap-1 hover:underline"
+              >
+                <Clock className="h-3 w-3" />
+                {heldCarts.length} Waiting
+              </button>
+            )}
+            <span className="bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded-full">
+              {cart.reduce((sum, item) => sum + item.cartQuantity, 0)} items
+            </span>
+          </div>
         </div>
 
         {/* Customer Selection */}
@@ -295,16 +382,79 @@ export function POSClient({ products, customers, vatRate }: { products: Product[
             </div>
           </div>
 
-          <button
-            onClick={handleCheckout}
-            disabled={cart.length === 0 || isCheckingOut}
-            className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3 rounded-lg font-bold hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-50"
-          >
-            <CreditCard className="h-5 w-5" />
-            {isCheckingOut ? "Processing..." : "Complete Sale"}
-          </button>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={handleHoldCart}
+              disabled={cart.length === 0 || isHolding || isCheckingOut}
+              className="flex items-center justify-center gap-2 border border-border py-3 rounded-lg font-bold hover:bg-muted transition-colors disabled:opacity-50"
+            >
+              <Save className="h-5 w-5 text-muted-foreground" />
+              Hold Order
+            </button>
+            <button
+              onClick={handleCheckout}
+              disabled={cart.length === 0 || isCheckingOut || isHolding}
+              className="flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3 rounded-lg font-bold hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-50"
+            >
+              <CreditCard className="h-5 w-5" />
+              {isCheckingOut ? "Processing..." : "Complete Sale"}
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* Held Carts Modal */}
+      {showHeldCarts && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in duration-200 p-4">
+          <div className="bg-card w-full max-w-xl rounded-xl shadow-lg border p-6 animate-in zoom-in-95 duration-200 max-h-[80vh] flex flex-col">
+            <div className="flex justify-between items-center mb-4 pb-4 border-b">
+              <h2 className="text-xl font-bold flex items-center gap-2">
+                <Clock className="h-5 w-5 text-primary" />
+                Waiting Orders
+              </h2>
+              <button onClick={() => setShowHeldCarts(false)} className="text-muted-foreground hover:text-foreground">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto">
+              {heldCarts.length === 0 ? (
+                <div className="py-12 text-center text-muted-foreground">
+                  No waiting orders found.
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {heldCarts.map(hc => (
+                    <div key={hc.id} className="p-4 border rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-primary/30 transition-colors">
+                      <div>
+                        <p className="font-bold">{hc.name}</p>
+                        <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
+                          <Clock className="h-3 w-3" />
+                          {new Date(hc.createdAt).toLocaleTimeString()}
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <button 
+                          onClick={() => deleteHeldCartAction(hc.id)}
+                          className="px-3 py-1.5 text-sm font-medium border border-red-200 text-red-600 rounded-md hover:bg-red-50 transition-colors"
+                        >
+                          Discard
+                        </button>
+                        <button 
+                          onClick={() => handleResumeCart(hc)}
+                          className="px-3 py-1.5 text-sm font-medium bg-primary/10 text-primary rounded-md hover:bg-primary/20 transition-colors"
+                        >
+                          Resume
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

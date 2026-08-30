@@ -83,49 +83,28 @@ export default async function DashboardPage() {
       })
     ])
 
-    const todaySalesTotal = todaySalesData.reduce((sum, sale) => sum + sale.totalAmount, 0)
     const todaySalesCount = todaySalesData.length
 
-    const recentSales = todaySalesData.slice(0, 10).map(sale => ({
-      id: sale.id,
-      receiptNumber: sale.receiptNumber,
-      totalAmount: sale.totalAmount,
-      currency: sale.currency,
-      createdAt: sale.createdAt,
-      cashierName: sale.cashier.name,
-      items: sale.items.reduce((sum, item) => sum + item.quantity, 0)
-    }))
-
-    // Calculate Cashier performance
-    const cashierPerformanceMap = new Map<string, { cashierName: string, salesTotal: number, salesCount: number, currency: string }>()
-    
+    // Calculate revenue grouped by currency
+    const revenueByCurrency: Record<string, number> = {}
     todaySalesData.forEach(sale => {
-      const existing = cashierPerformanceMap.get(sale.cashier.id)
-      if (existing) {
-        existing.salesTotal += sale.totalAmount
-        existing.salesCount += 1
-      } else {
-        cashierPerformanceMap.set(sale.cashier.id, {
-          cashierName: sale.cashier.name,
-          salesTotal: sale.totalAmount,
-          salesCount: 1,
-          currency: sale.currency
-        })
-      }
+      // It's safer to sum from items directly to respect multiple currencies if any exist
+      // But sale.currency holds the primary currency for the sale
+      // Let's use items to accurately group
+      sale.items.forEach(item => {
+        const itemSubtotalWithVat = item.subtotal + (item.subtotal * (sale.vatRate / 100))
+        revenueByCurrency[item.currency] = (revenueByCurrency[item.currency] || 0) + itemSubtotalWithVat
+      })
     })
-
-    const cashierSales = Array.from(cashierPerformanceMap.values()).sort((a, b) => b.salesTotal - a.salesTotal)
 
     return (
       <ShopAdminDashboard 
         stats={{
           totalProducts,
           totalCustomers,
-          todaySalesTotal,
           todaySalesCount
         }}
-        recentSales={recentSales}
-        cashierSales={cashierSales}
+        revenueByCurrency={revenueByCurrency}
       />
     )
   }

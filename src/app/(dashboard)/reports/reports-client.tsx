@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Printer, Receipt, Calendar } from "lucide-react"
+import { Printer, Receipt } from "lucide-react"
 
 interface Transaction {
   id: string
@@ -178,8 +178,6 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
                 <tr>
                   <th className="px-6 py-4 font-medium">Receipt #</th>
                   <th className="px-6 py-4 font-medium">Customer Name</th>
-                  <th className="px-6 py-4 font-medium">Item sold (SKU)</th>
-                  <th className="px-6 py-4 font-medium">Date & Time</th>
                   {userRole === "SHOP_ADMIN" && selectedCashier === "ALL" && (
                     <th className="px-6 py-4 font-medium">Cashier</th>
                   )}
@@ -189,7 +187,7 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
               <tbody className="divide-y divide-border/50 print:divide-gray-200">
                 {paginatedTransactions.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-8 text-center text-muted-foreground">
+                    <td colSpan={4} className="px-6 py-8 text-center text-muted-foreground">
                       No transactions found for the selected criteria.
                     </td>
                   </tr>
@@ -198,15 +196,6 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
                     <tr key={tx.id} className="hover:bg-muted/20 transition-colors">
                       <td className="px-6 py-4 font-medium text-foreground">{tx.receiptNumber}</td>
                       <td className="px-6 py-4 text-foreground">{tx.customerName}</td>
-                      <td className="px-6 py-4 text-muted-foreground max-w-xs truncate" title={tx.itemsSold}>
-                        {tx.itemsSold}
-                      </td>
-                      <td className="px-6 py-4 text-muted-foreground whitespace-nowrap">
-                        <div className="flex items-center gap-1.5">
-                          <Calendar className="h-3.5 w-3.5" />
-                          {new Date(tx.date).toLocaleString()}
-                        </div>
-                      </td>
                       {userRole === "SHOP_ADMIN" && selectedCashier === "ALL" && (
                         <td className="px-6 py-4 text-muted-foreground">{tx.cashierName}</td>
                       )}

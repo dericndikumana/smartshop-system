@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { toggleCashierStatusAction, deleteCashierAction, createCashierAction, editCashierAction } from "@/app/actions/staff"
-import { CheckCircle, ShieldAlert, Trash2, Plus } from "lucide-react"
+import { Search, CheckCircle, ShieldAlert, Trash2, Plus } from "lucide-react"
 
 interface Cashier {
   id: string
@@ -11,11 +11,23 @@ interface Cashier {
   status: string
 }
 
-export function StaffClient({ cashiers }: { cashiers: Cashier[] }) {
+export function StaffClient({ cashiers: initialCashiers }: { cashiers: Cashier[] }) {
   const [isLoading, setIsLoading] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editCashier, setEditCashier] = useState<Cashier | null>(null)
   const [error, setError] = useState<string | null>(null)
+
+  const [searchTerm, setSearchTerm] = useState("")
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 5
+
+  const filteredCashiers = initialCashiers.filter(c => 
+    c.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    c.email.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
+  const totalPages = Math.ceil(filteredCashiers.length / itemsPerPage)
+  const paginatedCashiers = filteredCashiers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
 
   async function handleEditCashier(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -72,7 +84,20 @@ export function StaffClient({ cashiers }: { cashiers: Cashier[] }) {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-end">
+      <div className="flex flex-col sm:flex-row justify-between gap-4">
+        <div className="relative w-full max-w-sm">
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+          <input 
+            type="text" 
+            placeholder="Search cashiers..." 
+            value={searchTerm}
+            onChange={(e) => {
+              setSearchTerm(e.target.value)
+              setCurrentPage(1)
+            }}
+            className="w-full pl-9 rounded-md border bg-background px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all" 
+          />
+        </div>
         <button 
           onClick={() => setIsModalOpen(true)}
           className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium"
@@ -94,14 +119,14 @@ export function StaffClient({ cashiers }: { cashiers: Cashier[] }) {
               </tr>
             </thead>
             <tbody>
-              {cashiers.length === 0 ? (
+              {paginatedCashiers.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="px-4 py-8 text-center text-muted-foreground">
                     No cashiers found.
                   </td>
                 </tr>
               ) : (
-                cashiers.map((cashier) => (
+                paginatedCashiers.map((cashier) => (
                   <tr key={cashier.id} className="border-b hover:bg-muted/20">
                     <td className="px-4 py-3 font-medium">{cashier.name}</td>
                     <td className="px-4 py-3">{cashier.email}</td>
@@ -149,6 +174,31 @@ export function StaffClient({ cashiers }: { cashiers: Cashier[] }) {
             </tbody>
           </table>
         </div>
+        
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-6 py-3 border-t bg-muted/10">
+            <p className="text-xs text-muted-foreground">
+              Showing <span className="font-medium">{((currentPage - 1) * itemsPerPage) + 1}</span> to <span className="font-medium">{Math.min(currentPage * itemsPerPage, filteredCashiers.length)}</span> of <span className="font-medium">{filteredCashiers.length}</span> cashiers
+            </p>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-1 text-xs rounded-md border bg-background hover:bg-muted text-muted-foreground disabled:opacity-50 transition-colors"
+              >
+                Previous
+              </button>
+              <button
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 text-xs rounded-md border bg-background hover:bg-muted text-muted-foreground disabled:opacity-50 transition-colors"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {isModalOpen && (

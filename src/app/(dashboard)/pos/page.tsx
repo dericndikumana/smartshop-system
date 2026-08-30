@@ -34,6 +34,22 @@ export default async function POSPage() {
       orderBy: { fullName: 'asc' }
     })
 
+    // Fetch held carts for this shop and cashier
+    const rawHeldCarts = await prisma.heldCart.findMany({
+      where: {
+        shopId: session.user.shopId,
+        cashierId: session.user.id
+      },
+      include: {
+        items: {
+          include: {
+            product: true
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    })
+
     const serializedProducts = products.map(p => ({
       id: p.id,
       name: p.name || "Unknown",
@@ -47,11 +63,26 @@ export default async function POSPage() {
       fullName: c.fullName
     }))
 
+    const heldCarts = rawHeldCarts.map(hc => ({
+      id: hc.id,
+      name: hc.name || "Unknown",
+      createdAt: hc.createdAt.toISOString(),
+      items: hc.items.map(item => ({
+        id: item.id,
+        productId: item.productId,
+        productName: item.product.name,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        currency: item.currency
+      }))
+    }))
+
     return (
       <POSClient 
         products={serializedProducts} 
         customers={serializedCustomers}
         vatRate={Number(vatSetting?.isEnabled ? vatSetting.rate : 0)}
+        heldCarts={heldCarts}
       />
     )
   } catch (error) {
