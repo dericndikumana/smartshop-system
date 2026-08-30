@@ -24,7 +24,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!user) return null
 
         if (user.status === "BLOCKED" || user.status === "INACTIVE") {
-          throw new Error("Access denied. Your account is " + user.status.toLowerCase() + ".")
+          throw new Error("suspended")
         }
 
         const isValid = await bcrypt.compare(credentials.password as string, user.password)

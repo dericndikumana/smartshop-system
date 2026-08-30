@@ -1,6 +1,8 @@
 import LoginForm from "@/components/auth/login-form"
 
-export default function LoginPage() {
+export default function LoginPage({ searchParams }: { searchParams: { error?: string } }) {
+  const isSuspended = searchParams.error === "suspended"
+
   return (
     <div className="flex min-h-screen bg-background">
       {/* Left side: Marketing Splash */}
@@ -55,6 +57,13 @@ export default function LoginPage() {
               Enter your email and password to access your shop.
             </p>
           </div>
+
+          {isSuspended && (
+            <div className="p-4 bg-red-100 border border-red-200 text-red-700 rounded-lg text-sm font-medium shadow-sm animate-in fade-in slide-in-from-top-2">
+              Your account has been suspended. Please contact the System Administrator to help you.
+            </div>
+          )}
+
           <LoginForm />
           <div className="mt-8 text-center text-sm text-muted-foreground bg-background p-4 rounded-xl border shadow-sm">
             <p>If you don&apos;t have an account, please contact the System Administrator to guide you:</p>

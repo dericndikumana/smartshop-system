@@ -25,7 +25,18 @@ export default function LoginForm() {
       })
 
       if (res?.error) {
-        setError("Invalid email or password.")
+        if (res.error === "suspended" || res.error === "CredentialsSignin") {
+          // If the auth throws "suspended", show custom message. Otherwise generic.
+          if (res.error === "suspended" || res.error.includes("suspended")) {
+             setError("Your account has been suspended. Please contact the System Administrator to help you.")
+          } else {
+             setError("Invalid email or password.")
+          }
+        } else if (res.error.includes("suspended")) {
+           setError("Your account has been suspended. Please contact the System Administrator to help you.")
+        } else {
+           setError(res.error)
+        }
       } else {
         router.push("/")
         router.refresh()
