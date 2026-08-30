@@ -57,7 +57,7 @@ export function Sidebar({ role, onNavClick, isCollapsed, onToggleCollapse }: Sid
 
       <div className={`p-6 border-b flex items-center justify-center transition-all ${isCollapsed ? "px-2" : "px-6"}`}>
         <h1 className={`text-2xl font-bold tracking-tight text-primary transition-all ${isCollapsed ? "scale-0 hidden" : "scale-100"}`}>
-          shopCore
+          SmartShop
         </h1>
         {isCollapsed && <Store className="h-8 w-8 text-primary" />}
       </div>

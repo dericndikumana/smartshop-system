@@ -11,14 +11,14 @@ export default function LoginPage() {
         <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-96 h-96 rounded-full bg-white/10 blur-3xl pointer-events-none"></div>
 
         <div className="relative z-10">
-          <h1 className="text-3xl font-bold tracking-tight">shopCore</h1>
+          <h1 className="text-3xl font-bold tracking-tight">SmartShop</h1>
           <p className="mt-2 text-lg font-medium text-primary-foreground/80">MULTI-TENANT RETAIL PLATFORM</p>
         </div>
         
         <div className="space-y-6 max-w-lg relative z-10">
           <h2 className="text-4xl font-bold leading-tight">Run the counter and the back office from one screen.</h2>
           <p className="text-xl text-primary-foreground/90 leading-relaxed">
-            shopCore gives every shop owner a fast point of sale, live inventory, and sales reporting that&apos;s actually built from real transactions — not a spreadsheet duct-taped to a till.
+            SmartShop gives every shop owner a fast point of sale, live inventory, and sales reporting that&apos;s actually built from real transactions — not a spreadsheet duct-taped to a till.
           </p>
         </div>
 
@@ -49,7 +49,7 @@ export default function LoginPage() {
       <div className="flex w-full lg:w-1/2 items-center justify-center p-8 bg-muted/10">
         <div className="w-full max-w-sm space-y-8 animate-in fade-in zoom-in-95 duration-500">
           <div className="space-y-2 text-center lg:text-left">
-            <h1 className="text-3xl font-bold tracking-tight text-primary lg:hidden mb-8">shopCore</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-primary lg:hidden mb-8">SmartShop</h1>
             <h2 className="text-2xl font-semibold tracking-tight">Sign in</h2>
             <p className="text-sm text-muted-foreground">
               Enter your email and password to access your shop.

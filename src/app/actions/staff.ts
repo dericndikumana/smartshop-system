@@ -113,3 +113,52 @@ export async function createCashierAction(formData: FormData) {
     return { success: false, error: "An unexpected error occurred" }
   }
 }
+
+const editCashierSchema = z.object({
+  userId: z.string(),
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+})
+
+export async function editCashierAction(formData: FormData) {
+  try {
+    const session = await auth()
+    if (!session || session.user.role !== "SHOP_ADMIN" || !session.user.shopId) {
+      return { success: false, error: "Unauthorized" }
+    }
+
+    const data = {
+      userId: formData.get("userId") as string,
+      name: formData.get("name") as string,
+      email: formData.get("email") as string,
+    }
+
+    const validated = editCashierSchema.parse(data)
+
+    const existingUser = await prisma.user.findUnique({
+      where: { email: validated.email }
+    })
+    
+    if (existingUser && existingUser.id !== validated.userId) {
+      return { success: false, error: "Email is already taken by another user." }
+    }
+
+    await prisma.user.update({
+      where: { 
+        id: validated.userId,
+        shopId: session.user.shopId
+      },
+      data: { name: validated.name, email: validated.email }
+    })
+
+    revalidatePath("/staff")
+    return { success: true }
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      // @ts-expect-error ZodError generic typing mismatch
+      return { success: false, error: error.errors[0].message }
+    }
+    console.error("Edit Cashier Error:", error)
+    return { success: false, error: "An unexpected error occurred" }
+  }
+}

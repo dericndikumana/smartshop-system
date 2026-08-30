@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Store, Trash2, ShieldAlert, CheckCircle, Search, Plus, Edit, Key, ChevronLeft, ChevronRight } from "lucide-react"
-import { deleteShopAction, toggleShopStatusAction, createShopAction, editShopAdminAction, resetShopAdminPasswordAction } from "@/app/actions/superadmin"
+import { deleteShopAction, toggleShopStatusAction, createShopAction, editShopAdminAction, resetShopAdminPasswordAction, editShopAction } from "@/app/actions/superadmin"
 
 interface Shop {
   id: string
@@ -24,11 +24,29 @@ export function ShopsClient({ shops: initialShops }: { shops: Shop[] }) {
   // Modals state
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [editAdmin, setEditAdmin] = useState<Shop | null>(null)
+  const [editShop, setEditShop] = useState<Shop | null>(null)
   
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   // Actions
+  async function handleEditShop(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setIsLoading(true)
+    setError(null)
+    
+    const formData = new FormData(e.currentTarget)
+    formData.append("shopId", editShop!.id)
+    
+    const result = await editShopAction(formData)
+    
+    if (result?.error) {
+      setError(result.error)
+    } else {
+      setEditShop(null)
+    }
+    setIsLoading(false)
+  }
   async function handleCreateShop(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setIsLoading(true)
@@ -161,8 +179,19 @@ export function ShopsClient({ shops: initialShops }: { shops: Shop[] }) {
                 paginatedShops.map((shop) => (
                   <tr key={shop.id} className="hover:bg-muted/20 transition-colors">
                     <td className="px-6 py-4">
-                      <p className="font-medium text-base">{shop.name}</p>
-                      <p className="text-xs text-muted-foreground mt-1">ID: {shop.id.slice(0, 8)}...</p>
+                      <div className="flex flex-col group/shop">
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium text-base">{shop.name}</p>
+                          <button 
+                            onClick={() => setEditShop(shop)}
+                            className="p-1 text-muted-foreground hover:text-primary opacity-0 group-hover/shop:opacity-100 transition-opacity rounded-md"
+                            title="Edit Shop"
+                          >
+                            <Edit className="h-3 w-3" />
+                          </button>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">ID: {shop.id.slice(0, 8)}...</p>
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-between group/admin">
@@ -334,6 +363,45 @@ export function ShopsClient({ shops: initialShops }: { shops: Shop[] }) {
                 <button 
                   type="button" 
                   onClick={() => setEditAdmin(null)}
+                  className="px-4 py-2 text-sm font-medium rounded-md border hover:bg-muted transition-colors"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={isLoading}
+                  className="px-4 py-2 text-sm font-medium rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
+                >
+                  {isLoading ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Shop Modal */}
+      {editShop && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in duration-200 p-4">
+          <div className="bg-card w-full max-w-sm rounded-xl shadow-lg border p-6 animate-in zoom-in-95 duration-200">
+            <h2 className="text-xl font-bold mb-1">Edit Shop Details</h2>
+            <p className="text-sm text-muted-foreground mb-4">Update details for {editShop.name}</p>
+            
+            {error && (
+              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-600 text-sm">
+                {error}
+              </div>
+            )}
+            <form onSubmit={handleEditShop} className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Shop Name</label>
+                <input required name="shopName" type="text" defaultValue={editShop.name} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+              </div>
+              
+              <div className="flex justify-end gap-3 mt-6">
+                <button 
+                  type="button" 
+                  onClick={() => setEditShop(null)}
                   className="px-4 py-2 text-sm font-medium rounded-md border hover:bg-muted transition-colors"
                 >
                   Cancel

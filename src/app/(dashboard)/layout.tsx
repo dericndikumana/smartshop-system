@@ -15,8 +15,19 @@ export default async function DashboardLayout({
     redirect("/login")
   }
 
+  let shopName = undefined
+  
+  if (session?.user?.shopId) {
+    const prisma = (await import("@/lib/prisma")).default
+    const shop = await prisma.shop.findUnique({
+      where: { id: session.user.shopId },
+      select: { name: true }
+    })
+    shopName = shop?.name
+  }
+
   return (
-    <DashboardShell user={session.user}>
+    <DashboardShell user={session.user} shopName={shopName}>
       {children}
     </DashboardShell>
   )

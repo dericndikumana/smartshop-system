@@ -13,9 +13,10 @@ interface HeaderProps {
     shopId?: string | null
   }
   hideBorder?: boolean
+  shopName?: string
 }
 
-export function Header({ user, hideBorder }: HeaderProps) {
+export function Header({ user, hideBorder, shopName }: HeaderProps) {
   const { setTheme, theme } = useTheme()
 
   const getRoleLabel = (role?: string) => {
@@ -29,7 +30,7 @@ export function Header({ user, hideBorder }: HeaderProps) {
     <header className={cn("flex items-center justify-between px-6 py-3 bg-background", !hideBorder && "border-b sticky top-0 z-10 shadow-sm")}>
       <div className="flex items-center gap-4">
         <h2 className="text-lg font-semibold hidden md:block">
-          {user.role === "SUPER_ADMIN" ? "System Overview" : "Dashboard"}
+          {user.role === "SUPER_ADMIN" ? "System Overview" : (shopName || "Dashboard")}
         </h2>
       </div>
       

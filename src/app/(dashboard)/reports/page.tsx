@@ -28,10 +28,11 @@ export default async function ReportsPage() {
     include: {
       items: {
         include: {
-          product: { select: { name: true } }
+          product: { select: { name: true, sku: true } }
         }
       },
-      cashier: { select: { name: true, id: true } }
+      cashier: { select: { name: true, id: true } },
+      customer: { select: { fullName: true } }
     },
     orderBy: { createdAt: 'desc' }
   })
@@ -39,12 +40,13 @@ export default async function ReportsPage() {
   // Format details for the new table
   const detailedTransactions = sales.map(sale => {
     const totalAmount = sale.items.reduce((sum, item) => sum + item.subtotal + (item.subtotal * (sale.vatRate / 100)), 0)
-    const itemsSoldList = sale.items.map(item => `${item.product.name} (x${item.quantity})`).join(", ")
+    const itemsSoldList = sale.items.map(item => `${item.product.name} ${item.product.sku ? `(${item.product.sku})` : ''} (x${item.quantity})`).join(", ")
     return {
       id: sale.id,
       receiptNumber: sale.receiptNumber,
       cashierId: sale.cashier.id,
       cashierName: sale.cashier.name,
+      customerName: sale.customer?.fullName || "Walk-in Customer",
       date: sale.createdAt.toISOString(),
       itemsSold: itemsSoldList,
       totalAmount,

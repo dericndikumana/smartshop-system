@@ -79,7 +79,7 @@ export function ShopAdminDashboard({ stats, recentSales, cashierSales }: ShopAdm
               Cashier Performance (Today)
             </h2>
           </div>
-          <div className="p-0 overflow-x-auto">
+          <div className="p-0 overflow-x-auto max-h-[300px] overflow-y-auto">
             {cashierSales.length === 0 ? (
               <div className="p-8 text-center text-muted-foreground">
                 No sales recorded today.
@@ -122,7 +122,7 @@ export function ShopAdminDashboard({ stats, recentSales, cashierSales }: ShopAdm
               Recent Transactions
             </h2>
           </div>
-          <div className="p-0 overflow-x-auto">
+          <div className="p-0 overflow-x-auto max-h-[300px] overflow-y-auto">
             {recentSales.length === 0 ? (
               <div className="p-8 text-center text-muted-foreground">
                 No recent transactions.

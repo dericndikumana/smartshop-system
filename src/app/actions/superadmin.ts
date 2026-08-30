@@ -230,3 +230,41 @@ export async function resetShopAdminPasswordAction(userId: string) {
     return { success: false, error: "An unexpected error occurred" }
   }
 }
+
+const editShopSchema = z.object({
+  shopId: z.string(),
+  shopName: z.string().min(2, "Shop name must be at least 2 characters"),
+})
+
+export async function editShopAction(formData: FormData) {
+  try {
+    const session = await auth()
+    if (!session || session.user.role !== "SUPER_ADMIN") {
+      return { success: false, error: "Unauthorized" }
+    }
+
+    const data = {
+      shopId: formData.get("shopId") as string,
+      shopName: formData.get("shopName") as string,
+    }
+
+    const validated = editShopSchema.parse(data)
+
+    await prisma.shop.update({
+      where: { id: validated.shopId },
+      data: { name: validated.shopName }
+    })
+
+    revalidatePath("/superadmin/shops")
+    revalidatePath("/superadmin")
+    return { success: true }
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      // @ts-expect-error ZodError generic typing mismatch
+      return { success: false, error: error.errors[0].message }
+    }
+    console.error("Edit Shop Error:", error)
+    return { success: false, error: "An unexpected error occurred" }
+  }
+}
+

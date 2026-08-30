@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { toggleCashierStatusAction, deleteCashierAction, createCashierAction } from "@/app/actions/staff"
+import { toggleCashierStatusAction, deleteCashierAction, createCashierAction, editCashierAction } from "@/app/actions/staff"
 import { CheckCircle, ShieldAlert, Trash2, Plus } from "lucide-react"
 
 interface Cashier {
@@ -14,7 +14,27 @@ interface Cashier {
 export function StaffClient({ cashiers }: { cashiers: Cashier[] }) {
   const [isLoading, setIsLoading] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editCashier, setEditCashier] = useState<Cashier | null>(null)
   const [error, setError] = useState<string | null>(null)
+
+  async function handleEditCashier(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setIsLoading(true)
+    setError(null)
+    
+    const formData = new FormData(e.currentTarget)
+    formData.append("userId", editCashier!.id)
+    
+    const result = await editCashierAction(formData)
+    
+    if (result?.error) {
+      setError(result.error)
+    } else {
+      setEditCashier(null)
+    }
+    
+    setIsLoading(false)
+  }
 
   async function handleCreateCashier(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -97,6 +117,13 @@ export function StaffClient({ cashiers }: { cashiers: Cashier[] }) {
                     </td>
                     <td className="px-4 py-3 text-right">
                       <button 
+                        onClick={() => setEditCashier(cashier)}
+                        disabled={isLoading}
+                        className="text-xs font-medium px-3 py-1.5 rounded-md text-primary hover:bg-primary/10 transition-colors disabled:opacity-50 mr-2"
+                      >
+                        Edit
+                      </button>
+                      <button 
                         onClick={() => handleToggleStatus(cashier.id, cashier.status)}
                         disabled={isLoading}
                         className={`text-xs font-medium px-3 py-1.5 rounded-md transition-colors mr-2 ${
@@ -161,6 +188,46 @@ export function StaffClient({ cashiers }: { cashiers: Cashier[] }) {
                   className="px-4 py-2 text-sm font-medium rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
                 >
                   {isLoading ? "Saving..." : "Add Cashier"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {editCashier && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in duration-200 p-4">
+          <div className="bg-card w-full max-w-md rounded-xl shadow-lg border p-6 animate-in zoom-in-95 duration-200">
+            <h2 className="text-xl font-bold mb-4">Edit Cashier</h2>
+            {error && (
+              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-600 text-sm">
+                {error}
+              </div>
+            )}
+            <form onSubmit={handleEditCashier} className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Cashier Name</label>
+                <input required name="name" type="text" defaultValue={editCashier.name} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Email Address</label>
+                <input required name="email" type="email" defaultValue={editCashier.email} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+              </div>
+              
+              <div className="flex justify-end gap-3 mt-6">
+                <button 
+                  type="button" 
+                  onClick={() => setEditCashier(null)}
+                  className="px-4 py-2 text-sm font-medium rounded-md border hover:bg-muted transition-colors"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={isLoading}
+                  className="px-4 py-2 text-sm font-medium rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
+                >
+                  {isLoading ? "Saving..." : "Save Changes"}
                 </button>
               </div>
             </form>

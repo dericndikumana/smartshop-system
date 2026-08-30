@@ -8,6 +8,7 @@ interface Transaction {
   receiptNumber: string
   cashierId: string
   cashierName: string
+  customerName: string
   date: string
   itemsSold: string
   totalAmount: number
@@ -22,6 +23,10 @@ interface ReportsClientProps {
 
 export function ReportsClient({ transactions, cashiers, userRole }: ReportsClientProps) {
   const [selectedCashier, setSelectedCashier] = useState<string>("ALL")
+  const [customerSearch, setCustomerSearch] = useState("")
+  const [startDate, setStartDate] = useState("")
+  const [endDate, setEndDate] = useState("")
+  
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 5
 
@@ -29,11 +34,40 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
     window.print()
   }
 
-  // Filter transactions based on selected cashier
+  // Filter transactions based on selected cashier, customer name, and date range
   const filteredTransactions = useMemo(() => {
-    if (selectedCashier === "ALL") return transactions
-    return transactions.filter(t => t.cashierId === selectedCashier)
-  }, [transactions, selectedCashier])
+    return transactions.filter(t => {
+      // Cashier filter
+      if (selectedCashier !== "ALL" && t.cashierId !== selectedCashier) return false
+      
+      // Customer search filter
+      if (customerSearch.trim() && !t.customerName.toLowerCase().includes(customerSearch.toLowerCase())) {
+        if (!t.receiptNumber.toLowerCase().includes(customerSearch.toLowerCase())) {
+          return false
+        }
+      }
+
+      // Date range filter
+      if (startDate || endDate) {
+        const txDate = new Date(t.date)
+        txDate.setHours(0, 0, 0, 0)
+        
+        if (startDate) {
+          const start = new Date(startDate)
+          start.setHours(0, 0, 0, 0)
+          if (txDate < start) return false
+        }
+        
+        if (endDate) {
+          const end = new Date(endDate)
+          end.setHours(0, 0, 0, 0)
+          if (txDate > end) return false
+        }
+      }
+
+      return true
+    })
+  }, [transactions, selectedCashier, customerSearch, startDate, endDate])
 
   const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage)
   const paginatedTransactions = filteredTransactions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
@@ -70,30 +104,72 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
         </div>
 
         <div>
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
-            <h2 className="text-xl font-bold flex items-center gap-2 border-b pb-2 sm:border-none sm:pb-0">
+          <div className="flex flex-col gap-4 mb-6">
+            <h2 className="text-xl font-bold flex items-center gap-2 border-b pb-2">
               <Receipt className="h-5 w-5 text-primary print:text-black" />
               Transaction Details
             </h2>
             
-            {userRole === "SHOP_ADMIN" && (
-              <div className="flex items-center gap-2 print:hidden">
-                <label className="text-sm font-medium text-muted-foreground">Filter by Cashier:</label>
-                <select 
-                  value={selectedCashier}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 print:hidden">
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-muted-foreground">Search Customer/Receipt</label>
+                <input 
+                  type="text" 
+                  value={customerSearch}
                   onChange={(e) => {
-                    setSelectedCashier(e.target.value)
+                    setCustomerSearch(e.target.value)
                     setCurrentPage(1)
                   }}
-                  className="rounded-md border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                >
-                  <option value="ALL">All Cashiers</option>
-                  {cashiers.map(c => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
-                </select>
+                  placeholder="Name or receipt..."
+                  className="rounded-md border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary w-full"
+                />
               </div>
-            )}
+
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-muted-foreground">Start Date</label>
+                <input 
+                  type="date" 
+                  value={startDate}
+                  onChange={(e) => {
+                    setStartDate(e.target.value)
+                    setCurrentPage(1)
+                  }}
+                  className="rounded-md border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary w-full"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-muted-foreground">End Date</label>
+                <input 
+                  type="date" 
+                  value={endDate}
+                  onChange={(e) => {
+                    setEndDate(e.target.value)
+                    setCurrentPage(1)
+                  }}
+                  className="rounded-md border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary w-full"
+                />
+              </div>
+
+              {userRole === "SHOP_ADMIN" && (
+                <div className="flex flex-col gap-1">
+                  <label className="text-sm font-medium text-muted-foreground">Filter by Cashier</label>
+                  <select 
+                    value={selectedCashier}
+                    onChange={(e) => {
+                      setSelectedCashier(e.target.value)
+                      setCurrentPage(1)
+                    }}
+                    className="rounded-md border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary w-full"
+                  >
+                    <option value="ALL">All Cashiers</option>
+                    {cashiers.map(c => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden print:border-gray-300 print:shadow-none">
@@ -101,7 +177,8 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
               <thead className="bg-muted/50 text-muted-foreground uppercase text-xs print:bg-gray-100">
                 <tr>
                   <th className="px-6 py-4 font-medium">Receipt #</th>
-                  <th className="px-6 py-4 font-medium">Items Sold</th>
+                  <th className="px-6 py-4 font-medium">Customer Name</th>
+                  <th className="px-6 py-4 font-medium">Item sold (SKU)</th>
                   <th className="px-6 py-4 font-medium">Date & Time</th>
                   {userRole === "SHOP_ADMIN" && selectedCashier === "ALL" && (
                     <th className="px-6 py-4 font-medium">Cashier</th>
@@ -112,7 +189,7 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
               <tbody className="divide-y divide-border/50 print:divide-gray-200">
                 {paginatedTransactions.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-8 text-center text-muted-foreground">
+                    <td colSpan={6} className="px-6 py-8 text-center text-muted-foreground">
                       No transactions found for the selected criteria.
                     </td>
                   </tr>
@@ -120,6 +197,7 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
                   paginatedTransactions.map((tx) => (
                     <tr key={tx.id} className="hover:bg-muted/20 transition-colors">
                       <td className="px-6 py-4 font-medium text-foreground">{tx.receiptNumber}</td>
+                      <td className="px-6 py-4 text-foreground">{tx.customerName}</td>
                       <td className="px-6 py-4 text-muted-foreground max-w-xs truncate" title={tx.itemsSold}>
                         {tx.itemsSold}
                       </td>
