@@ -67,8 +67,6 @@ export function StaffClient({ cashiers: initialCashiers }: { cashiers: Cashier[]
   }
 
   async function handleToggleStatus(userId: string, currentStatus: string) {
-    if (!confirm(`Are you sure you want to ${currentStatus === "ACTIVE" ? "suspend" : "activate"} this cashier?`)) return
-    
     setIsLoading(true)
     await toggleCashierStatusAction(userId, currentStatus)
     toast.success(`Cashier ${currentStatus === "ACTIVE" ? "suspended" : "activated"} successfully.`)
@@ -76,8 +74,6 @@ export function StaffClient({ cashiers: initialCashiers }: { cashiers: Cashier[]
   }
 
   async function handleDelete(userId: string) {
-    if (!confirm("Are you sure you want to delete this cashier? This action cannot be undone.")) return
-    
     setIsLoading(true)
     await deleteCashierAction(userId)
     toast.success("Cashier deleted successfully.")

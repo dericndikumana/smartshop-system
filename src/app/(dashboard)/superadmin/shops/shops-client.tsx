@@ -82,9 +82,7 @@ export function ShopsClient({ shops: initialShops }: { shops: Shop[] }) {
     setIsLoading(false)
   }
 
-  async function handleResetPassword(userId: string, shopName: string) {
-    if (!confirm(`Are you sure you want to reset the password for ${shopName}'s admin? The new password will be "shop@123".`)) return
-    
+  async function handleResetPassword(userId: string) {
     setIsLoading(true)
     const result = await resetShopAdminPasswordAction(userId)
     if (result?.error) {
@@ -95,9 +93,7 @@ export function ShopsClient({ shops: initialShops }: { shops: Shop[] }) {
     setIsLoading(false)
   }
 
-  async function handleDelete(shopId: string, shopName: string) {
-    if (!confirm(`Are you absolutely sure you want to delete "${shopName}"? This will delete all products, sales, and users associated with this shop. THIS CANNOT BE UNDONE.`)) return
-    
+  async function handleDelete(shopId: string) {
     setIsLoading(true)
     await deleteShopAction(shopId)
     toast.success("Shop deleted successfully.")
@@ -105,8 +101,6 @@ export function ShopsClient({ shops: initialShops }: { shops: Shop[] }) {
   }
 
   async function handleToggleStatus(shopId: string, currentStatus: string) {
-    if (!confirm(`Are you sure you want to ${currentStatus === "ACTIVE" ? "suspend" : "activate"} this shop?`)) return
-    
     setIsLoading(true)
     await toggleShopStatusAction(shopId, currentStatus)
     toast.success(`Shop ${currentStatus === "ACTIVE" ? "suspended" : "activated"} successfully.`)
@@ -210,7 +204,7 @@ export function ShopsClient({ shops: initialShops }: { shops: Shop[] }) {
                             <Edit className="h-3.5 w-3.5" />
                           </button>
                           <button 
-                            onClick={() => handleResetPassword(shop.adminId, shop.name)}
+                            onClick={() => handleResetPassword(shop.adminId)}
                             disabled={isLoading}
                             className="p-1.5 text-muted-foreground hover:text-orange-500 hover:bg-orange-500/10 rounded-md transition-colors disabled:opacity-50"
                             title="Reset Password to shop@123"
@@ -248,7 +242,7 @@ export function ShopsClient({ shops: initialShops }: { shops: Shop[] }) {
                           {shop.status === "ACTIVE" ? "Suspend" : "Activate"}
                         </button>
                         <button
-                          onClick={() => handleDelete(shop.id, shop.name)}
+                          onClick={() => handleDelete(shop.id)}
                           disabled={isLoading}
                           className="p-1.5 text-red-600 hover:bg-red-500/10 rounded-md transition-colors disabled:opacity-50"
                           title="Delete Shop"

@@ -24,16 +24,10 @@ export default function LoginForm() {
       })
 
       if (res?.error) {
-        if (res.error === "suspended" || res.error === "CredentialsSignin") {
-          if (res.error === "suspended" || res.error.includes("suspended")) {
-             toast.error("Your account has been suspended. Please contact the System Administrator to help you.")
-          } else {
-             toast.error("Invalid email or password.")
-          }
-        } else if (res.error.includes("suspended")) {
+        if (res.error === "Configuration" || res.error === "suspended" || res.error.includes("suspended")) {
            toast.error("Your account has been suspended. Please contact the System Administrator to help you.")
         } else {
-           toast.error(res.error)
+           toast.error("Invalid email or password.")
         }
       } else {
         router.push("/")

@@ -2,6 +2,7 @@
 
 import { Store, ShieldAlert, CheckCircle } from "lucide-react"
 import { toggleUserStatusAction } from "@/app/actions/superadmin"
+import { toast } from "sonner"
 
 interface SuperAdminClientProps {
   stats: { label: string; value: string }[]
@@ -16,12 +17,14 @@ interface SuperAdminClientProps {
 }
 
 export function SuperAdminClient({ stats, admins, currentUserId }: SuperAdminClientProps) {
-
   async function handleToggleStatus(userId: string, currentStatus: string) {
     if (userId === currentUserId) return
-    if (!confirm(`Are you sure you want to ${currentStatus === "ACTIVE" ? "suspend" : "activate"} this user?`)) return
-    
-    await toggleUserStatusAction(userId, currentStatus)
+    try {
+      await toggleUserStatusAction(userId, currentStatus)
+      toast.success(`Admin ${currentStatus === "ACTIVE" ? "suspended" : "activated"} successfully.`)
+    } catch (e) {
+      console.error(e)
+    }
   }
 
   return (

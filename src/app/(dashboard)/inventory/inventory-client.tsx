@@ -120,15 +120,15 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
     setIsLoading(false)
   }
 
-  async function handleDelete(id: string, name: string) {
-    if (!confirm(`Are you sure you want to delete "${name}"?`)) return
-    
+  async function handleDelete(id: string) {
+    setIsLoading(true)
     const result = await deleteProductAction(id)
     if (result?.error) {
       toast.error(result.error)
     } else {
       toast.success("Product deleted successfully")
     }
+    setIsLoading(false)
   }
 
   return (
@@ -252,7 +252,8 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                           <ArrowUp className="h-4 w-4" />
                         </button>
                         <button
-                          onClick={() => handleDelete(product.id, product.name)}
+                          onClick={() => handleDelete(product.id)}
+                          disabled={isLoading}
                           className="p-2 text-red-600 hover:bg-red-500/10 rounded-md transition-colors inline-flex items-center justify-center"
                           title="Delete Product"
                         >
