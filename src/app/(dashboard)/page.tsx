@@ -48,8 +48,8 @@ export default async function DashboardPage() {
     let totalItemsSold = 0
     const revenueByCurrency: Record<string, number> = {}
 
-    cashierSales.forEach(sale => {
-      sale.items.forEach(item => {
+    cashierSales.forEach((sale: any) => {
+      sale.items.forEach((item: any) => {
         totalItemsSold += item.quantity
         const itemSubtotalWithVat = item.subtotal + (item.subtotal * (sale.vatRate / 100))
         revenueByCurrency[item.currency] = (revenueByCurrency[item.currency] || 0) + itemSubtotalWithVat
@@ -87,11 +87,11 @@ export default async function DashboardPage() {
 
     // Calculate revenue grouped by currency
     const revenueByCurrency: Record<string, number> = {}
-    todaySalesData.forEach(sale => {
+    todaySalesData.forEach((sale: any) => {
       // It's safer to sum from items directly to respect multiple currencies if any exist
       // But sale.currency holds the primary currency for the sale
       // Let's use items to accurately group
-      sale.items.forEach(item => {
+      sale.items.forEach((item: any) => {
         const itemSubtotalWithVat = item.subtotal + (item.subtotal * (sale.vatRate / 100))
         revenueByCurrency[item.currency] = (revenueByCurrency[item.currency] || 0) + itemSubtotalWithVat
       })

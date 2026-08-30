@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import prisma from "@/lib/prisma"
-import { SuperAdminClient } from "./superadmin-client"
+import { SuperAdminClient } from "@/app/(dashboard)/superadmin/superadmin-client"
 
 export const dynamic = 'force-dynamic'
 
@@ -32,7 +32,7 @@ export default async function SuperAdminPage() {
     { label: "Active Sessions", value: "N/A" } // NextAuth doesn't track active JWT sessions by default
   ]
 
-  const mappedAdmins = allAdmins.map(admin => ({
+  const mappedAdmins = allAdmins.map((admin: any) => ({
     id: admin.id,
     name: admin.name,
     email: admin.email,
