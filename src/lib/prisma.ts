@@ -1,13 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 
 const prismaClientSingleton = () => {
-  return new PrismaClient({
-    datasources: {
-      db: {
-        url: process.env.DATABASE_URL || "postgresql://neondb_owner:npg_B3TIFUpqV4zL@ep-hidden-tree-axj3ycik-pooler.c-4.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
-      }
-    }
-  })
+  return new PrismaClient()
 }
 
 declare const globalThis: {
