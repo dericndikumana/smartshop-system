@@ -2,6 +2,8 @@ import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { ShoppingCart, User, Plus, Search } from "lucide-react"
 
+export const dynamic = 'force-dynamic'
+
 export default async function POSPage() {
   const session = await auth()
   

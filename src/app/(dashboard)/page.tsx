@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
