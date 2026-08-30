@@ -5,6 +5,8 @@ import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
+import { ThemeProvider } from "@/components/layout/theme-provider";
+
 export const metadata: Metadata = {
   title: "SmartShop System",
   description: "Professional POS and inventory management platform",
@@ -16,9 +18,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("font-sans", inter.variable)}>
+    <html lang="en" className={cn("font-sans", inter.variable)} suppressHydrationWarning>
       <body className="antialiased bg-background text-foreground">
-        {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
