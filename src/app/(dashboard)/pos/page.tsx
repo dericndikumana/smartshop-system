@@ -27,10 +27,6 @@ export default async function POSPage() {
     where: { shopId: session.user.shopId }
   })
 
-  // Fetch shop setting (receipt prefix)
-  const shopSetting = await prisma.shopSetting.findUnique({
-    where: { shopId: session.user.shopId }
-  })
 
   const serializedProducts = products.map(p => ({
     id: p.id,
