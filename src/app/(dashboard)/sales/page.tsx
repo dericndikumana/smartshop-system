@@ -29,7 +29,7 @@ export default async function SalesPage() {
       },
       receipt: true
     },
-    orderBy: { createdAt: 'asc' }
+    orderBy: { createdAt: 'desc' }
   })
 
   // Format data for client

@@ -44,23 +44,23 @@ export default async function DashboardPage() {
       }
     })
 
-    const salesTotal = cashierSales.reduce((sum, sale) => sum + sale.totalAmount, 0)
     const salesCount = cashierSales.length
+    let totalItemsSold = 0
+    const revenueByCurrency: Record<string, number> = {}
 
-    const recentSales = cashierSales.slice(0, 10).map(sale => ({
-      id: sale.id,
-      receiptNumber: sale.receiptNumber,
-      totalAmount: sale.totalAmount,
-      currency: sale.currency,
-      createdAt: sale.createdAt,
-      items: sale.items.reduce((sum, item) => sum + item.quantity, 0)
-    }))
+    cashierSales.forEach(sale => {
+      sale.items.forEach(item => {
+        totalItemsSold += item.quantity
+        const itemSubtotalWithVat = item.subtotal + (item.subtotal * (sale.vatRate / 100))
+        revenueByCurrency[item.currency] = (revenueByCurrency[item.currency] || 0) + itemSubtotalWithVat
+      })
+    })
 
     return (
       <CashierDashboard 
-        salesTotal={salesTotal}
         salesCount={salesCount}
-        recentSales={recentSales}
+        totalItemsSold={totalItemsSold}
+        revenueByCurrency={revenueByCurrency}
       />
     )
   }

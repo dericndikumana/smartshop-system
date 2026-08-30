@@ -34,7 +34,7 @@ export default async function ReportsPage() {
       cashier: { select: { name: true, id: true } },
       customer: { select: { fullName: true } }
     },
-    orderBy: { createdAt: 'asc' }
+    orderBy: { createdAt: 'desc' }
   })
 
   // Format details for the new table

@@ -186,6 +186,7 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
                 <tr>
                   <th className="px-6 py-4 font-medium">Receipt #</th>
                   <th className="px-6 py-4 font-medium">Customer Name</th>
+                  <th className="px-6 py-4 font-medium">Products Sold</th>
                   {userRole === "SHOP_ADMIN" && selectedCashier === "ALL" && (
                     <th className="px-6 py-4 font-medium">Cashier</th>
                   )}
@@ -204,6 +205,7 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
                     <tr key={tx.id} className="hover:bg-muted/20 transition-colors">
                       <td className="px-6 py-4 font-medium text-foreground">{tx.receiptNumber}</td>
                       <td className="px-6 py-4 text-foreground">{tx.customerName}</td>
+                      <td className="px-6 py-4 text-muted-foreground text-xs">{tx.itemsSold}</td>
                       {userRole === "SHOP_ADMIN" && selectedCashier === "ALL" && (
                         <td className="px-6 py-4 text-muted-foreground">{tx.cashierName}</td>
                       )}
@@ -220,7 +222,7 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
               </tbody>
               <tfoot className="bg-muted/10 font-bold border-t border-border/50">
                 <tr>
-                  <td colSpan={userRole === "SHOP_ADMIN" && selectedCashier === "ALL" ? 3 : 2} className="px-6 py-4 text-right">
+                  <td colSpan={userRole === "SHOP_ADMIN" && selectedCashier === "ALL" ? 4 : 3} className="px-6 py-4 text-right">
                     Total:
                   </td>
                   <td className="px-6 py-4 text-right">
