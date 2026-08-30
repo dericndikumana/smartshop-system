@@ -46,7 +46,7 @@ export function Sidebar({ role, onNavClick, isCollapsed, onToggleCollapse }: Sid
   }
 
   return (
-    <div className="w-full border-r h-full bg-card flex flex-col relative group">
+    <div className="w-full border-r h-full bg-card flex flex-col relative group shadow-xl">
       {/* Desktop Collapse Toggle */}
       <button 
         onClick={onToggleCollapse}
