@@ -1,4 +1,5 @@
 import { auth } from "@/lib/auth"
+import { SettingsClient } from "./settings-client"
 
 export const dynamic = 'force-dynamic'
 
@@ -30,28 +31,7 @@ export default async function SettingsPage() {
           </div>
         </div>
         
-        <div className="border-t pt-6">
-          <h3 className="text-lg font-medium text-destructive">Security</h3>
-          <p className="text-sm text-muted-foreground mb-4">Change your password.</p>
-          
-          <form className="space-y-4 max-w-sm">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">New Password</label>
-              <input 
-                type="password" 
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" 
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Confirm Password</label>
-              <input 
-                type="password" 
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" 
-              />
-            </div>
-            <button type="button" className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium">Update Password</button>
-          </form>
-        </div>
+        <SettingsClient />
       </div>
     </div>
   )
