@@ -56,6 +56,7 @@ export default async function POSPage() {
       sellingPrice: Number(p.sellingPrice || 0),
       currency: p.currency || "RWF",
       quantity: Number(p.quantity || 0),
+      sku: p.sku || "",
     }))
 
     const serializedCustomers = customers.map(c => ({

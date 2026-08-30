@@ -12,6 +12,7 @@ interface Product {
   sellingPrice: number
   currency: string
   quantity: number
+  sku?: string
 }
 
 interface Customer {
@@ -51,9 +52,10 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
   const [showHeldCarts, setShowHeldCarts] = useState(false)
   const [isHolding, setIsHolding] = useState(false)
 
-  const filteredProducts = products.filter(p => 
-    p.name.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const filteredProducts = products.filter(p => {
+    const term = searchTerm.toLowerCase()
+    return p.name.toLowerCase().includes(term) || (p.sku && p.sku.toLowerCase().includes(term))
+  })
 
   const filteredCustomers = customers.filter(c => 
     c.fullName.toLowerCase().includes(customerSearch.toLowerCase())
