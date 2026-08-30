@@ -5,10 +5,12 @@ import { updateShopSettingsAction } from "@/app/actions/shop-settings"
 import { Store, Percent } from "lucide-react"
 
 export function ShopSettingsClient({ 
+  initialShopName,
   initialVat, 
   isVatEnabled,
   initialPrefix 
 }: { 
+  initialShopName: string
   initialVat: number
   isVatEnabled: boolean
   initialPrefix: string 
@@ -48,6 +50,23 @@ export function ShopSettingsClient({
       
       <form onSubmit={handleSubmit} className="space-y-6 max-w-sm">
         
+        <div className="space-y-4 p-4 border rounded-lg bg-muted/10">
+          <div className="flex items-center gap-2 font-medium text-foreground">
+            <Store className="h-4 w-4 text-primary" />
+            General Information
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Shop Name (Displayed on Receipts)</label>
+            <input 
+              name="shopName"
+              type="text" 
+              required
+              defaultValue={initialShopName}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" 
+            />
+          </div>
+        </div>
+
         <div className="space-y-4 p-4 border rounded-lg bg-muted/10">
           <div className="flex items-center gap-2 font-medium text-foreground">
             <Percent className="h-4 w-4 text-primary" />

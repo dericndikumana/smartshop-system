@@ -2,7 +2,7 @@
 
 import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
-import { Moon, Sun, Bell, User } from "lucide-react"
+import { Moon, Sun, User } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface HeaderProps {
@@ -34,9 +34,6 @@ export function Header({ user, hideBorder }: HeaderProps) {
       </div>
       
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
-          <Bell className="h-5 w-5" />
-        </Button>
         <Button 
           variant="ghost" 
           size="icon" 

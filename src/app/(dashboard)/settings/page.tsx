@@ -13,10 +13,12 @@ export default async function SettingsPage() {
 
   let vatSetting = null
   let shopSetting = null
+  let shopDetails = null
 
   if (session.user.role === "SHOP_ADMIN" && session.user.shopId) {
     vatSetting = await prisma.vatSetting.findUnique({ where: { shopId: session.user.shopId } })
     shopSetting = await prisma.shopSetting.findUnique({ where: { shopId: session.user.shopId } })
+    shopDetails = await prisma.shop.findUnique({ where: { id: session.user.shopId } })
   }
 
   return (
@@ -31,6 +33,7 @@ export default async function SettingsPage() {
       {session.user.role === "SHOP_ADMIN" && (
         <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-6 space-y-6">
           <ShopSettingsClient 
+            initialShopName={shopDetails?.name || ""}
             initialVat={vatSetting?.rate || 0} 
             isVatEnabled={vatSetting?.isEnabled ?? false}
             initialPrefix={shopSetting?.receiptPrefix || "SC-"} 

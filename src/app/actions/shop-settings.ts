@@ -14,8 +14,17 @@ export async function updateShopSettingsAction(formData: FormData) {
     const vatRate = parseFloat(formData.get("vatRate") as string)
     const isVatEnabled = formData.get("isVatEnabled") === "on"
     const receiptPrefix = formData.get("receiptPrefix") as string
+    const shopName = formData.get("shopName") as string
 
     await prisma.$transaction(async (tx) => {
+      // Update Shop Name
+      if (shopName) {
+        await tx.shop.update({
+          where: { id: session.user.shopId! },
+          data: { name: shopName }
+        })
+      }
+
       // Upsert VAT
       await tx.vatSetting.upsert({
         where: { shopId: session.user.shopId! },

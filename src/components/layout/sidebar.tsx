@@ -36,8 +36,11 @@ export function Sidebar({ role, onNavClick, isCollapsed, onToggleCollapse }: Sid
     ]
   } else if (role === "CASHIER") {
     navItems = [
+      { name: "Dashboard", href: "/", icon: LayoutDashboard },
       { name: "POS Terminal", href: "/pos", icon: ShoppingCart },
+      { name: "Inventory", href: "/inventory", icon: Package },
       { name: "My Receipts", href: "/sales", icon: Receipt },
+      { name: "Reports", href: "/reports", icon: FileText },
       { name: "My Settings", href: "/settings", icon: Settings },
     ]
   }

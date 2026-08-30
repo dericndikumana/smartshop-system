@@ -27,7 +27,7 @@ export default async function InventoryPage() {
       minStock: Number(p.minStock || 0),
     }))
 
-    return <InventoryClient products={serializedProducts} />
+    return <InventoryClient products={serializedProducts} userRole={session.user.role} />
   } catch (error) {
     return (
       <div className="p-10 bg-red-50 text-red-500 font-mono text-sm break-all overflow-auto h-screen">

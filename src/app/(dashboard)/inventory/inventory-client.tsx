@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { Package, Plus, Trash2, Search, AlertCircle, ArrowUp } from "lucide-react"
-import { createProductAction, deleteProductAction, addStockAction } from "@/app/actions/inventory"
+import { Package, Plus, Trash2, Search, AlertCircle, ArrowUp, Edit } from "lucide-react"
+import { createProductAction, deleteProductAction, addStockAction, editProductAction } from "@/app/actions/inventory"
 import { toast } from "sonner"
 
 const CURRENCIES = [
@@ -33,19 +33,29 @@ const getInitialsColor = (name: string) => {
   return colors[index % colors.length]
 }
 
-export function InventoryClient({ products: initialProducts }: { products: Product[] }) {
+export function InventoryClient({ products: initialProducts, userRole }: { products: Product[], userRole?: string }) {
   const [searchTerm, setSearchTerm] = useState("")
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState<"new" | "existing">("new")
+  const [activeTab, setActiveTab] = useState<"new" | "existing" | "edit">("new")
   const [isLoading, setIsLoading] = useState(false)
 
   // For existing stock add
   const [selectedProductId, setSelectedProductId] = useState("")
   const [quantityToAdd, setQuantityToAdd] = useState(1)
+  
+  // For editing
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 5
 
   const filteredProducts = initialProducts.filter(p => 
     p.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
+
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage)
+  const paginatedProducts = filteredProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
 
   async function handleCreateProduct(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -60,6 +70,24 @@ export function InventoryClient({ products: initialProducts }: { products: Produ
       toast.success("Product created successfully!")
       setIsModalOpen(false)
       ;(e.target as HTMLFormElement).reset()
+    }
+    
+    setIsLoading(false)
+  }
+
+  async function handleEditProduct(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    if (!editingProduct) return
+    setIsLoading(true)
+    
+    const formData = new FormData(e.currentTarget)
+    const result = await editProductAction(editingProduct.id, formData)
+    
+    if (result?.error) {
+      toast.error(result.error)
+    } else {
+      toast.success("Product updated successfully!")
+      setIsModalOpen(false)
     }
     
     setIsLoading(false)
@@ -112,13 +140,18 @@ export function InventoryClient({ products: initialProducts }: { products: Produ
             Manage your shop&apos;s products, stock levels, and pricing.
           </p>
         </div>
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors shadow-sm"
-        >
-          <Plus className="h-5 w-5" />
-          Add / Update Stock
-        </button>
+        {userRole !== "CASHIER" && (
+          <button 
+            onClick={() => {
+              setActiveTab("new")
+              setIsModalOpen(true)
+            }}
+            className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors shadow-sm"
+          >
+            <Plus className="h-5 w-5" />
+            Add / Update Stock
+          </button>
+        )}
       </div>
 
       <div className="rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden">
@@ -133,7 +166,10 @@ export function InventoryClient({ products: initialProducts }: { products: Produ
               type="text" 
               placeholder="Search products by name..." 
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value)
+                setCurrentPage(1)
+              }}
               className="w-full pl-9 rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all" 
             />
           </div>
@@ -145,19 +181,19 @@ export function InventoryClient({ products: initialProducts }: { products: Produ
                 <th className="px-6 py-4 font-medium">Product</th>
                 <th className="px-6 py-4 font-medium">Price</th>
                 <th className="px-6 py-4 font-medium">Stock Level</th>
-                <th className="px-6 py-4 font-medium text-right">Actions</th>
+                {userRole !== "CASHIER" && <th className="px-6 py-4 font-medium text-right">Actions</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
-              {filteredProducts.length === 0 ? (
+              {paginatedProducts.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-6 py-12 text-center text-muted-foreground">
+                  <td colSpan={userRole !== "CASHIER" ? 4 : 3} className="px-6 py-12 text-center text-muted-foreground">
                     <Package className="h-12 w-12 mx-auto mb-4 opacity-20" />
                     No products found. Add your first product to get started.
                   </td>
                 </tr>
               ) : (
-                filteredProducts.map((product) => (
+                paginatedProducts.map((product) => (
                   <tr key={product.id} className="hover:bg-muted/30 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
@@ -191,50 +227,95 @@ export function InventoryClient({ products: initialProducts }: { products: Produ
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-right flex justify-end gap-2">
-                      <button
-                        onClick={() => {
-                          setActiveTab("existing")
-                          setSelectedProductId(product.id)
-                          setIsModalOpen(true)
-                        }}
-                        className="p-2 text-primary hover:bg-primary/10 rounded-md transition-colors inline-flex items-center justify-center"
-                        title="Add Stock"
-                      >
-                        <ArrowUp className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(product.id, product.name)}
-                        className="p-2 text-red-600 hover:bg-red-500/10 rounded-md transition-colors inline-flex items-center justify-center"
-                        title="Delete Product"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </td>
+                    {userRole !== "CASHIER" && (
+                      <td className="px-6 py-4 text-right flex justify-end gap-2">
+                        <button
+                          onClick={() => {
+                            setActiveTab("edit")
+                            setEditingProduct(product)
+                            setIsModalOpen(true)
+                          }}
+                          className="p-2 text-primary hover:bg-primary/10 rounded-md transition-colors inline-flex items-center justify-center"
+                          title="Edit Product"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            setActiveTab("existing")
+                            setSelectedProductId(product.id)
+                            setIsModalOpen(true)
+                          }}
+                          className="p-2 text-primary hover:bg-primary/10 rounded-md transition-colors inline-flex items-center justify-center"
+                          title="Add Stock"
+                        >
+                          <ArrowUp className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(product.id, product.name)}
+                          className="p-2 text-red-600 hover:bg-red-500/10 rounded-md transition-colors inline-flex items-center justify-center"
+                          title="Delete Product"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 ))
               )}
             </tbody>
           </table>
         </div>
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-6 py-3 border-t bg-muted/10">
+            <p className="text-xs text-muted-foreground">
+              Showing <span className="font-medium">{((currentPage - 1) * itemsPerPage) + 1}</span> to <span className="font-medium">{Math.min(currentPage * itemsPerPage, filteredProducts.length)}</span> of <span className="font-medium">{filteredProducts.length}</span> products
+            </p>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-1 text-xs rounded-md border bg-background hover:bg-muted text-muted-foreground disabled:opacity-50 transition-colors"
+              >
+                Previous
+              </button>
+              <button
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 text-xs rounded-md border bg-background hover:bg-muted text-muted-foreground disabled:opacity-50 transition-colors"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
-      {isModalOpen && (
+      {isModalOpen && userRole !== "CASHIER" && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in duration-200 p-4">
           <div className="bg-card w-full max-w-md rounded-xl shadow-xl border overflow-hidden animate-in zoom-in-95 duration-200">
             <div className="flex border-b">
-              <button 
-                className={`flex-1 py-3 text-sm font-medium ${activeTab === "new" ? "bg-muted/50 border-b-2 border-primary text-primary" : "text-muted-foreground hover:bg-muted/30"}`}
-                onClick={() => setActiveTab("new")}
-              >
-                Create New Product
-              </button>
-              <button 
-                className={`flex-1 py-3 text-sm font-medium ${activeTab === "existing" ? "bg-muted/50 border-b-2 border-primary text-primary" : "text-muted-foreground hover:bg-muted/30"}`}
-                onClick={() => setActiveTab("existing")}
-              >
-                Add Stock to Existing
-              </button>
+              {activeTab === "edit" ? (
+                <button className="flex-1 py-3 text-sm font-medium bg-muted/50 border-b-2 border-primary text-primary">
+                  Edit Product
+                </button>
+              ) : (
+                <>
+                  <button 
+                    className={`flex-1 py-3 text-sm font-medium ${activeTab === "new" ? "bg-muted/50 border-b-2 border-primary text-primary" : "text-muted-foreground hover:bg-muted/30"}`}
+                    onClick={() => setActiveTab("new")}
+                  >
+                    Create New Product
+                  </button>
+                  <button 
+                    className={`flex-1 py-3 text-sm font-medium ${activeTab === "existing" ? "bg-muted/50 border-b-2 border-primary text-primary" : "text-muted-foreground hover:bg-muted/30"}`}
+                    onClick={() => setActiveTab("existing")}
+                  >
+                    Add Stock to Existing
+                  </button>
+                </>
+              )}
             </div>
             
             <div className="p-6">
@@ -290,6 +371,61 @@ export function InventoryClient({ products: initialProducts }: { products: Produ
                       className="px-4 py-2 text-sm font-medium rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-50"
                     >
                       {isLoading ? "Saving..." : "Create Product"}
+                    </button>
+                  </div>
+                </form>
+              ) : activeTab === "edit" && editingProduct ? (
+                <form onSubmit={handleEditProduct} className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Product Name</label>
+                    <input required name="name" type="text" defaultValue={editingProduct.name} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">SKU (Optional)</label>
+                    <input name="sku" type="text" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g. PRD-12345" />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Price</label>
+                      <input required name="sellingPrice" type="number" step="0.01" min="0" defaultValue={editingProduct.sellingPrice} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Currency</label>
+                      <select required name="currency" defaultValue={editingProduct.currency} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+                        {CURRENCIES.map(c => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Current Stock</label>
+                      <input required name="quantity" type="number" min="0" defaultValue={editingProduct.quantity} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Low Stock Alert At</label>
+                      <input required name="minStock" type="number" min="0" defaultValue={editingProduct.minStock} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-end gap-3 mt-8">
+                    <button 
+                      type="button" 
+                      onClick={() => setIsModalOpen(false)}
+                      className="px-4 py-2 text-sm font-medium rounded-md border hover:bg-muted transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      type="submit" 
+                      disabled={isLoading}
+                      className="px-4 py-2 text-sm font-medium rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-50"
+                    >
+                      {isLoading ? "Saving..." : "Update Product"}
                     </button>
                   </div>
                 </form>

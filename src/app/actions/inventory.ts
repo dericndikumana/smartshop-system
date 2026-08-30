@@ -58,6 +58,53 @@ export async function createProductAction(formData: FormData) {
   }
 }
 
+export async function editProductAction(productId: string, formData: FormData) {
+  try {
+    const session = await auth()
+    if (!session || !session.user.shopId || session.user.role === "CASHIER") {
+      return { success: false, error: "Unauthorized" }
+    }
+
+    const data = {
+      name: formData.get("name") as string,
+      sku: (formData.get("sku") as string) || undefined,
+      sellingPrice: formData.get("sellingPrice"),
+      currency: formData.get("currency") as string,
+      quantity: formData.get("quantity"),
+      minStock: formData.get("minStock"),
+    }
+
+    const validated = productSchema.parse(data)
+
+    await prisma.product.update({
+      where: { 
+        id: productId,
+        shopId: session.user.shopId
+      },
+      data: {
+        name: validated.name,
+        sku: validated.sku,
+        sellingPrice: validated.sellingPrice,
+        currency: validated.currency,
+        quantity: validated.quantity,
+        minStock: validated.minStock,
+        status: validated.quantity > 0 ? "IN_STOCK" : "OUT_OF_STOCK"
+      }
+    })
+
+    revalidatePath("/inventory")
+    revalidatePath("/pos")
+    return { success: true }
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      // @ts-expect-error ZodError generic typing mismatch
+      return { success: false, error: error.errors[0].message }
+    }
+    console.error("Edit Product Error:", error)
+    return { success: false, error: "An unexpected error occurred" }
+  }
+}
+
 export async function addStockAction(productId: string, quantityToAdd: number) {
   try {
     const session = await auth()
