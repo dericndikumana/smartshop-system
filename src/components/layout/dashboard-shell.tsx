@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Sidebar } from "./sidebar"
 import { Header } from "./header"
+import { Footer } from "./footer"
 import { MobileSidebarOverlay, MobileMenuButton } from "./mobile-nav"
 
 export function DashboardShell({ 
@@ -41,6 +42,7 @@ export function DashboardShell({
         <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-muted/20">
           {children}
         </main>
+        <Footer />
       </div>
     </div>
   )
