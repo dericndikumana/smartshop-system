@@ -4,18 +4,17 @@ import { useState } from "react"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
 
 export default function LoginForm() {
   const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    setError("")
 
     try {
       const res = await signIn("credentials", {
@@ -26,23 +25,22 @@ export default function LoginForm() {
 
       if (res?.error) {
         if (res.error === "suspended" || res.error === "CredentialsSignin") {
-          // If the auth throws "suspended", show custom message. Otherwise generic.
           if (res.error === "suspended" || res.error.includes("suspended")) {
-             setError("Your account has been suspended. Please contact the System Administrator to help you.")
+             toast.error("Your account has been suspended. Please contact the System Administrator to help you.")
           } else {
-             setError("Invalid email or password.")
+             toast.error("Invalid email or password.")
           }
         } else if (res.error.includes("suspended")) {
-           setError("Your account has been suspended. Please contact the System Administrator to help you.")
+           toast.error("Your account has been suspended. Please contact the System Administrator to help you.")
         } else {
-           setError(res.error)
+           toast.error(res.error)
         }
       } else {
         router.push("/")
         router.refresh()
       }
     } catch {
-      setError("An unexpected error occurred.")
+      toast.error("An unexpected error occurred.")
     } finally {
       setLoading(false)
     }
@@ -50,11 +48,6 @@ export default function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {error && (
-        <div className="p-3 text-sm text-red-500 bg-red-100 dark:bg-red-950/50 rounded-md border border-red-200 dark:border-red-900">
-          {error}
-        </div>
-      )}
       <div className="space-y-2">
         <label className="text-sm font-medium leading-none" htmlFor="email">
           Email Address

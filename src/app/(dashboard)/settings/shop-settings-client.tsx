@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { updateShopSettingsAction } from "@/app/actions/shop-settings"
 import { Store, Percent } from "lucide-react"
+import { toast } from "sonner"
 
 export function ShopSettingsClient({ 
   initialShopName,
@@ -16,22 +17,18 @@ export function ShopSettingsClient({
   initialPrefix: string 
 }) {
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState<string | null>(null)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setIsLoading(true)
-    setError(null)
-    setSuccess(null)
 
     const formData = new FormData(e.currentTarget)
     const result = await updateShopSettingsAction(formData)
 
     if (result.error) {
-      setError(result.error)
+      toast.error(result.error)
     } else if (result.success) {
-      setSuccess("Shop settings updated successfully.")
+      toast.success("Shop settings updated successfully.")
     }
     
     setIsLoading(false)
@@ -44,9 +41,6 @@ export function ShopSettingsClient({
         Store Configuration
       </h3>
       <p className="text-sm text-muted-foreground mb-6">Manage global settings for your shop tenant.</p>
-      
-      {error && <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-600 text-sm">{error}</div>}
-      {success && <div className="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-emerald-600 text-sm">{success}</div>}
       
       <form onSubmit={handleSubmit} className="space-y-6 max-w-sm">
         

@@ -31,10 +31,11 @@ export default function RootLayout({
             position="top-center" 
             toastOptions={{
               classNames: {
-                success: "bg-green-500 text-white border-green-600",
-                error: "bg-purple-600 text-white border-purple-700",
-                info: "bg-blue-500 text-white border-blue-600",
-                warning: "bg-amber-500 text-white border-amber-600",
+                toast: "w-full flex p-4 rounded-lg shadow-sm font-medium text-sm border",
+                success: "bg-[#e5f5ec] text-[#0f5132] border-[#c3e6cb]",
+                error: "bg-[#ffe5e5] text-[#b02a37] border-[#f5c2c7]",
+                info: "bg-blue-100 text-blue-800 border-blue-200",
+                warning: "bg-amber-100 text-amber-800 border-amber-200",
               }
             }}
           />

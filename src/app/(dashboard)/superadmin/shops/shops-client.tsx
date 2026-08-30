@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Store, Trash2, ShieldAlert, CheckCircle, Search, Plus, Edit, Key, ChevronLeft, ChevronRight } from "lucide-react"
 import { deleteShopAction, toggleShopStatusAction, createShopAction, editShopAdminAction, resetShopAdminPasswordAction, editShopAction } from "@/app/actions/superadmin"
+import { toast } from "sonner"
 
 interface Shop {
   id: string
@@ -27,13 +28,11 @@ export function ShopsClient({ shops: initialShops }: { shops: Shop[] }) {
   const [editShop, setEditShop] = useState<Shop | null>(null)
   
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
   // Actions
   async function handleEditShop(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setIsLoading(true)
-    setError(null)
     
     const formData = new FormData(e.currentTarget)
     formData.append("shopId", editShop!.id)
@@ -41,25 +40,26 @@ export function ShopsClient({ shops: initialShops }: { shops: Shop[] }) {
     const result = await editShopAction(formData)
     
     if (result?.error) {
-      setError(result.error)
+      toast.error(result.error)
     } else {
       setEditShop(null)
+      toast.success("Shop updated successfully.")
     }
     setIsLoading(false)
   }
   async function handleCreateShop(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setIsLoading(true)
-    setError(null)
     
     const formData = new FormData(e.currentTarget)
     const result = await createShopAction(formData)
     
     if (result?.error) {
-      setError(result.error)
+      toast.error(result.error)
     } else {
       setIsCreateOpen(false)
       ;(e.target as HTMLFormElement).reset()
+      toast.success("Shop created successfully.")
     }
     setIsLoading(false)
   }
@@ -67,7 +67,6 @@ export function ShopsClient({ shops: initialShops }: { shops: Shop[] }) {
   async function handleEditAdmin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setIsLoading(true)
-    setError(null)
     
     const formData = new FormData(e.currentTarget)
     formData.append("userId", editAdmin!.adminId)
@@ -75,9 +74,10 @@ export function ShopsClient({ shops: initialShops }: { shops: Shop[] }) {
     const result = await editShopAdminAction(formData)
     
     if (result?.error) {
-      setError(result.error)
+      toast.error(result.error)
     } else {
       setEditAdmin(null)
+      toast.success("Admin updated successfully.")
     }
     setIsLoading(false)
   }
@@ -88,9 +88,9 @@ export function ShopsClient({ shops: initialShops }: { shops: Shop[] }) {
     setIsLoading(true)
     const result = await resetShopAdminPasswordAction(userId)
     if (result?.error) {
-      alert(result.error)
+      toast.error(result.error)
     } else {
-      alert("Password reset to shop@123 successfully!")
+      toast.success("Password reset to shop@123 successfully!")
     }
     setIsLoading(false)
   }
@@ -100,6 +100,7 @@ export function ShopsClient({ shops: initialShops }: { shops: Shop[] }) {
     
     setIsLoading(true)
     await deleteShopAction(shopId)
+    toast.success("Shop deleted successfully.")
     setIsLoading(false)
   }
 
@@ -108,6 +109,7 @@ export function ShopsClient({ shops: initialShops }: { shops: Shop[] }) {
     
     setIsLoading(true)
     await toggleShopStatusAction(shopId, currentStatus)
+    toast.success(`Shop ${currentStatus === "ACTIVE" ? "suspended" : "activated"} successfully.`)
     setIsLoading(false)
   }
 
@@ -288,16 +290,10 @@ export function ShopsClient({ shops: initialShops }: { shops: Shop[] }) {
         )}
       </div>
 
-      {/* Create Modal */}
       {isCreateOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in duration-200 p-4">
           <div className="bg-card w-full max-w-md rounded-xl shadow-lg border p-6 animate-in zoom-in-95 duration-200">
             <h2 className="text-xl font-bold mb-4">Create New Shop & Admin</h2>
-            {error && (
-              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-600 text-sm">
-                {error}
-              </div>
-            )}
             <form onSubmit={handleCreateShop} className="space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Shop Name</label>
@@ -337,18 +333,11 @@ export function ShopsClient({ shops: initialShops }: { shops: Shop[] }) {
         </div>
       )}
 
-      {/* Edit Admin Modal */}
       {editAdmin && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in duration-200 p-4">
           <div className="bg-card w-full max-w-sm rounded-xl shadow-lg border p-6 animate-in zoom-in-95 duration-200">
             <h2 className="text-xl font-bold mb-1">Edit Shop Admin</h2>
             <p className="text-sm text-muted-foreground mb-4">Update details for {editAdmin.name}</p>
-            
-            {error && (
-              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-600 text-sm">
-                {error}
-              </div>
-            )}
             <form onSubmit={handleEditAdmin} className="space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Admin Full Name</label>
@@ -380,18 +369,11 @@ export function ShopsClient({ shops: initialShops }: { shops: Shop[] }) {
         </div>
       )}
 
-      {/* Edit Shop Modal */}
       {editShop && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in duration-200 p-4">
           <div className="bg-card w-full max-w-sm rounded-xl shadow-lg border p-6 animate-in zoom-in-95 duration-200">
             <h2 className="text-xl font-bold mb-1">Edit Shop Details</h2>
             <p className="text-sm text-muted-foreground mb-4">Update details for {editShop.name}</p>
-            
-            {error && (
-              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-600 text-sm">
-                {error}
-              </div>
-            )}
             <form onSubmit={handleEditShop} className="space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Shop Name</label>

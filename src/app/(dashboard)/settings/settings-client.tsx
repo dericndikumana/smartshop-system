@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { updatePasswordAction, updateProfileInfoAction } from "@/app/actions/user"
 import { Lock, User } from "lucide-react"
+import { toast } from "sonner"
 
 interface SettingsClientProps {
   userRole: string
@@ -12,26 +13,19 @@ interface SettingsClientProps {
 
 export function SettingsClient({ userRole, initialName, initialEmail }: SettingsClientProps) {
   const [isPwdLoading, setIsPwdLoading] = useState(false)
-  const [pwdError, setPwdError] = useState<string | null>(null)
-  const [pwdSuccess, setPwdSuccess] = useState<string | null>(null)
-
   const [isProfLoading, setIsProfLoading] = useState(false)
-  const [profError, setProfError] = useState<string | null>(null)
-  const [profSuccess, setProfSuccess] = useState<string | null>(null)
 
   async function handleProfileSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setIsProfLoading(true)
-    setProfError(null)
-    setProfSuccess(null)
 
     const formData = new FormData(e.currentTarget)
     const result = await updateProfileInfoAction(formData)
 
     if (result.error) {
-      setProfError(result.error)
+      toast.error(result.error)
     } else if (result.success) {
-      setProfSuccess(result.message || "Profile updated!")
+      toast.success(result.message || "Profile updated successfully.")
     }
     
     setIsProfLoading(false)
@@ -40,16 +34,14 @@ export function SettingsClient({ userRole, initialName, initialEmail }: Settings
   async function handlePasswordSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setIsPwdLoading(true)
-    setPwdError(null)
-    setPwdSuccess(null)
 
     const formData = new FormData(e.currentTarget)
     const result = await updatePasswordAction(formData)
 
     if (result.error) {
-      setPwdError(result.error)
+      toast.error(result.error)
     } else if (result.success) {
-      setPwdSuccess(result.message || "Password updated!")
+      toast.success(result.message || "Password updated successfully.")
       ;(e.target as HTMLFormElement).reset()
     }
     
@@ -64,9 +56,6 @@ export function SettingsClient({ userRole, initialName, initialEmail }: Settings
           Edit Profile
         </h3>
         <p className="text-sm text-muted-foreground mb-4">Update your name and email address.</p>
-        
-        {profError && <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-600 text-sm">{profError}</div>}
-        {profSuccess && <div className="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-emerald-600 text-sm">{profSuccess}</div>}
         
         <form onSubmit={handleProfileSubmit} className="space-y-4 max-w-sm">
           <div className="space-y-2">
@@ -106,9 +95,6 @@ export function SettingsClient({ userRole, initialName, initialEmail }: Settings
             Security
           </h3>
           <p className="text-sm text-muted-foreground mb-4">Update your account password.</p>
-          
-          {pwdError && <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-600 text-sm">{pwdError}</div>}
-          {pwdSuccess && <div className="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-emerald-600 text-sm">{pwdSuccess}</div>}
           
           <form onSubmit={handlePasswordSubmit} className="space-y-4 max-w-sm">
             <div className="space-y-2">
