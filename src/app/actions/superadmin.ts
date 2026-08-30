@@ -111,3 +111,54 @@ export async function toggleUserStatusAction(userId: string, currentStatus: stri
     return { success: false, error: "An unexpected error occurred" }
   }
 }
+
+export async function deleteShopAction(shopId: string) {
+  try {
+    const session = await auth()
+    if (!session || session.user.role !== "SUPER_ADMIN") {
+      return { success: false, error: "Unauthorized" }
+    }
+
+    await prisma.$transaction(async (tx) => {
+      // First delete all users associated with this shop manually because schema doesn't cascade
+      await tx.user.deleteMany({
+        where: { shopId }
+      })
+
+      // Then delete the shop (cascades everything else)
+      await tx.shop.delete({
+        where: { id: shopId }
+      })
+    })
+
+    revalidatePath("/superadmin/shops")
+    revalidatePath("/superadmin")
+    return { success: true }
+  } catch (error) {
+    console.error("Delete Shop Error:", error)
+    return { success: false, error: "An unexpected error occurred" }
+  }
+}
+
+export async function toggleShopStatusAction(shopId: string, currentStatus: string) {
+  try {
+    const session = await auth()
+    if (!session || session.user.role !== "SUPER_ADMIN") {
+      return { success: false, error: "Unauthorized" }
+    }
+
+    const newStatus = currentStatus === "ACTIVE" ? "BLOCKED" : "ACTIVE"
+
+    await prisma.shop.update({
+      where: { id: shopId },
+      data: { status: newStatus }
+    })
+
+    revalidatePath("/superadmin/shops")
+    revalidatePath("/superadmin")
+    return { success: true }
+  } catch (error) {
+    console.error("Toggle Shop Status Error:", error)
+    return { success: false, error: "An unexpected error occurred" }
+  }
+}

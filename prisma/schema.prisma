@@ -113,6 +113,9 @@ model Product {
   shopId       String
   shop         Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
 
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
   saleItems         SaleItem[]
   heldCartItems     HeldCartItem[]
   stockTransactions StockTransaction[]

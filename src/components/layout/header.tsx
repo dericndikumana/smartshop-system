@@ -3,6 +3,7 @@
 import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
 import { Moon, Sun, Bell, User } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 interface HeaderProps {
   user: {
@@ -11,9 +12,10 @@ interface HeaderProps {
     role?: string
     shopId?: string | null
   }
+  hideBorder?: boolean
 }
 
-export function Header({ user }: HeaderProps) {
+export function Header({ user, hideBorder }: HeaderProps) {
   const { setTheme, theme } = useTheme()
 
   const getRoleLabel = (role?: string) => {
@@ -24,7 +26,7 @@ export function Header({ user }: HeaderProps) {
   }
 
   return (
-    <header className="flex items-center justify-between px-6 py-3 border-b bg-background sticky top-0 z-10 shadow-sm">
+    <header className={cn("flex items-center justify-between px-6 py-3 bg-background", !hideBorder && "border-b sticky top-0 z-10 shadow-sm")}>
       <div className="flex items-center gap-4">
         <h2 className="text-lg font-semibold hidden md:block">
           {user.role === "SUPER_ADMIN" ? "System Overview" : "Dashboard"}

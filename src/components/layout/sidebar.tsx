@@ -7,9 +7,10 @@ import { signOut } from "next-auth/react"
 
 interface SidebarProps {
   role: string
+  onNavClick?: () => void
 }
 
-export function Sidebar({ role }: SidebarProps) {
+export function Sidebar({ role, onNavClick }: SidebarProps) {
   const pathname = usePathname()
   
   // Define navigation based on Role
@@ -40,13 +41,11 @@ export function Sidebar({ role }: SidebarProps) {
   }
 
   return (
-    <div className="w-64 border-r h-screen bg-card flex flex-col hidden md:flex">
-      <div className="p-6 border-b flex items-center justify-center">
-        <div className="text-center">
+    <div className="w-64 border-r h-full bg-card flex flex-col">
+        <div className="p-6 border-b flex items-center justify-center">
           <h1 className="text-2xl font-bold tracking-tight text-primary">shopCore</h1>
           <p className="text-[10px] text-muted-foreground mt-1 tracking-widest uppercase font-semibold">System v1.0</p>
         </div>
-      </div>
       
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
@@ -55,6 +54,7 @@ export function Sidebar({ role }: SidebarProps) {
             <Link
               key={item.href}
               href={item.href}
+              onClick={onNavClick}
               className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors",
                 isActive 
