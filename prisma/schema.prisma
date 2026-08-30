@@ -1,0 +1,324 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Shop {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String?
+  email     String?
+  address   String?
+  logo      String?
+  status    String   @default("ACTIVE") // ACTIVE, BLOCKED, INACTIVE
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users              User[]
+  products           Product[]
+  categories         Category[]
+  customers          Customer[]
+  sales              Sale[]
+  heldCarts          HeldCart[]
+  stockTransactions  StockTransaction[]
+  vatSetting         VatSetting?
+  shopSetting        ShopSetting?
+  activityLogs       ActivityLog[]
+  returns            Return[]
+  receipts           Receipt[]
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique // SUPER_ADMIN, SHOP_ADMIN, CASHIER
+  description String?
+  
+  users       User[]
+  permissions RolePermission[]
+}
+
+model Permission {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+
+  roles       RolePermission[]
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  status    String   @default("ACTIVE") // ACTIVE, BLOCKED, INACTIVE
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  roleId    String
+  role      Role     @relation(fields: [roleId], references: [id])
+
+  shopId    String?
+  shop      Shop?    @relation(fields: [shopId], references: [id])
+
+  sales             Sale[]
+  heldCarts         HeldCart[]
+  stockTransactions StockTransaction[]
+  activityLogs      ActivityLog[]
+  returns           Return[]
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String
+  shopId    String
+  shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  products  Product[]
+
+  @@unique([name, shopId])
+}
+
+model Product {
+  id           String   @id @default(cuid())
+  name         String
+  sku          String?
+  barcode      String?
+  description  String?
+  buyingPrice  Float?
+  sellingPrice Float
+  currency     String   @default("RWF")
+  quantity     Int      @default(0)
+  minStock     Int      @default(5)
+  supplier     String?
+  expiryDate   DateTime?
+  status       String   @default("IN_STOCK") // IN_STOCK, LOW_STOCK, OUT_OF_STOCK, INACTIVE
+  imageUrl     String?
+  
+  categoryId   String?
+  category     Category? @relation(fields: [categoryId], references: [id])
+
+  shopId       String
+  shop         Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  saleItems         SaleItem[]
+  heldCartItems     HeldCartItem[]
+  stockTransactions StockTransaction[]
+  returnItems       ReturnItem[]
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  fullName  String
+  phone     String?
+  email     String?
+  address   String?
+  
+  shopId    String
+  shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  sales     Sale[]
+  heldCarts HeldCart[]
+  returns   Return[]
+}
+
+model Currency {
+  id        String   @id @default(cuid())
+  code      String   @unique // RWF, USD, EUR, etc.
+  name      String
+  symbol    String
+  isActive  Boolean  @default(true)
+}
+
+model Sale {
+  id            String   @id @default(cuid())
+  receiptNumber String
+  totalAmount   Float
+  vatAmount     Float    @default(0)
+  vatRate       Float    @default(0)
+  currency      String   @default("RWF")
+  createdAt     DateTime @default(now())
+
+  cashierId     String
+  cashier       User     @relation(fields: [cashierId], references: [id])
+
+  customerId    String?
+  customer      Customer? @relation(fields: [customerId], references: [id])
+
+  shopId        String
+  shop          Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  items         SaleItem[]
+  payments      Payment[]
+  receipt       Receipt?
+  returns       Return[]
+
+  @@unique([receiptNumber, shopId])
+}
+
+model SaleItem {
+  id           String  @id @default(cuid())
+  quantity     Int
+  unitPrice    Float
+  subtotal     Float
+  currency     String
+  
+  saleId       String
+  sale         Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
+
+  productId    String
+  product      Product @relation(fields: [productId], references: [id])
+}
+
+model Payment {
+  id            String   @id @default(cuid())
+  method        String   // CASH, MOBILE_MONEY, CARD, BANK_TRANSFER
+  amountReceived Float
+  change        Float    @default(0)
+  currency      String
+  createdAt     DateTime @default(now())
+
+  saleId        String
+  sale          Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
+}
+
+model HeldCart {
+  id        String   @id @default(cuid())
+  name      String?  // Optional reference name
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cashierId String
+  cashier   User     @relation(fields: [cashierId], references: [id])
+
+  customerId String?
+  customer   Customer? @relation(fields: [customerId], references: [id])
+
+  shopId    String
+  shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  items     HeldCartItem[]
+}
+
+model HeldCartItem {
+  id        String  @id @default(cuid())
+  quantity  Int
+  unitPrice Float
+  currency  String
+
+  heldCartId String
+  heldCart   HeldCart @relation(fields: [heldCartId], references: [id], onDelete: Cascade)
+
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id])
+}
+
+model StockTransaction {
+  id        String   @id @default(cuid())
+  type      String   // STOCK_IN, STOCK_OUT, SALE, RETURN, ADJUSTMENT
+  quantity  Int      // Positive or negative
+  reason    String?
+  createdAt DateTime @default(now())
+
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  shopId    String
+  shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+}
+
+model VatSetting {
+  id        String   @id @default(cuid())
+  rate      Float    // e.g. 18.0
+  isEnabled Boolean  @default(true)
+
+  shopId    String   @unique
+  shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+}
+
+model ShopSetting {
+  id              String   @id @default(cuid())
+  receiptFooter   String?
+  receiptLogo     String?
+  receiptContact  String?
+  receiptPrefix   String   @default("SC-")
+  nextReceiptSeq  Int      @default(1)
+  
+  shopId          String   @unique
+  shop            Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+}
+
+model ActivityLog {
+  id          String   @id @default(cuid())
+  action      String
+  description String
+  createdAt   DateTime @default(now())
+
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
+
+  shopId      String?
+  shop        Shop?    @relation(fields: [shopId], references: [id], onDelete: Cascade)
+}
+
+model Return {
+  id            String   @id @default(cuid())
+  reason        String?
+  totalRefund   Float
+  currency      String
+  createdAt     DateTime @default(now())
+
+  saleId        String
+  sale          Sale     @relation(fields: [saleId], references: [id])
+
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+
+  customerId    String?
+  customer      Customer? @relation(fields: [customerId], references: [id])
+
+  shopId        String
+  shop          Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  items         ReturnItem[]
+}
+
+model ReturnItem {
+  id        String   @id @default(cuid())
+  quantity  Int
+  refund    Float
+
+  returnId  String
+  return    Return   @relation(fields: [returnId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+}
+
+model Receipt {
+  id          String   @id @default(cuid())
+  receiptNum  String
+  printedAt   DateTime @default(now())
+  reprints    Int      @default(0)
+  
+  saleId      String   @unique
+  sale        Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
+
+  shopId      String
+  shop        Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+}
