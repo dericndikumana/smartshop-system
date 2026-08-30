@@ -18,10 +18,12 @@ export default async function InventoryPage() {
   })
 
   const serializedProducts = products.map(p => ({
-    ...p,
-    createdAt: p.createdAt.toISOString(),
-    updatedAt: p.updatedAt.toISOString(),
-    expiryDate: p.expiryDate?.toISOString() || null
+    id: p.id,
+    name: p.name,
+    sellingPrice: Number(p.sellingPrice),
+    currency: p.currency,
+    quantity: p.quantity,
+    minStock: Number(p.minStock),
   }))
 
   // We are not uploading images, just passing data

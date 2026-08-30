@@ -31,7 +31,7 @@ export default async function POSPage() {
   const serializedProducts = products.map(p => ({
     id: p.id,
     name: p.name,
-    sellingPrice: p.sellingPrice,
+    sellingPrice: Number(p.sellingPrice),
     currency: p.currency,
     quantity: p.quantity,
   }))
@@ -39,7 +39,7 @@ export default async function POSPage() {
   return (
     <POSClient 
       products={serializedProducts} 
-      vatRate={vatSetting?.isEnabled ? vatSetting.rate : 0}
+      vatRate={Number(vatSetting?.isEnabled ? vatSetting.rate : 0)}
     />
   )
 }
