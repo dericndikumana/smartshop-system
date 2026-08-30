@@ -51,7 +51,7 @@ export default async function ReportsPage() {
       receiptNumber: sale.receiptNumber,
       cashierId: sale.cashier.id,
       cashierName: sale.cashier.name,
-      customerName: sale.customer?.fullName || "Walk-in Customer",
+      customerName: sale.customer?.fullName || "Walk-in",
       date: sale.createdAt.toISOString(),
       itemsSold: itemsSoldList,
       totalsByCurrency

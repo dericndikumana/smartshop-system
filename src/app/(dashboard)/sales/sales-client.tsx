@@ -197,7 +197,7 @@ export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
                 <p className="text-gray-500 mt-1">Receipt: {selectedSale.receiptNumber}</p>
                 <p className="text-gray-500">Date: {new Date(selectedSale.createdAt).toLocaleString()}</p>
                 <p className="text-gray-500">Cashier: {selectedSale.cashierName}</p>
-                {selectedSale.customerName && <p className="text-gray-500">Customer: {selectedSale.customerName}</p>}
+                <p className="text-gray-500">Customer: {selectedSale.customerName || "Walk-in"}</p>
               </div>
 
               <div className="border-t border-dashed border-gray-300 py-4 mb-4">
