@@ -4,13 +4,31 @@ import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
 import { Moon, Sun, Bell, User } from "lucide-react"
 
-export function Header() {
+interface HeaderProps {
+  user: {
+    name?: string | null
+    email?: string | null
+    role?: string
+    shopId?: string | null
+  }
+}
+
+export function Header({ user }: HeaderProps) {
   const { setTheme, theme } = useTheme()
+
+  const getRoleLabel = (role?: string) => {
+    if (role === "SUPER_ADMIN") return "SUPER ADMIN"
+    if (role === "SHOP_ADMIN") return "SHOP ADMIN"
+    if (role === "CASHIER") return "CASHIER"
+    return "USER"
+  }
 
   return (
     <header className="flex items-center justify-between px-6 py-3 border-b bg-background sticky top-0 z-10 shadow-sm">
       <div className="flex items-center gap-4">
-        <h2 className="text-lg font-semibold hidden md:block">Overview</h2>
+        <h2 className="text-lg font-semibold hidden md:block">
+          {user.role === "SUPER_ADMIN" ? "System Overview" : "Dashboard"}
+        </h2>
       </div>
       
       <div className="flex items-center gap-4">
@@ -32,8 +50,8 @@ export function Header() {
             <User className="h-5 w-5 text-primary" />
           </div>
           <div className="text-sm hidden sm:block">
-            <p className="font-semibold leading-none">Deric</p>
-            <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider mt-1">SUPER ADMIN</p>
+            <p className="font-semibold leading-none">{user.name || user.email?.split("@")[0] || "User"}</p>
+            <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider mt-1">{getRoleLabel(user.role)}</p>
           </div>
         </div>
       </div>
