@@ -31,6 +31,7 @@ export function DashboardShell({
       
       {/* Sidebar Wrapper */}
       <div className={`
+        print:hidden
         fixed inset-y-0 left-0 z-50 transform transition-all duration-300 ease-in-out md:relative md:translate-x-0
         ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
         ${isDesktopCollapsed ? "md:w-20" : "md:w-64"} w-64
@@ -45,16 +46,18 @@ export function DashboardShell({
 
       {/* Main Content */}
       <div className="flex flex-col flex-1 overflow-hidden min-w-0">
-        <div className="flex items-center px-4 md:px-0 bg-background border-b md:border-b-0 sticky top-0 z-10 shadow-sm md:shadow-none">
+        <div className="flex items-center px-4 md:px-0 bg-background border-b md:border-b-0 sticky top-0 z-10 shadow-sm md:shadow-none print:hidden">
           <MobileMenuButton onClick={() => setIsSidebarOpen(true)} />
           <div className="flex-1">
             <Header user={user} shopName={shopName} hideBorder />
           </div>
         </div>
-        <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-muted/20">
+        <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-muted/20 print:p-0 print:bg-white print:overflow-visible">
           {children}
         </main>
-        <Footer />
+        <div className="print:hidden">
+          <Footer />
+        </div>
       </div>
     </div>
   )
