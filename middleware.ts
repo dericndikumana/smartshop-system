@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server'
-import { auth } from './src/lib/auth'
+import NextAuth from 'next-auth'
+import { authConfig } from './src/lib/auth.config'
 
-export default auth((req) => {
+const { auth: middleware } = NextAuth(authConfig)
+
+export default middleware((req) => {
   const isLoggedIn = !!req.auth
   const isOnDashboard = req.nextUrl.pathname.startsWith('/') && !req.nextUrl.pathname.startsWith('/login')
   const isApiAuthRoute = req.nextUrl.pathname.startsWith('/api/auth')
@@ -28,7 +31,7 @@ export default auth((req) => {
     }
 
     // Role-based protection: Super Admin
-    if (req.nextUrl.pathname.startsWith('/super-admin') && user.role !== 'SUPER_ADMIN') {
+    if (req.nextUrl.pathname.startsWith('/superadmin') && user.role !== 'SUPER_ADMIN') {
       return NextResponse.redirect(new URL('/', req.nextUrl))
     }
 
