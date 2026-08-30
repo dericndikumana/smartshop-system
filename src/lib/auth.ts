@@ -18,12 +18,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         
         const user = await prisma.user.findUnique({
           where: { email: credentials.email as string },
-          include: { role: true }
+          include: { role: true, shop: true }
         })
 
         if (!user) return null
 
-        if (user.status === "BLOCKED" || user.status === "INACTIVE") {
+        if (user.status === "BLOCKED" || user.status === "INACTIVE" || user.shop?.status === "BLOCKED") {
           throw new Error("suspended")
         }
 

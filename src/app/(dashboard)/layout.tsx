@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { DashboardShell } from "@/components/layout/dashboard-shell"
 import { ForceLogout } from "@/components/auth/force-logout"
+import { SessionGuard } from "@/components/auth/session-guard"
 
 export const dynamic = 'force-dynamic'
 
@@ -20,24 +21,18 @@ export default async function DashboardLayout({
   
   const dbUser = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { status: true, shopId: true }
+    select: { status: true, shopId: true, shop: { select: { status: true, name: true } } }
   })
 
-  if (!dbUser || dbUser.status === "BLOCKED" || dbUser.status === "INACTIVE") {
+  if (!dbUser || dbUser.status === "BLOCKED" || dbUser.status === "INACTIVE" || dbUser.shop?.status === "BLOCKED") {
     return <ForceLogout />
   }
 
-  let shopName = undefined
-  if (dbUser.shopId) {
-    const shop = await prisma.shop.findUnique({
-      where: { id: dbUser.shopId },
-      select: { name: true }
-    })
-    shopName = shop?.name
-  }
+  const shopName = dbUser.shop?.name
 
   return (
     <DashboardShell user={session.user} shopName={shopName}>
+      <SessionGuard />
       {children}
     </DashboardShell>
   )
