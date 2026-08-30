@@ -60,7 +60,7 @@ export default function LoginPage() {
             <p>If you don&apos;t have an account, please contact the System Administrator to guide you:</p>
             <div className="mt-3 flex flex-col gap-1 items-center justify-center font-medium text-foreground">
               <span className="flex items-center gap-2">
-                <span className="text-primary">📞</span> +250781096567
+                <span className="text-primary">📞</span> +250781096567 <span className="text-xs text-green-600 bg-green-100 px-1.5 py-0.5 rounded-full ml-1 font-bold">WhatsApp</span>
               </span>
               <span className="flex items-center gap-2">
                 <span className="text-primary">✉️</span> ndikumanaderic2@gmail.com

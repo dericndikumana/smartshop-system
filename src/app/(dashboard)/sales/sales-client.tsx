@@ -46,6 +46,30 @@ export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
     window.print()
   }
 
+  const sendToWhatsApp = () => {
+    if (!selectedSale) return
+
+    let text = `*${selectedSale.shopName}*\n`
+    text += `Receipt: ${selectedSale.receiptNumber}\n`
+    text += `Date: ${new Date(selectedSale.createdAt).toLocaleString()}\n\n`
+    
+    text += `*Items:*\n`
+    selectedSale.items.forEach(item => {
+      text += `${item.quantity}x ${item.name} - ${item.currency} ${item.subtotal.toLocaleString()}\n`
+    })
+
+    text += `\n*Total Due:*\n`
+    Object.entries(selectedSale.totalsByCurrency).forEach(([currency, total]) => {
+      const finalTotal = total + (total * (selectedSale.vatRate / 100))
+      text += `${currency} ${finalTotal.toLocaleString()}\n`
+    })
+
+    text += `\nThank you for your business!`
+
+    const url = `https://wa.me/?text=${encodeURIComponent(text)}`
+    window.open(url, '_blank')
+  }
+
   return (
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 print:hidden">
@@ -174,10 +198,24 @@ export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
             <div className="flex items-center justify-between p-4 border-b bg-muted/10 print:hidden">
               <h2 className="font-bold text-lg">Receipt Details</h2>
               <div className="flex items-center gap-2">
-                <button onClick={printReceipt} className="p-2 text-muted-foreground hover:text-foreground rounded-md transition-colors">
+                <button 
+                  onClick={sendToWhatsApp} 
+                  className="px-3 py-1.5 text-xs font-bold bg-[#25D366] text-white rounded-md hover:bg-[#128C7E] transition-colors flex items-center gap-1"
+                  title="Send via WhatsApp"
+                >
+                  WhatsApp
+                </button>
+                <button 
+                  onClick={printReceipt} 
+                  className="p-2 bg-primary/10 text-primary hover:bg-primary/20 rounded-md transition-colors"
+                  title="Print Receipt"
+                >
                   <Printer className="h-4 w-4" />
                 </button>
-                <button onClick={() => setSelectedSale(null)} className="p-2 text-muted-foreground hover:text-foreground rounded-md transition-colors">
+                <button 
+                  onClick={() => setSelectedSale(null)} 
+                  className="p-2 text-muted-foreground hover:bg-muted rounded-md transition-colors"
+                >
                   <X className="h-4 w-4" />
                 </button>
               </div>
@@ -246,7 +284,7 @@ export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
 
               <div className="text-center mt-8 text-gray-500">
                 <p>Thank you for your business!</p>
-                <p className="text-xs mt-1">Powered by shopCore</p>
+                <p className="text-xs mt-1">Powered by SmartShop</p>
               </div>
             </div>
           </div>

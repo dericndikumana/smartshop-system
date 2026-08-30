@@ -39,7 +39,12 @@ export default async function ReportsPage() {
 
   // Format details for the new table
   const detailedTransactions = sales.map(sale => {
-    const totalAmount = sale.items.reduce((sum, item) => sum + item.subtotal + (item.subtotal * (sale.vatRate / 100)), 0)
+    const totalsByCurrency = sale.items.reduce((acc, item) => {
+      const sub = item.subtotal + (item.subtotal * (sale.vatRate / 100))
+      acc[item.currency] = (acc[item.currency] || 0) + sub
+      return acc
+    }, {} as Record<string, number>)
+    
     const itemsSoldList = sale.items.map(item => `${item.product.name} ${item.product.sku ? `(${item.product.sku})` : ''} (x${item.quantity})`).join(", ")
     return {
       id: sale.id,
@@ -49,8 +54,7 @@ export default async function ReportsPage() {
       customerName: sale.customer?.fullName || "Walk-in Customer",
       date: sale.createdAt.toISOString(),
       itemsSold: itemsSoldList,
-      totalAmount,
-      currency: sale.currency
+      totalsByCurrency
     }
   })
 

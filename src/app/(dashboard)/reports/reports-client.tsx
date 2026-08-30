@@ -11,8 +11,7 @@ interface Transaction {
   customerName: string
   date: string
   itemsSold: string
-  totalAmount: number
-  currency: string
+  totalsByCurrency: Record<string, number>
 }
 
 interface ReportsClientProps {
@@ -74,7 +73,9 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
 
   const totalsByCurrency = useMemo(() => {
     return filteredTransactions.reduce((acc, tx) => {
-      acc[tx.currency] = (acc[tx.currency] || 0) + tx.totalAmount
+      Object.entries(tx.totalsByCurrency).forEach(([curr, total]) => {
+        acc[curr] = (acc[curr] || 0) + total
+      })
       return acc
     }, {} as Record<string, number>)
   }, [filteredTransactions])
@@ -207,7 +208,11 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
                         <td className="px-6 py-4 text-muted-foreground">{tx.cashierName}</td>
                       )}
                       <td className="px-6 py-4 text-right font-semibold text-foreground">
-                        {tx.currency} {tx.totalAmount.toLocaleString()}
+                        <div className="flex flex-col gap-1 items-end">
+                          {Object.entries(tx.totalsByCurrency).map(([curr, total]) => (
+                            <span key={curr}>{curr} {total.toLocaleString()}</span>
+                          ))}
+                        </div>
                       </td>
                     </tr>
                   ))
