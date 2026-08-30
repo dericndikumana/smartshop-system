@@ -72,6 +72,13 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
   const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage)
   const paginatedTransactions = filteredTransactions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
 
+  const totalsByCurrency = useMemo(() => {
+    return filteredTransactions.reduce((acc, tx) => {
+      acc[tx.currency] = (acc[tx.currency] || 0) + tx.totalAmount
+      return acc
+    }, {} as Record<string, number>)
+  }, [filteredTransactions])
+
   return (
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-5xl mx-auto w-full">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 print:hidden">
@@ -206,6 +213,24 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
                   ))
                 )}
               </tbody>
+              <tfoot className="bg-muted/10 font-bold border-t border-border/50">
+                <tr>
+                  <td colSpan={userRole === "SHOP_ADMIN" && selectedCashier === "ALL" ? 3 : 2} className="px-6 py-4 text-right">
+                    Total:
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <div className="flex flex-col gap-1 justify-end items-end">
+                      {Object.entries(totalsByCurrency).length === 0 ? (
+                        <span>0.00</span>
+                      ) : (
+                        Object.entries(totalsByCurrency).map(([currency, total]) => (
+                          <span key={currency} className="text-primary">{currency} {total.toLocaleString()}</span>
+                        ))
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              </tfoot>
             </table>
             
             {/* Pagination Controls */}

@@ -56,6 +56,17 @@ export default function LoginPage() {
             </p>
           </div>
           <LoginForm />
+          <div className="mt-8 text-center text-sm text-muted-foreground bg-background p-4 rounded-xl border shadow-sm">
+            <p>If you don&apos;t have an account, please contact the System Administrator to guide you:</p>
+            <div className="mt-3 flex flex-col gap-1 items-center justify-center font-medium text-foreground">
+              <span className="flex items-center gap-2">
+                <span className="text-primary">📞</span> +250781096567
+              </span>
+              <span className="flex items-center gap-2">
+                <span className="text-primary">✉️</span> ndikumanaderic2@gmail.com
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

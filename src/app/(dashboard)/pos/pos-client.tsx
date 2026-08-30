@@ -163,6 +163,42 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
     }
   }
 
+  const handleDirectCheckout = async (heldCart: HeldCart) => {
+    setIsCheckingOut(true)
+
+    // Attempt to extract customer name
+    let custName = undefined
+    const match = heldCart.name.match(/^(.*?)\s*\(\d+ item/)
+    if (match && match[1] && match[1] !== "Walk-in") {
+      custName = match[1]
+    }
+
+    const primaryCurr = heldCart.items.length > 0 ? heldCart.items[0].currency : "RWF"
+
+    const payload = {
+      items: heldCart.items.map(item => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        currency: item.currency
+      })),
+      vatRate,
+      primaryCurrency: primaryCurr,
+      customerName: custName
+    }
+
+    const result = await checkoutAction(payload)
+    if (result.error) {
+      toast.error(result.error)
+    } else {
+      await deleteHeldCartAction(heldCart.id)
+      toast.success(`Sale completed successfully! Receipt generated.`)
+      if (heldCarts.length <= 1) setShowHeldCarts(false)
+    }
+    
+    setIsCheckingOut(false)
+  }
+
   const handleCheckout = async () => {
     if (cart.length === 0) return
     setIsCheckingOut(true)
@@ -436,15 +472,25 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
                       <div className="flex gap-2">
                         <button 
                           onClick={() => deleteHeldCartAction(hc.id)}
-                          className="px-3 py-1.5 text-sm font-medium border border-red-200 text-red-600 rounded-md hover:bg-red-50 transition-colors"
+                          disabled={isCheckingOut}
+                          className="px-3 py-1.5 text-sm font-medium border border-red-200 text-red-600 rounded-md hover:bg-red-50 transition-colors disabled:opacity-50"
                         >
                           Discard
                         </button>
                         <button 
                           onClick={() => handleResumeCart(hc)}
-                          className="px-3 py-1.5 text-sm font-medium bg-primary/10 text-primary rounded-md hover:bg-primary/20 transition-colors"
+                          disabled={isCheckingOut}
+                          className="px-3 py-1.5 text-sm font-medium bg-primary/10 text-primary rounded-md hover:bg-primary/20 transition-colors disabled:opacity-50"
                         >
                           Resume
+                        </button>
+                        <button 
+                          onClick={() => handleDirectCheckout(hc)}
+                          disabled={isCheckingOut}
+                          className="px-3 py-1.5 text-sm font-medium bg-emerald-500/10 text-emerald-600 rounded-md hover:bg-emerald-500/20 transition-colors flex items-center gap-1 disabled:opacity-50"
+                        >
+                          <CreditCard className="h-3.5 w-3.5" />
+                          Checkout
                         </button>
                       </div>
                     </div>
