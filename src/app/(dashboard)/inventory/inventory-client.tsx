@@ -1,11 +1,16 @@
 "use client"
 
 import { useState } from "react"
-import { Package, Plus, Trash2, Search, AlertCircle } from "lucide-react"
-import { createProductAction, deleteProductAction } from "@/app/actions/inventory"
+import { Package, Plus, Trash2, Search, AlertCircle, ArrowUp } from "lucide-react"
+import { createProductAction, deleteProductAction, addStockAction } from "@/app/actions/inventory"
+import { toast } from "sonner"
 
 const CURRENCIES = [
-  "RWF", "USD", "EUR", "GBP", "ZAR", "KES", "UGX", "TZS", "NGN", "GHS", "ZIG"
+  "RWF", "KES", "UGX", "TZS", "BIF", "CDF", "NGN", "GHS", "ZAR", "EGP", 
+  "MAD", "DZD", "XOF", "XAF", "ZMW", "ZIG", "MWK", "MZN", "AOA", "BWP",
+  "NAD", "SZL", "LSL", "SDG", "SSP", "ETB", "SOS", "DJF", "ERN", "MUR",
+  "MGA", "SCR", "KMF", "CVE", "STN", "SLL", "LRD", "GNF", "GMD", "MRU",
+  "USD", "EUR", "GBP"
 ]
 
 interface Product {
@@ -17,7 +22,6 @@ interface Product {
   minStock: number
 }
 
-// Helper to generate a consistent color block for initials based on string
 const getInitialsColor = (name: string) => {
   const colors = [
     "bg-red-500", "bg-orange-500", "bg-amber-500", "bg-green-500", 
@@ -32,8 +36,12 @@ const getInitialsColor = (name: string) => {
 export function InventoryClient({ products: initialProducts }: { products: Product[] }) {
   const [searchTerm, setSearchTerm] = useState("")
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState<"new" | "existing">("new")
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+
+  // For existing stock add
+  const [selectedProductId, setSelectedProductId] = useState("")
+  const [quantityToAdd, setQuantityToAdd] = useState(1)
 
   const filteredProducts = initialProducts.filter(p => 
     p.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -42,14 +50,14 @@ export function InventoryClient({ products: initialProducts }: { products: Produ
   async function handleCreateProduct(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setIsLoading(true)
-    setError(null)
     
     const formData = new FormData(e.currentTarget)
     const result = await createProductAction(formData)
     
     if (result?.error) {
-      setError(result.error)
+      toast.error(result.error)
     } else {
+      toast.success("Product created successfully!")
       setIsModalOpen(false)
       ;(e.target as HTMLFormElement).reset()
     }
@@ -57,9 +65,42 @@ export function InventoryClient({ products: initialProducts }: { products: Produ
     setIsLoading(false)
   }
 
+  async function handleAddStock(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    if (!selectedProductId) {
+      toast.error("Please select a product")
+      return
+    }
+    if (quantityToAdd <= 0) {
+      toast.error("Quantity must be greater than zero")
+      return
+    }
+
+    setIsLoading(true)
+    
+    const result = await addStockAction(selectedProductId, quantityToAdd)
+    
+    if (result?.error) {
+      toast.error(result.error)
+    } else {
+      toast.success("Stock added successfully!")
+      setIsModalOpen(false)
+      setSelectedProductId("")
+      setQuantityToAdd(1)
+    }
+    
+    setIsLoading(false)
+  }
+
   async function handleDelete(id: string, name: string) {
     if (!confirm(`Are you sure you want to delete "${name}"?`)) return
-    await deleteProductAction(id)
+    
+    const result = await deleteProductAction(id)
+    if (result?.error) {
+      toast.error(result.error)
+    } else {
+      toast.success("Product deleted successfully")
+    }
   }
 
   return (
@@ -76,7 +117,7 @@ export function InventoryClient({ products: initialProducts }: { products: Produ
           className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors shadow-sm"
         >
           <Plus className="h-5 w-5" />
-          Add Product
+          Add / Update Stock
         </button>
       </div>
 
@@ -150,7 +191,18 @@ export function InventoryClient({ products: initialProducts }: { products: Produ
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-6 py-4 text-right flex justify-end gap-2">
+                      <button
+                        onClick={() => {
+                          setActiveTab("existing")
+                          setSelectedProductId(product.id)
+                          setIsModalOpen(true)
+                        }}
+                        className="p-2 text-primary hover:bg-primary/10 rounded-md transition-colors inline-flex items-center justify-center"
+                        title="Add Stock"
+                      >
+                        <ArrowUp className="h-4 w-4" />
+                      </button>
                       <button
                         onClick={() => handleDelete(product.id, product.name)}
                         className="p-2 text-red-600 hover:bg-red-500/10 rounded-md transition-colors inline-flex items-center justify-center"
@@ -169,65 +221,132 @@ export function InventoryClient({ products: initialProducts }: { products: Produ
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in duration-200 p-4">
-          <div className="bg-card w-full max-w-md rounded-xl shadow-xl border p-6 animate-in zoom-in-95 duration-200">
-            <h2 className="text-xl font-bold mb-4">Add New Product</h2>
-            {error && (
-              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-600 text-sm">
-                {error}
-              </div>
-            )}
-            <form onSubmit={handleCreateProduct} className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Product Name</label>
-                <input required name="name" type="text" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g. Premium Coffee Beans" />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Price</label>
-                  <input required name="sellingPrice" type="number" step="0.01" min="0" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="0.00" />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Currency</label>
-                  <select required name="currency" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
-                    {CURRENCIES.map(c => (
-                      <option key={c} value={c}>{c}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
+          <div className="bg-card w-full max-w-md rounded-xl shadow-xl border overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="flex border-b">
+              <button 
+                className={`flex-1 py-3 text-sm font-medium ${activeTab === "new" ? "bg-muted/50 border-b-2 border-primary text-primary" : "text-muted-foreground hover:bg-muted/30"}`}
+                onClick={() => setActiveTab("new")}
+              >
+                Create New Product
+              </button>
+              <button 
+                className={`flex-1 py-3 text-sm font-medium ${activeTab === "existing" ? "bg-muted/50 border-b-2 border-primary text-primary" : "text-muted-foreground hover:bg-muted/30"}`}
+                onClick={() => setActiveTab("existing")}
+              >
+                Add Stock to Existing
+              </button>
+            </div>
+            
+            <div className="p-6">
+              {activeTab === "new" ? (
+                <form onSubmit={handleCreateProduct} className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Product Name</label>
+                    <input required name="name" type="text" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g. Premium Coffee Beans" />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">SKU (Optional)</label>
+                    <input name="sku" type="text" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g. PRD-12345" />
+                  </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Initial Stock</label>
-                  <input required name="quantity" type="number" min="0" defaultValue="0" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Low Stock Alert At</label>
-                  <input required name="minStock" type="number" min="0" defaultValue="5" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
-                </div>
-              </div>
-              
-              <div className="flex justify-end gap-3 mt-8">
-                <button 
-                  type="button" 
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 text-sm font-medium rounded-md border hover:bg-muted transition-colors"
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="submit" 
-                  disabled={isLoading}
-                  className="px-4 py-2 text-sm font-medium rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-50"
-                >
-                  {isLoading ? "Saving..." : "Save Product"}
-                </button>
-              </div>
-            </form>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Price</label>
+                      <input required name="sellingPrice" type="number" step="0.01" min="0" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="0.00" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Currency</label>
+                      <select required name="currency" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+                        {CURRENCIES.map(c => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Initial Stock</label>
+                      <input required name="quantity" type="number" min="0" defaultValue="0" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Low Stock Alert At</label>
+                      <input required name="minStock" type="number" min="0" defaultValue="5" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-end gap-3 mt-8">
+                    <button 
+                      type="button" 
+                      onClick={() => setIsModalOpen(false)}
+                      className="px-4 py-2 text-sm font-medium rounded-md border hover:bg-muted transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      type="submit" 
+                      disabled={isLoading}
+                      className="px-4 py-2 text-sm font-medium rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-50"
+                    >
+                      {isLoading ? "Saving..." : "Create Product"}
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <form onSubmit={handleAddStock} className="space-y-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Select Product</label>
+                    <select 
+                      required 
+                      value={selectedProductId}
+                      onChange={(e) => setSelectedProductId(e.target.value)}
+                      className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                    >
+                      <option value="" disabled>Select an existing product...</option>
+                      {initialProducts.map(p => (
+                        <option key={p.id} value={p.id}>
+                          {p.name} ({p.quantity} in stock)
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Quantity to Add</label>
+                    <input 
+                      required 
+                      type="number" 
+                      min="1" 
+                      value={quantityToAdd}
+                      onChange={(e) => setQuantityToAdd(parseInt(e.target.value) || 0)}
+                      className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" 
+                    />
+                  </div>
+                  
+                  <div className="flex justify-end gap-3 mt-8">
+                    <button 
+                      type="button" 
+                      onClick={() => setIsModalOpen(false)}
+                      className="px-4 py-2 text-sm font-medium rounded-md border hover:bg-muted transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      type="submit" 
+                      disabled={isLoading || !selectedProductId}
+                      className="px-4 py-2 text-sm font-medium rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-50"
+                    >
+                      {isLoading ? "Saving..." : "Add Stock"}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
           </div>
         </div>
       )}
     </div>
   )
 }
+

@@ -6,6 +6,8 @@ import { Header } from "./header"
 import { Footer } from "./footer"
 import { MobileSidebarOverlay, MobileMenuButton } from "./mobile-nav"
 
+import { IdleTimer } from "./idle-timer"
+
 export function DashboardShell({ 
   children, 
   user 
@@ -18,6 +20,7 @@ export function DashboardShell({
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
+      <IdleTimer />
       {/* Mobile Overlay */}
       <MobileSidebarOverlay 
         isOpen={isSidebarOpen} 

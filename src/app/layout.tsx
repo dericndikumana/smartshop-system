@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
 import { ThemeProvider } from "@/components/layout/theme-provider";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "SmartShop System",
@@ -26,6 +27,17 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <Toaster 
+            position="top-center" 
+            toastOptions={{
+              classNames: {
+                success: "bg-green-500 text-white border-green-600",
+                error: "bg-purple-600 text-white border-purple-700",
+                info: "bg-blue-500 text-white border-blue-600",
+                warning: "bg-amber-500 text-white border-amber-600",
+              }
+            }}
+          />
         </ThemeProvider>
       </body>
     </html>

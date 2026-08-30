@@ -28,6 +28,12 @@ export default async function POSPage() {
       where: { shopId: session.user.shopId }
     })
 
+    // Fetch customers
+    const customers = await prisma.customer.findMany({
+      where: { shopId: session.user.shopId },
+      orderBy: { fullName: 'asc' }
+    })
+
     const serializedProducts = products.map(p => ({
       id: p.id,
       name: p.name || "Unknown",
@@ -36,9 +42,15 @@ export default async function POSPage() {
       quantity: Number(p.quantity || 0),
     }))
 
+    const serializedCustomers = customers.map(c => ({
+      id: c.id,
+      fullName: c.fullName
+    }))
+
     return (
       <POSClient 
         products={serializedProducts} 
+        customers={serializedCustomers}
         vatRate={Number(vatSetting?.isEnabled ? vatSetting.rate : 0)}
       />
     )

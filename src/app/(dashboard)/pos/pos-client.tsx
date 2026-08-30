@@ -1,8 +1,9 @@
 "use client"
 
-import { useState } from "react"
-import { Search, ShoppingCart, Minus, Plus, Trash2, CreditCard } from "lucide-react"
+import { useState, useRef, useEffect } from "react"
+import { Search, ShoppingCart, Minus, Plus, Trash2, CreditCard, User } from "lucide-react"
 import { checkoutAction } from "@/app/actions/pos"
+import { toast } from "sonner"
 
 interface Product {
   id: string
@@ -12,19 +13,42 @@ interface Product {
   quantity: number
 }
 
+interface Customer {
+  id: string
+  fullName: string
+}
+
 interface CartItem extends Product {
   cartQuantity: number
 }
 
-export function POSClient({ products, vatRate }: { products: Product[], vatRate: number }) {
+export function POSClient({ products, customers, vatRate }: { products: Product[], customers: Customer[], vatRate: number }) {
   const [searchTerm, setSearchTerm] = useState("")
   const [cart, setCart] = useState<CartItem[]>([])
   const [isCheckingOut, setIsCheckingOut] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  
+  // Customer states
+  const [customerSearch, setCustomerSearch] = useState("")
+  const [showCustomerDropdown, setShowCustomerDropdown] = useState(false)
+  const customerDropdownRef = useRef<HTMLDivElement>(null)
 
   const filteredProducts = products.filter(p => 
     p.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
+
+  const filteredCustomers = customers.filter(c => 
+    c.fullName.toLowerCase().includes(customerSearch.toLowerCase())
+  )
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (customerDropdownRef.current && !customerDropdownRef.current.contains(event.target as Node)) {
+        setShowCustomerDropdown(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
 
   const addToCart = (product: Product) => {
     setCart(prev => {
@@ -66,7 +90,6 @@ export function POSClient({ products, vatRate }: { products: Product[], vatRate:
   const handleCheckout = async () => {
     if (cart.length === 0) return
     setIsCheckingOut(true)
-    setError(null)
 
     const payload = {
       items: cart.map(item => ({
@@ -76,16 +99,17 @@ export function POSClient({ products, vatRate }: { products: Product[], vatRate:
         currency: item.currency
       })),
       vatRate,
-      primaryCurrency: Object.keys(totalsByCurrency)[0] || "RWF" // Use first currency as primary for the sale record
+      primaryCurrency: Object.keys(totalsByCurrency)[0] || "RWF", // Use first currency as primary for the sale record
+      customerName: customerSearch.trim() || undefined
     }
 
     const result = await checkoutAction(payload)
     if (result.error) {
-      setError(result.error)
+      toast.error(result.error)
     } else {
       setCart([])
-      alert(`Sale completed successfully! Receipt generated.`)
-      // In a real app, we would print the receipt or redirect to /sales/${receiptId}
+      setCustomerSearch("")
+      toast.success(`Sale completed successfully! Receipt generated.`)
     }
     
     setIsCheckingOut(false)
@@ -162,6 +186,46 @@ export function POSClient({ products, vatRate }: { products: Product[], vatRate:
           </span>
         </div>
 
+        {/* Customer Selection */}
+        <div className="p-4 border-b relative" ref={customerDropdownRef}>
+          <div className="relative">
+            <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+            <input 
+              type="text" 
+              placeholder="Customer Name (Optional)" 
+              value={customerSearch}
+              onChange={(e) => {
+                setCustomerSearch(e.target.value)
+                setShowCustomerDropdown(true)
+              }}
+              onFocus={() => setShowCustomerDropdown(true)}
+              className="w-full pl-9 rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all" 
+            />
+          </div>
+          {showCustomerDropdown && customerSearch.length > 0 && (
+            <div className="absolute z-10 w-[calc(100%-2rem)] mt-1 bg-card border rounded-md shadow-lg max-h-40 overflow-y-auto">
+              {filteredCustomers.length > 0 ? (
+                filteredCustomers.map(c => (
+                  <button
+                    key={c.id}
+                    onClick={() => {
+                      setCustomerSearch(c.fullName)
+                      setShowCustomerDropdown(false)
+                    }}
+                    className="w-full text-left px-3 py-2 text-sm hover:bg-muted transition-colors"
+                  >
+                    {c.fullName}
+                  </button>
+                ))
+              ) : (
+                <div className="px-3 py-2 text-sm text-muted-foreground italic">
+                  Create new customer &quot;{customerSearch}&quot;
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
         <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
           {cart.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground opacity-50">
@@ -196,8 +260,6 @@ export function POSClient({ products, vatRate }: { products: Product[], vatRate:
         </div>
 
         <div className="p-4 border-t bg-muted/10">
-          {error && <div className="mb-3 p-2 bg-red-500/10 text-red-500 text-xs rounded-md border border-red-500/20">{error}</div>}
-          
           <div className="space-y-2 mb-4">
             <div className="flex justify-between text-sm text-muted-foreground">
               <span>Subtotals</span>

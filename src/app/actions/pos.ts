@@ -13,7 +13,8 @@ const checkoutSchema = z.object({
     currency: z.string()
   })).min(1, "Cart cannot be empty"),
   vatRate: z.number().min(0),
-  primaryCurrency: z.string() // We'll just save the first currency as the receipt currency for simplicity, but track subtotal currencies in items
+  primaryCurrency: z.string(),
+  customerName: z.string().optional()
 })
 
 export async function checkoutAction(data: z.infer<typeof checkoutSchema>) {
@@ -35,6 +36,27 @@ export async function checkoutAction(data: z.infer<typeof checkoutSchema>) {
 
     // Run transaction
     const saleResult = await prisma.$transaction(async (tx) => {
+      // 0. Handle Customer
+      let customerId: string | undefined = undefined
+      if (validated.customerName && validated.customerName.trim() !== "") {
+        const customerName = validated.customerName.trim()
+        const existingCustomer = await tx.customer.findFirst({
+          where: { shopId: session.user.shopId!, fullName: customerName }
+        })
+
+        if (existingCustomer) {
+          customerId = existingCustomer.id
+        } else {
+          const newCustomer = await tx.customer.create({
+            data: {
+              fullName: customerName,
+              shopId: session.user.shopId!
+            }
+          })
+          customerId = newCustomer.id
+        }
+      }
+
       // 1. Generate receipt number
       const shopSetting = await tx.shopSetting.findUnique({ where: { shopId: session.user.shopId! } })
       const prefix = shopSetting?.receiptPrefix || "SC-"
@@ -61,6 +83,7 @@ export async function checkoutAction(data: z.infer<typeof checkoutSchema>) {
           currency: validated.primaryCurrency,
           shopId: session.user.shopId!,
           cashierId: session.user.id,
+          customerId: customerId,
           items: {
             create: validated.items.map(item => ({
               productId: item.productId,
