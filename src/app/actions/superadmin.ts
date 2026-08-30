@@ -162,3 +162,71 @@ export async function toggleShopStatusAction(shopId: string, currentStatus: stri
     return { success: false, error: "An unexpected error occurred" }
   }
 }
+
+const editShopAdminSchema = z.object({
+  userId: z.string(),
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+})
+
+export async function editShopAdminAction(formData: FormData) {
+  try {
+    const session = await auth()
+    if (!session || session.user.role !== "SUPER_ADMIN") {
+      return { success: false, error: "Unauthorized" }
+    }
+
+    const data = {
+      userId: formData.get("userId") as string,
+      name: formData.get("name") as string,
+      email: formData.get("email") as string,
+    }
+
+    const validated = editShopAdminSchema.parse(data)
+
+    const existingUser = await prisma.user.findUnique({
+      where: { email: validated.email }
+    })
+    
+    if (existingUser && existingUser.id !== validated.userId) {
+      return { success: false, error: "Email is already taken by another user." }
+    }
+
+    await prisma.user.update({
+      where: { id: validated.userId },
+      data: { name: validated.name, email: validated.email }
+    })
+
+    revalidatePath("/superadmin/shops")
+    revalidatePath("/superadmin")
+    return { success: true }
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      // @ts-expect-error ZodError generic typing mismatch
+      return { success: false, error: error.errors[0].message }
+    }
+    console.error("Edit Admin Error:", error)
+    return { success: false, error: "An unexpected error occurred" }
+  }
+}
+
+export async function resetShopAdminPasswordAction(userId: string) {
+  try {
+    const session = await auth()
+    if (!session || session.user.role !== "SUPER_ADMIN") {
+      return { success: false, error: "Unauthorized" }
+    }
+
+    const hashedPassword = await bcrypt.hash("shop@123", 10)
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword }
+    })
+
+    return { success: true }
+  } catch (error) {
+    console.error("Reset Password Error:", error)
+    return { success: false, error: "An unexpected error occurred" }
+  }
+}

@@ -35,7 +35,6 @@ export default async function StaffPage() {
             Add, remove, and suspend staff members for your shop.
           </p>
         </div>
-        <button className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors">Add Cashier</button>
       </div>
       
       <StaffClient cashiers={cashiers} />

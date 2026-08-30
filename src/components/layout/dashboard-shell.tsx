@@ -14,6 +14,7 @@ export function DashboardShell({
   user: { role?: string, email?: string | null, name?: string | null }
 }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [isDesktopCollapsed, setIsDesktopCollapsed] = useState(false)
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
@@ -25,10 +26,16 @@ export function DashboardShell({
       
       {/* Sidebar Wrapper */}
       <div className={`
-        fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0
+        fixed inset-y-0 left-0 z-50 transform transition-all duration-300 ease-in-out md:relative md:translate-x-0
         ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
+        ${isDesktopCollapsed ? "md:w-20" : "md:w-64"} w-64
       `}>
-        <Sidebar role={user.role || ""} onNavClick={() => setIsSidebarOpen(false)} />
+        <Sidebar 
+          role={user.role || ""} 
+          onNavClick={() => setIsSidebarOpen(false)} 
+          isCollapsed={isDesktopCollapsed}
+          onToggleCollapse={() => setIsDesktopCollapsed(!isDesktopCollapsed)}
+        />
       </div>
 
       {/* Main Content */}

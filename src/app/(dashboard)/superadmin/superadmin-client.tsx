@@ -1,8 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { Plus, Store, ShieldAlert, CheckCircle } from "lucide-react"
-import { createShopAction, toggleUserStatusAction } from "@/app/actions/superadmin"
+import { Store, ShieldAlert, CheckCircle } from "lucide-react"
+import { toggleUserStatusAction } from "@/app/actions/superadmin"
 
 interface SuperAdminClientProps {
   stats: { label: string; value: string }[]
@@ -17,27 +16,6 @@ interface SuperAdminClientProps {
 }
 
 export function SuperAdminClient({ stats, admins, currentUserId }: SuperAdminClientProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  async function handleCreateShop(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setIsLoading(true)
-    setError(null)
-    
-    const formData = new FormData(e.currentTarget)
-    const result = await createShopAction(formData)
-    
-    if (result?.error) {
-      setError(result.error)
-    } else {
-      setIsModalOpen(false)
-      ;(e.target as HTMLFormElement).reset()
-    }
-    
-    setIsLoading(false)
-  }
 
   async function handleToggleStatus(userId: string, currentStatus: string) {
     if (userId === currentUserId) return
@@ -50,18 +28,11 @@ export function SuperAdminClient({ stats, admins, currentUserId }: SuperAdminCli
     <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Super Admin Dashboard</h1>
+          <h1 className="text-3xl font-bold tracking-tight">System Overview</h1>
           <p className="text-muted-foreground mt-2">
-            Global system overview and tenant management.
+            Global system statistics and tenant management.
           </p>
         </div>
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
-        >
-          <Plus className="h-5 w-5" />
-          Create New Shop
-        </button>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -73,16 +44,16 @@ export function SuperAdminClient({ stats, admins, currentUserId }: SuperAdminCli
         ))}
       </div>
 
-      <div className="rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-border/50 bg-muted/10">
+      <div className="rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden flex flex-col max-h-[400px]">
+        <div className="p-6 border-b border-border/50 bg-muted/10 shrink-0">
           <h2 className="text-xl font-semibold flex items-center gap-2">
             <Store className="h-5 w-5 text-primary" />
             Registered Shop Admins
           </h2>
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-auto flex-1 relative">
           <table className="w-full text-sm text-left">
-            <thead className="bg-muted/50 text-muted-foreground uppercase text-xs">
+            <thead className="bg-muted/50 text-muted-foreground uppercase text-xs sticky top-0 z-10 shadow-sm border-b">
               <tr>
                 <th className="px-6 py-4 font-medium">Name</th>
                 <th className="px-6 py-4 font-medium">Email</th>
@@ -95,7 +66,7 @@ export function SuperAdminClient({ stats, admins, currentUserId }: SuperAdminCli
               {admins.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-8 text-center text-muted-foreground">
-                    No shops created yet. Click &quot;Create New Shop&quot; to onboard your first tenant.
+                    No shops created yet. Go to Manage Shops to onboard your first tenant.
                   </td>
                 </tr>
               ) : (
@@ -139,54 +110,6 @@ export function SuperAdminClient({ stats, admins, currentUserId }: SuperAdminCli
           </table>
         </div>
       </div>
-
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in duration-200 p-4">
-          <div className="bg-card w-full max-w-md rounded-xl shadow-lg border p-6 animate-in zoom-in-95 duration-200">
-            <h2 className="text-xl font-bold mb-4">Create New Shop & Admin</h2>
-            {error && (
-              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-600 text-sm">
-                {error}
-              </div>
-            )}
-            <form onSubmit={handleCreateShop} className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Shop Name</label>
-                <input required name="shopName" type="text" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g. Downtown Coffee Co." />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Admin Full Name</label>
-                <input required name="adminName" type="text" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g. John Doe" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Admin Email</label>
-                <input required name="adminEmail" type="email" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g. john@downtowncoffee.com" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Admin Password</label>
-                <input required name="adminPassword" type="password" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Minimum 6 characters" />
-              </div>
-              
-              <div className="flex justify-end gap-3 mt-6">
-                <button 
-                  type="button" 
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 text-sm font-medium rounded-md border hover:bg-muted transition-colors"
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="submit" 
-                  disabled={isLoading}
-                  className="px-4 py-2 text-sm font-medium rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
-                >
-                  {isLoading ? "Creating..." : "Create Tenant"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

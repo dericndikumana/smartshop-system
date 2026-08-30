@@ -53,8 +53,11 @@ export default async function SettingsPage() {
             </div>
           </div>
         </div>
-        
-        <SettingsClient />
+        <SettingsClient 
+          userRole={session.user.role || ""} 
+          initialName={session.user.name || ""} 
+          initialEmail={session.user.email || ""} 
+        />
       </div>
     </div>
   )

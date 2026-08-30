@@ -28,6 +28,7 @@ export default async function ManageShopsPage() {
     id: shop.id,
     name: shop.name,
     status: shop.status,
+    adminId: shop.users[0]?.id || "",
     adminName: shop.users[0]?.name || "No Admin",
     adminEmail: shop.users[0]?.email || "N/A",
     productsCount: shop._count.products,

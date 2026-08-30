@@ -5,6 +5,11 @@ import prisma from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 import { z } from "zod"
 
+const updateProfileSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+})
+
 const updatePasswordSchema = z.object({
   currentPassword: z.string().min(1, "Current password is required"),
   newPassword: z.string().min(6, "New password must be at least 6 characters"),
@@ -61,6 +66,41 @@ export async function updatePasswordAction(formData: FormData) {
       return { success: false, error: error.errors[0].message }
     }
     console.error("Update Password Error:", error)
+    return { success: false, error: "An unexpected error occurred" }
+  }
+}
+
+export async function updateProfileInfoAction(formData: FormData) {
+  try {
+    const session = await auth()
+    if (!session || !session.user) {
+      return { success: false, error: "Unauthorized" }
+    }
+
+    const data = {
+      name: formData.get("name") as string,
+      email: formData.get("email") as string,
+    }
+
+    const validated = updateProfileSchema.parse(data)
+
+    const existing = await prisma.user.findUnique({ where: { email: validated.email } })
+    if (existing && existing.id !== session.user.id) {
+      return { success: false, error: "Email is already taken" }
+    }
+
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: { name: validated.name, email: validated.email }
+    })
+
+    return { success: true, message: "Profile updated successfully. Please log in again to sync session." }
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      // @ts-expect-error ZodError generic typing mismatch
+      return { success: false, error: error.errors[0].message }
+    }
+    console.error("Update Profile Error:", error)
     return { success: false, error: "An unexpected error occurred" }
   }
 }
