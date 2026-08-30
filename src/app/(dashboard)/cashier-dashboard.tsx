@@ -17,7 +17,7 @@ export function CashierDashboard({ salesCount, totalItemsSold, revenueByCurrency
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Cashier Dashboard</h1>
         <p className="text-muted-foreground mt-2">
-          Track your performance for today.
+          Track your overall performance.
         </p>
       </div>
       
@@ -26,7 +26,7 @@ export function CashierDashboard({ salesCount, totalItemsSold, revenueByCurrency
           <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-6 flex flex-col gap-2">
             <div className="flex items-center gap-2 text-muted-foreground">
               <Receipt className="h-5 w-5 text-primary" />
-              <h3 className="font-medium text-sm">Transactions</h3>
+              <h3 className="font-medium text-sm">Total Transactions</h3>
             </div>
             <p className="text-2xl font-bold">{salesCount}</p>
           </div>
@@ -51,7 +51,7 @@ export function CashierDashboard({ salesCount, totalItemsSold, revenueByCurrency
         </div>
       ) : (
         <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-12 text-center text-muted-foreground">
-          No sales registered yet today. Head over to the POS to start selling!
+          No sales registered yet. Head over to the POS to start selling!
         </div>
       )}
     </div>

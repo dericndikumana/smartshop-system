@@ -6,7 +6,7 @@ interface ShopAdminDashboardProps {
   stats: {
     totalProducts: number
     totalCustomers: number
-    todaySalesCount: number
+    todaySalesCount: number // Kept variable name the same for compatibility, but it represents all-time now
   }
   revenueByCurrency: Record<string, number>
 }
@@ -28,7 +28,7 @@ export function ShopAdminDashboard({ stats, revenueByCurrency }: ShopAdminDashbo
         <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-6 flex flex-col gap-2">
           <div className="flex items-center gap-2 text-muted-foreground">
             <Receipt className="h-5 w-5 text-primary" />
-            <h3 className="font-medium text-sm">Today&apos;s Sales</h3>
+            <h3 className="font-medium text-sm">Total Sales</h3>
           </div>
           <p className="text-2xl font-bold">{stats.todaySalesCount}</p>
         </div>
@@ -51,7 +51,7 @@ export function ShopAdminDashboard({ stats, revenueByCurrency }: ShopAdminDashbo
       </div>
       
       {/* Revenue Breakdown */}
-      <h2 className="text-xl font-bold mt-4 border-b pb-2">Revenue Breakdown (Today)</h2>
+      <h2 className="text-xl font-bold mt-4 border-b pb-2">Revenue Breakdown (All Time)</h2>
       
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {currencies.map(currency => (
@@ -66,7 +66,7 @@ export function ShopAdminDashboard({ stats, revenueByCurrency }: ShopAdminDashbo
         
         {currencies.length === 0 && (
           <div className="rounded-xl border border-dashed bg-muted/20 text-muted-foreground p-6 flex items-center justify-center col-span-full">
-            No sales recorded today.
+            No sales recorded yet.
           </div>
         )}
       </div>

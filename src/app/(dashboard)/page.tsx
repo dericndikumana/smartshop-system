@@ -38,8 +38,7 @@ export default async function DashboardPage() {
     const cashierSales = await prisma.sale.findMany({
       where: {
         shopId: session.user.shopId,
-        cashierId: session.user.id,
-        createdAt: { gte: today }
+        cashierId: session.user.id
       },
       orderBy: { createdAt: 'desc' },
       include: {
@@ -75,8 +74,7 @@ export default async function DashboardPage() {
       prisma.customer.count({ where: { shopId: session.user.shopId } }),
       prisma.sale.findMany({
         where: {
-          shopId: session.user.shopId,
-          createdAt: { gte: today }
+          shopId: session.user.shopId
         },
         orderBy: { createdAt: 'desc' },
         include: {

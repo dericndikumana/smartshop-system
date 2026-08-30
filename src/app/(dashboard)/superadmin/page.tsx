@@ -17,6 +17,7 @@ export default async function SuperAdminPage() {
 
   // Fetch real data
   const totalShops = await prisma.shop.count()
+  const totalSystemSales = await prisma.sale.count()
   const totalAdmins = await prisma.user.count({
     where: { role: { name: "SHOP_ADMIN" } }
   })
@@ -32,7 +33,7 @@ export default async function SuperAdminPage() {
     { label: "Total Tenants (Shops)", value: totalShops.toString() },
     { label: "Total Shop Admins", value: totalAdmins.toString() },
     { label: "System Health", value: "Optimal" },
-    { label: "Active Sessions", value: "N/A" } // NextAuth doesn't track active JWT sessions by default
+    { label: "Global System Sales", value: totalSystemSales.toString() } 
   ]
 
   const mappedAdmins = allAdmins.map((admin: AdminWithShop) => ({
