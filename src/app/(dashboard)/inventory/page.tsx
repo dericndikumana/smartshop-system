@@ -28,12 +28,12 @@ export default async function InventoryPage() {
     }))
 
     return <InventoryClient products={serializedProducts} />
-  } catch (error: any) {
+  } catch (error) {
     return (
       <div className="p-10 bg-red-50 text-red-500 font-mono text-sm break-all overflow-auto h-screen">
         <h1 className="text-xl font-bold mb-4">CRITICAL SERVER ERROR (INVENTORY)</h1>
-        <p><strong>Error Message:</strong> {error?.message || String(error)}</p>
-        <pre className="mt-4 p-4 bg-red-100 rounded">{error?.stack}</pre>
+        <p><strong>Error Message:</strong> {error instanceof Error ? error.message : String(error)}</p>
+        <pre className="mt-4 p-4 bg-red-100 rounded">{error instanceof Error ? error.stack : ''}</pre>
       </div>
     )
   }
