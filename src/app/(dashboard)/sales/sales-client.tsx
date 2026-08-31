@@ -19,6 +19,7 @@ interface Sale {
   cashierName: string
   customerName: string | null
   shopName: string
+  shopPhone: string | null
   items: SaleItem[]
   totalsByCurrency: Record<string, number>
   vatRate: number
@@ -194,36 +195,33 @@ export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
             <div id="receipt-print-area" className="p-4 overflow-y-auto bg-white text-black font-mono text-sm print:overflow-visible mx-auto" style={{ width: '100%', maxWidth: '350px' }}>
               <div className="text-center mb-4">
                 <h1 className="text-xl font-bold uppercase">{selectedSale.shopName}</h1>
-                <p className="mt-1 font-bold">
-                  {selectedSale.vatRate > 0 ? "TAX INVOICE" : "INVOICE"}
-                </p>
-                {selectedSale.vatRate > 0 && (
-                  <div className="flex justify-between text-xs mt-1">
-                    <span>VAT {selectedSale.vatRate}%</span>
-                  </div>
-                )}
-                {selectedSale.customerName && (
-                  <p className="text-left mt-2">Customer Name : {selectedSale.customerName.toUpperCase()}</p>
-                )}
+                <p>Rwanda</p>
+                {selectedSale.shopPhone && <p>Tel: {selectedSale.shopPhone}</p>}
               </div>
 
-              <div className="border-t border-b border-black py-2 mb-2">
+              <div className="border-t border-black border-dashed pt-2 mt-2 mb-2">
+                <p>Receipt #: <span className="font-bold">{selectedSale.receiptNumber}</span></p>
+                <p>Date: {new Date(selectedSale.createdAt).toLocaleString('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).replace(',', '')}</p>
+                {selectedSale.customerName && <p>Customer: {selectedSale.customerName.toUpperCase()}</p>}
+              </div>
+
+              <div className="border-t border-b border-black border-dashed py-2 mb-2">
                 <table className="w-full text-xs">
                   <thead>
-                    <tr className="text-left">
-                      <th className="pb-1 font-normal w-1/2">Item</th>
-                      <th className="pb-1 text-center font-normal">Qty</th>
-                      <th className="pb-1 text-right font-normal">Price</th>
-                      <th className="pb-1 text-right font-normal">Value</th>
+                    <tr className="text-left font-bold">
+                      <th className="pb-1 w-1/2">Item</th>
+                      <th className="pb-1 text-center">Qty</th>
+                      <th className="pb-1 text-right">P</th>
+                      <th className="pb-1 text-right">Sub</th>
                     </tr>
                   </thead>
                   <tbody>
                     {selectedSale.items.map(item => (
                       <tr key={item.id} className="align-top">
-                        <td className="py-1 pr-1">{item.name}</td>
+                        <td className="py-1 pr-1">{item.name.toUpperCase()}</td>
                         <td className="py-1 text-center">{item.quantity}</td>
-                        <td className="py-1 text-right">{item.unitPrice.toFixed(2)}</td>
-                        <td className="py-1 text-right">{item.subtotal.toFixed(2)}</td>
+                        <td className="py-1 text-right">{item.unitPrice.toFixed(0)}/{item.currency}</td>
+                        <td className="py-1 text-right">{item.subtotal.toFixed(0)}/{item.currency}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -232,44 +230,42 @@ export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
 
               <div className="py-1 space-y-1 text-xs">
                 {Object.entries(selectedSale.totalsByCurrency).map(([currency, total]) => {
-                  const vatAmount = total * (selectedSale.vatRate / 100)
-                  const grandTotal = total + vatAmount
+                  const rate = selectedSale.vatRate;
+                  let netTotal = total;
+                  let vatAmount = 0;
+                  
+                  if (rate > 0) {
+                    netTotal = total / (1 + rate / 100);
+                    vatAmount = total - netTotal;
+                  }
                   
                   return (
                     <div key={currency} className="mb-2">
-                      <div className="flex justify-end gap-4">
-                        <span className="w-16 text-right">Nett</span>
-                        <span className="w-20 text-right">{total.toFixed(2)}</span>
-                      </div>
-                      {selectedSale.vatRate > 0 && (
-                        <div className="flex justify-end gap-4">
-                          <span className="w-16 text-right">VAT INC</span>
-                          <span className="w-20 text-right">{vatAmount.toFixed(2)}</span>
-                        </div>
+                      {rate > 0 && (
+                        <>
+                          <div className="flex justify-between">
+                            <span>Net Total ({currency})</span>
+                            <span>{netTotal.toFixed(0)}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>VAT {rate}% ({currency})</span>
+                            <span>{vatAmount.toFixed(0)}</span>
+                          </div>
+                        </>
                       )}
-                      <div className="border-t border-black my-1 border-dashed"></div>
                       <div className="flex justify-between font-bold">
-                        <span>{currency}</span>
-                        <span>{grandTotal.toFixed(2)}</span>
+                        <span>TOTAL ({currency})</span>
+                        <span>{total.toFixed(0)}</span>
                       </div>
                     </div>
                   )
                 })}
               </div>
 
-              <div className="border-t border-black pt-2 mt-2 text-xs">
-                <p>CASH SALE Invoice # : {selectedSale.receiptNumber}</p>
-                <p>{selectedSale.items.length} Line Item(s)</p>
-                <p>{selectedSale.items.reduce((sum, item) => sum + item.quantity, 0)} Item(s)</p>
-                <p>Operator/Cashier : {selectedSale.cashierName.toUpperCase()}</p>
-                <div className="flex gap-4">
-                  <p>Server Date : {new Date(selectedSale.createdAt).toLocaleDateString('en-GB')}</p>
-                  <p>Time : {new Date(selectedSale.createdAt).toLocaleTimeString('en-GB', { hour12: false })}</p>
-                </div>
-              </div>
-
-              <div className="text-center mt-6 text-xs">
-                <p>& O E</p>
+              <div className="border-t border-black border-dashed pt-2 mt-2 text-center text-xs">
+                <p>Thank you for shopping with us!</p>
+                <p>{new Date().toLocaleString('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).replace(',', '')}</p>
+                <p>Powered by {selectedSale.shopName}</p>
               </div>
             </div>
           </div>

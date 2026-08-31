@@ -35,6 +35,7 @@ export default async function SettingsPage() {
           <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-6 space-y-6">
             <ShopSettingsClient 
               initialShopName={shopDetails?.name || ""}
+              initialPhone={shopDetails?.phone || ""}
               initialVat={vatSetting?.rate || 0} 
               isVatEnabled={vatSetting?.isEnabled ?? false}
               initialPrefix={shopSetting?.receiptPrefix || "SC-"} 

@@ -23,7 +23,7 @@ export default async function SalesPage() {
     include: {
       cashier: { select: { name: true } },
       customer: { select: { fullName: true } },
-      shop: { select: { name: true } },
+      shop: { select: { name: true, phone: true } },
       items: {
         include: { product: { select: { name: true } } }
       },
@@ -47,6 +47,7 @@ export default async function SalesPage() {
       cashierName: sale.cashier.name,
       customerName: sale.customer?.fullName || null,
       shopName: sale.shop.name,
+      shopPhone: sale.shop.phone,
       items: sale.items.map(item => ({
         id: item.id,
         name: item.product.name,

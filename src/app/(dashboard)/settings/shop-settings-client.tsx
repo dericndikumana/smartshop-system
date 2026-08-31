@@ -7,11 +7,13 @@ import { toast } from "sonner"
 
 export function ShopSettingsClient({ 
   initialShopName,
+  initialPhone,
   initialVat, 
   isVatEnabled,
   initialPrefix 
 }: { 
   initialShopName: string
+  initialPhone: string
   initialVat: number
   isVatEnabled: boolean
   initialPrefix: string 
@@ -56,6 +58,15 @@ export function ShopSettingsClient({
               type="text" 
               required
               defaultValue={initialShopName}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" 
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Shop Phone (Displayed on Receipts)</label>
+            <input 
+              name="shopPhone"
+              type="text" 
+              defaultValue={initialPhone}
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" 
             />
           </div>

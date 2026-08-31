@@ -428,10 +428,10 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
             
             {vatRate > 0 && Object.entries(totalsByCurrency).length > 0 && (
               <div className="flex justify-between text-sm text-muted-foreground border-t border-border/50 pt-2">
-                <span>VAT ({vatRate}%)</span>
+                <span>VAT ({vatRate}%) Included</span>
                 <div className="text-right flex flex-col">
                   {Object.entries(totalsByCurrency).map(([currency, total]) => (
-                    <span key={currency}>{currency} {(total * (vatRate / 100)).toLocaleString()}</span>
+                    <span key={currency}>{currency} {(total - (total / (1 + vatRate / 100))).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                   ))}
                 </div>
               </div>
@@ -442,7 +442,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
               <div className="text-right flex flex-col">
                 {Object.entries(totalsByCurrency).length === 0 ? <span>0.00</span> : (
                   Object.entries(totalsByCurrency).map(([currency, total]) => (
-                    <span key={currency} className="text-primary">{currency} {(total + (total * (vatRate / 100))).toLocaleString()}</span>
+                    <span key={currency} className="text-primary">{currency} {total.toLocaleString()}</span>
                   ))
                 )}
               </div>

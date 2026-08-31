@@ -70,14 +70,21 @@ export async function checkoutAction(data: z.infer<typeof checkoutSchema>) {
       })
 
       // Calculate total amount (We'll just sum raw values for the Sale object, but receipts will group by currency via items)
-      const totalAmount = validated.items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0)
-      const vatAmount = totalAmount * (validated.vatRate / 100)
+      const rawTotal = validated.items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0)
+      
+      const vatRate = validated.vatRate
+      let vatAmount = 0
+      
+      if (vatRate > 0) {
+        const netTotal = rawTotal / (1 + vatRate / 100)
+        vatAmount = rawTotal - netTotal
+      }
 
       // 2. Create Sale
       const sale = await tx.sale.create({
         data: {
           receiptNumber,
-          totalAmount: totalAmount + vatAmount,
+          totalAmount: rawTotal,
           vatAmount,
           vatRate: validated.vatRate,
           currency: validated.primaryCurrency,
