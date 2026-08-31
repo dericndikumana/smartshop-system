@@ -5,7 +5,7 @@ import LoginForm from "@/components/auth/login-form"
 import { X, ArrowRight, Store } from "lucide-react"
 
 export default function LoginClient({ isSuspended }: { isSuspended: boolean }) {
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(isSuspended)
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#0f172a] text-slate-50 flex flex-col items-center justify-center selection:bg-fuchsia-500/30">
@@ -31,12 +31,6 @@ export default function LoginClient({ isSuspended }: { isSuspended: boolean }) {
         <p className="text-lg md:text-2xl text-slate-300 font-medium mb-8 max-w-2xl leading-relaxed">
           The all-in-one multi-tenant retail platform. Run the counter and the back office from one screen.
         </p>
-
-        {isSuspended && (
-          <div className="mb-8 p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl max-w-md text-sm font-medium backdrop-blur-sm">
-            Your account has been suspended. Please contact the System Administrator to help you.
-          </div>
-        )}
 
         <button
           onClick={() => setIsModalOpen(true)}
@@ -84,7 +78,7 @@ export default function LoginClient({ isSuspended }: { isSuspended: boolean }) {
           </div>
 
           <div className="[&_label]:text-slate-200 [&_input]:bg-slate-900/50 [&_input]:border-white/10 [&_input]:text-white [&_input]:placeholder:text-slate-500 [&_input:focus]:border-fuchsia-500 [&_input:focus]:ring-fuchsia-500/20 [&_button]:bg-white [&_button]:text-slate-900 [&_button:hover]:bg-slate-200 [&_button]:rounded-xl [&_button]:font-bold [&_button]:h-12">
-            <LoginForm />
+            <LoginForm initialSuspended={isSuspended} />
           </div>
           
           <div className="mt-6 pt-6 border-t border-white/10 text-center">

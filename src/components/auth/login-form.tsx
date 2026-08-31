@@ -6,12 +6,14 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { AlertCircle, RefreshCw } from "lucide-react"
 
-export default function LoginForm() {
+export default function LoginForm({ initialSuspended }: { initialSuspended?: boolean }) {
   const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [errorMessage, setErrorMessage] = useState<string | null>(
+    initialSuspended ? "Your account has been suspended. Please contact the System Administrator." : null
+  )
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
