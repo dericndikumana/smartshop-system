@@ -6,7 +6,6 @@ import en from "@/locales/en.json"
 import rw from "@/locales/rw.json"
 
 type Language = "en" | "rw"
-type Translations = typeof en
 
 interface LanguageContextType {
   language: Language
@@ -48,11 +47,11 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   const t = (key: string): string => {
     const keys = key.split(".")
-    let value: any = dictionaries[language]
+    let value: unknown = dictionaries[language]
 
     for (const k of keys) {
       if (value && typeof value === "object" && k in value) {
-        value = value[k]
+        value = (value as Record<string, unknown>)[k]
       } else {
         return key // Return key if translation not found
       }
