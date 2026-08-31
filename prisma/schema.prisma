@@ -103,6 +103,7 @@ model Product {
   currency     String   @default("RWF")
   quantity     Int      @default(0)
   minStock     Int      @default(5)
+  piecesPerBundle Int?  @default(1)
   supplier     String?
   expiryDate   DateTime?
   status       String   @default("IN_STOCK") // IN_STOCK, LOW_STOCK, OUT_OF_STOCK, INACTIVE

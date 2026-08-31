@@ -26,6 +26,7 @@ export default async function InventoryPage() {
       buyingPrice: p.buyingPrice ? Number(p.buyingPrice) : null,
       currency: p.currency || "RWF",
       quantity: Number(p.quantity || 0),
+      piecesPerBundle: Number(p.piecesPerBundle || 1),
       minStock: Number(p.minStock || 0),
     }))
 

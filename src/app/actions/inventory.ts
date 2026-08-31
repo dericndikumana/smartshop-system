@@ -9,10 +9,10 @@ const productSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   sku: z.string().optional(),
   buyingPrice: z.coerce.number().min(0, "Buying price must be non-negative").optional(),
-  sellingPrice: z.coerce.number().min(0, "Price must be positive"),
+  sellingPrice: z.coerce.number().min(0, "Price must be non-negative").optional().default(0),
   currency: z.string().min(2, "Currency is required"),
   quantity: z.coerce.number().min(0, "Quantity must be non-negative"),
-  minStock: z.coerce.number().min(0, "Min stock must be non-negative"),
+  piecesPerBundle: z.coerce.number().min(1, "Must have at least 1 piece per bundle").optional().default(1),
 })
 
 export async function createProductAction(formData: FormData) {
@@ -26,10 +26,10 @@ export async function createProductAction(formData: FormData) {
       name: formData.get("name") as string,
       sku: (formData.get("sku") as string) || undefined,
       buyingPrice: formData.get("buyingPrice") ? formData.get("buyingPrice") : undefined,
-      sellingPrice: formData.get("sellingPrice"),
+      sellingPrice: formData.get("sellingPrice") ? formData.get("sellingPrice") : undefined,
       currency: formData.get("currency") as string,
       quantity: formData.get("quantity"),
-      minStock: formData.get("minStock"),
+      piecesPerBundle: formData.get("piecesPerBundle") ? formData.get("piecesPerBundle") : undefined,
     }
 
     const validated = productSchema.parse(data)
@@ -42,7 +42,8 @@ export async function createProductAction(formData: FormData) {
         sellingPrice: validated.sellingPrice,
         currency: validated.currency,
         quantity: validated.quantity,
-        minStock: validated.minStock,
+        minStock: 2, // Default to 2
+        piecesPerBundle: validated.piecesPerBundle,
         shopId: session.user.shopId,
         status: validated.quantity > 0 ? "IN_STOCK" : "OUT_OF_STOCK"
       }
@@ -72,10 +73,10 @@ export async function editProductAction(productId: string, formData: FormData) {
       name: formData.get("name") as string,
       sku: (formData.get("sku") as string) || undefined,
       buyingPrice: formData.get("buyingPrice") ? formData.get("buyingPrice") : undefined,
-      sellingPrice: formData.get("sellingPrice"),
+      sellingPrice: formData.get("sellingPrice") ? formData.get("sellingPrice") : undefined,
       currency: formData.get("currency") as string,
       quantity: formData.get("quantity"),
-      minStock: formData.get("minStock"),
+      piecesPerBundle: formData.get("piecesPerBundle") ? formData.get("piecesPerBundle") : undefined,
     }
 
     const validated = productSchema.parse(data)
@@ -92,7 +93,8 @@ export async function editProductAction(productId: string, formData: FormData) {
         sellingPrice: validated.sellingPrice,
         currency: validated.currency,
         quantity: validated.quantity,
-        minStock: validated.minStock,
+        minStock: 2, // Default to 2
+        piecesPerBundle: validated.piecesPerBundle,
         status: validated.quantity > 0 ? "IN_STOCK" : "OUT_OF_STOCK"
       }
     })

@@ -20,6 +20,7 @@ interface Product {
   sellingPrice: number
   currency: string
   quantity: number
+  piecesPerBundle?: number
   minStock: number
 }
 
@@ -180,8 +181,9 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
             <thead className="bg-muted/50 text-muted-foreground uppercase text-xs">
               <tr>
                 <th className="px-6 py-4 font-medium">Product</th>
-                <th className="px-6 py-4 font-medium">Price (Buy / Sell)</th>
-                <th className="px-6 py-4 font-medium">Stock & Value</th>
+                <th className="px-6 py-4 font-medium">Pieces / Bundle</th>
+                <th className="px-6 py-4 font-medium">Bundles & Amount</th>
+                <th className="px-6 py-4 font-medium">Total Pieces</th>
                 {userRole !== "CASHIER" && <th className="px-6 py-4 font-medium text-right">Actions</th>}
               </tr>
             </thead>
@@ -210,33 +212,32 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                     <td className="px-6 py-4">
                       <div className="flex flex-col gap-1 text-sm">
                         <p>
-                          <span className="text-muted-foreground">Buy:</span> {product.buyingPrice ? `${product.currency} ${product.buyingPrice.toLocaleString()}` : "-"}
+                          <span className="text-muted-foreground">Price/Bundle:</span> {product.buyingPrice ? `${product.currency} ${product.buyingPrice.toLocaleString()}` : "-"}
                         </p>
                         <p className="font-semibold text-foreground">
-                          <span className="text-muted-foreground font-normal">Sell:</span> {product.currency} {product.sellingPrice.toLocaleString()}
+                          <span className="text-muted-foreground font-normal">Sell:</span> {product.currency} {product.sellingPrice > 0 ? product.sellingPrice.toLocaleString() : "Not Set"}
+                        </p>
+                        <p className="text-muted-foreground mt-1 text-xs">
+                          {product.piecesPerBundle || 1} pieces / bundle
                         </p>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-col gap-1">
-                        <span className={`inline-flex w-fit items-center px-2 py-0.5 rounded-full text-xs font-semibold border ${
-                          product.quantity <= product.minStock
-                            ? "bg-red-500/10 text-red-600 border-red-500/20 dark:bg-red-500/20 dark:text-red-400"
-                            : "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:bg-emerald-500/20 dark:text-emerald-400"
-                        }`}>
-                          {product.quantity} units
+                        <span className={`inline-flex w-fit items-center px-2 py-0.5 rounded-full text-xs font-semibold border bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:bg-emerald-500/20 dark:text-emerald-400`}>
+                          {product.quantity} Bundles
                         </span>
                         {product.buyingPrice && product.quantity > 0 && (
                           <p className="text-xs font-medium text-muted-foreground mt-1">
-                            Value: {product.currency} {(product.buyingPrice * product.quantity).toLocaleString()}
+                            Amount: {product.currency} {(product.buyingPrice * product.quantity).toLocaleString()}
                           </p>
                         )}
-                        {product.quantity <= product.minStock && (
-                          <span className="text-[10px] text-red-500 font-medium flex items-center gap-1 mt-1">
-                            <AlertCircle className="h-3 w-3" /> Low Stock
-                          </span>
-                        )}
                       </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <p className="font-semibold text-foreground">
+                        {(product.quantity * (product.piecesPerBundle || 1)).toLocaleString()} pieces
+                      </p>
                     </td>
                     {userRole !== "CASHIER" && (
                       <td className="px-6 py-4 text-right flex justify-end gap-2">
@@ -345,12 +346,12 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Buying Price</label>
+                      <label className="text-sm font-medium">Price Per Bundle</label>
                       <input name="buyingPrice" type="number" step="0.01" min="0" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="0.00" />
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Selling Price</label>
-                      <input required name="sellingPrice" type="number" step="0.01" min="0" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="0.00" />
+                      <input name="sellingPrice" type="number" step="0.01" min="0" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="0.00" />
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Currency</label>
@@ -364,12 +365,12 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Initial Stock</label>
+                      <label className="text-sm font-medium">Nbr of Bundles</label>
                       <input required name="quantity" type="number" min="0" defaultValue="0" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Low Stock Alert At</label>
-                      <input required name="minStock" type="number" min="0" defaultValue="5" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                      <label className="text-sm font-medium">Pieces Per Bundle</label>
+                      <input required name="piecesPerBundle" type="number" min="1" defaultValue="1" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
                     </div>
                   </div>
                   
@@ -404,12 +405,12 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Buying Price</label>
+                      <label className="text-sm font-medium">Price Per Bundle</label>
                       <input name="buyingPrice" type="number" step="0.01" min="0" defaultValue={editingProduct.buyingPrice || ""} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="0.00" />
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Selling Price</label>
-                      <input required name="sellingPrice" type="number" step="0.01" min="0" defaultValue={editingProduct.sellingPrice} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                      <input name="sellingPrice" type="number" step="0.01" min="0" defaultValue={editingProduct.sellingPrice} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Currency</label>
@@ -423,12 +424,12 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Current Stock</label>
+                      <label className="text-sm font-medium">Nbr of Bundles</label>
                       <input required name="quantity" type="number" min="0" defaultValue={editingProduct.quantity} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Low Stock Alert At</label>
-                      <input required name="minStock" type="number" min="0" defaultValue={editingProduct.minStock} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                      <label className="text-sm font-medium">Pieces Per Bundle</label>
+                      <input required name="piecesPerBundle" type="number" min="1" defaultValue={editingProduct.piecesPerBundle || 1} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
                     </div>
                   </div>
                   
