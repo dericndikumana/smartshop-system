@@ -6,11 +6,12 @@ export const authConfig = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        const u = user as import("next-auth").User
+        const u = user as import("next-auth").User & { language?: string }
         token.id = u.id
         token.role = u.role
         token.shopId = u.shopId
         token.status = u.status
+        token.language = u.language
       }
       return token
     },
@@ -20,6 +21,7 @@ export const authConfig = {
         session.user.role = token.role as string
         session.user.shopId = token.shopId as string | null
         session.user.status = token.status as string
+        session.user.language = (token.language as string) || "en"
       }
       return session
     }

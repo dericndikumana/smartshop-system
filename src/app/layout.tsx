@@ -8,6 +8,9 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 import { ThemeProvider } from "@/components/layout/theme-provider";
 import { Toaster } from "sonner";
 
+import { AuthProvider } from "@/components/providers/auth-provider";
+import { LanguageProvider } from "@/components/providers/language-provider";
+
 export const metadata: Metadata = {
   title: "SmartShop System",
   description: "Professional POS and inventory management platform",
@@ -21,12 +24,14 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn("font-sans", inter.variable)} suppressHydrationWarning>
       <body className="antialiased bg-background text-foreground">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          disableTransitionOnChange
-        >
-          {children}
+        <AuthProvider>
+          <LanguageProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="light"
+              disableTransitionOnChange
+            >
+              {children}
           <Toaster 
             position="top-center" 
             toastOptions={{
@@ -39,7 +44,9 @@ export default function RootLayout({
               }
             }}
           />
-        </ThemeProvider>
+            </ThemeProvider>
+          </LanguageProvider>
+        </AuthProvider>
       </body>
     </html>
   );

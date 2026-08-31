@@ -1,0 +1,68 @@
+{
+  "common": {
+    "dashboard": "Incamake",
+    "shops": "Amaduka",
+    "staff": "Abakozi",
+    "inventory": "Ububiko",
+    "products": "Ibicuruzwa",
+    "categories": "Ibyiciro",
+    "sales": "Ibyagurishijwe",
+    "customers": "Abakiriya",
+    "settings": "Igenamiterere",
+    "logout": "Sohoka",
+    "search": "Shakisha...",
+    "save": "Bika Impinduka",
+    "cancel": "Kureka",
+    "create": "Kurema",
+    "edit": "Hindura",
+    "delete": "Siba",
+    "status": "Imiterere",
+    "actions": "Ibikorwa",
+    "active": "Bikora",
+    "inactive": "Ntibikora",
+    "blocked": "Bifunzwe",
+    "deleted": "Byasibwe",
+    "language": "Ururimi"
+  },
+  "sidebar": {
+    "system_overview": "Incamake y'Ikoranabuhanga",
+    "manage_shops": "Cunga Amaduka",
+    "shop_dashboard": "Incamake y'Iduka",
+    "pos_terminal": "Kugurisha (POS)",
+    "inventory": "Ububiko",
+    "sales_receipts": "Ibyagurishijwe & Inyemezabuguzi",
+    "manage_cashiers": "Cunga Abagurisha",
+    "reports": "Raporo",
+    "settings": "Igenamiterere",
+    "my_receipts": "Inyemezabuguzi Zanjye",
+    "my_settings": "Igenamiterere Ryanjye",
+    "dashboard": "Incamake"
+  },
+  "dashboard": {
+    "total_sales": "Igiteranyo cy'Ibyagurishijwe",
+    "total_products": "Igiteranyo cy'Ibicuruzwa",
+    "low_stock": "Ibicuruzwa Biri Hasi",
+    "recent_sales": "Ibyagurishijwe Vuba",
+    "view_all": "Reba Byose"
+  },
+  "superadmin": {
+    "system_overview": "Incamake y'Ikoranabuhanga",
+    "system_desc": "Imibare y'imikorere n'imicungire y'amaduka.",
+    "registered_admins": "Abayobozi b'Amaduka Banditswe",
+    "name": "Izina",
+    "email": "Imeri",
+    "shop_assigned": "Iduka Yahawe",
+    "suspend": "Hagarika",
+    "activate": "Emeza",
+    "no_shops": "Nta maduka yaremwe. Jya mu gucunga amaduka wongeremo iduka."
+  },
+  "cashier": {
+    "point_of_sale": "Aho Kugurishiriza (POS)",
+    "cart": "Agatebo",
+    "total": "Igiteranyo",
+    "checkout": "Ishyura",
+    "hold_cart": "Bika Agatebo",
+    "clear_cart": "Siba Agatebo",
+    "no_products": "Nta bicuruzwa byabonetse."
+  }
+}

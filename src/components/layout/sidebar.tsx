@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation"
 import { LayoutDashboard, ShoppingCart, Package, Users, FileText, Settings, LogOut, Receipt, Store, ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { signOut } from "next-auth/react"
+import { useTranslation } from "@/components/providers/language-provider"
 
 interface SidebarProps {
   role: string
@@ -14,34 +15,35 @@ interface SidebarProps {
 
 export function Sidebar({ role, onNavClick, isCollapsed, onToggleCollapse }: SidebarProps) {
   const pathname = usePathname()
+  const { t } = useTranslation()
   
   // Define navigation based on Role
   let navItems: { name: string; href: string; icon: React.ElementType }[] = []
 
   if (role === "SUPER_ADMIN") {
     navItems = [
-      { name: "System Overview", href: "/superadmin", icon: LayoutDashboard },
-      { name: "Manage Shops", href: "/superadmin/shops", icon: Store },
-      { name: "System Settings", href: "/settings", icon: Settings },
+      { name: t("sidebar.system_overview"), href: "/superadmin", icon: LayoutDashboard },
+      { name: t("sidebar.manage_shops"), href: "/superadmin/shops", icon: Store },
+      { name: t("sidebar.settings"), href: "/settings", icon: Settings },
     ]
   } else if (role === "SHOP_ADMIN") {
     navItems = [
-      { name: "Shop Dashboard", href: "/", icon: LayoutDashboard },
-      { name: "POS Terminal", href: "/pos", icon: ShoppingCart },
-      { name: "Inventory", href: "/inventory", icon: Package },
-      { name: "Sales & Receipts", href: "/sales", icon: Receipt },
-      { name: "Manage Cashiers", href: "/staff", icon: Users },
-      { name: "Reports", href: "/reports", icon: FileText },
-      { name: "Settings", href: "/settings", icon: Settings },
+      { name: t("sidebar.shop_dashboard"), href: "/", icon: LayoutDashboard },
+      { name: t("sidebar.pos_terminal"), href: "/pos", icon: ShoppingCart },
+      { name: t("sidebar.inventory"), href: "/inventory", icon: Package },
+      { name: t("sidebar.sales_receipts"), href: "/sales", icon: Receipt },
+      { name: t("sidebar.manage_cashiers"), href: "/staff", icon: Users },
+      { name: t("sidebar.reports"), href: "/reports", icon: FileText },
+      { name: t("sidebar.settings"), href: "/settings", icon: Settings },
     ]
   } else if (role === "CASHIER") {
     navItems = [
-      { name: "Dashboard", href: "/", icon: LayoutDashboard },
-      { name: "POS Terminal", href: "/pos", icon: ShoppingCart },
-      { name: "Inventory", href: "/inventory", icon: Package },
-      { name: "My Receipts", href: "/sales", icon: Receipt },
-      { name: "Reports", href: "/reports", icon: FileText },
-      { name: "My Settings", href: "/settings", icon: Settings },
+      { name: t("sidebar.dashboard"), href: "/", icon: LayoutDashboard },
+      { name: t("sidebar.pos_terminal"), href: "/pos", icon: ShoppingCart },
+      { name: t("sidebar.inventory"), href: "/inventory", icon: Package },
+      { name: t("sidebar.my_receipts"), href: "/sales", icon: Receipt },
+      { name: t("sidebar.reports"), href: "/reports", icon: FileText },
+      { name: t("sidebar.my_settings"), href: "/settings", icon: Settings },
     ]
   }
 
@@ -89,14 +91,14 @@ export function Sidebar({ role, onNavClick, isCollapsed, onToggleCollapse }: Sid
       <div className="p-4 border-t">
         <button 
           onClick={() => signOut({ callbackUrl: "/login" })}
-          title={isCollapsed ? "Logout" : undefined}
+          title={isCollapsed ? t("common.logout") : undefined}
           className={cn(
             "flex items-center gap-3 px-3 py-2 w-full rounded-md text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors font-medium",
             isCollapsed && "justify-center px-0"
           )}
         >
           <LogOut className={cn("h-4 w-4 flex-shrink-0", isCollapsed && "h-5 w-5")} />
-          {!isCollapsed && <span>Logout</span>}
+          {!isCollapsed && <span>{t("common.logout")}</span>}
         </button>
       </div>
     </div>

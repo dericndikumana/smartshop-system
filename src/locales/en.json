@@ -1,0 +1,68 @@
+{
+  "common": {
+    "dashboard": "Dashboard",
+    "shops": "Shops",
+    "staff": "Staff",
+    "inventory": "Inventory",
+    "products": "Products",
+    "categories": "Categories",
+    "sales": "Sales",
+    "customers": "Customers",
+    "settings": "Settings",
+    "logout": "Log Out",
+    "search": "Search...",
+    "save": "Save Changes",
+    "cancel": "Cancel",
+    "create": "Create",
+    "edit": "Edit",
+    "delete": "Delete",
+    "status": "Status",
+    "actions": "Actions",
+    "active": "Active",
+    "inactive": "Inactive",
+    "blocked": "Blocked",
+    "deleted": "Deleted",
+    "language": "Language"
+  },
+  "sidebar": {
+    "system_overview": "System Overview",
+    "manage_shops": "Manage Shops",
+    "shop_dashboard": "Shop Dashboard",
+    "pos_terminal": "POS Terminal",
+    "inventory": "Inventory",
+    "sales_receipts": "Sales & Receipts",
+    "manage_cashiers": "Manage Cashiers",
+    "reports": "Reports",
+    "settings": "Settings",
+    "my_receipts": "My Receipts",
+    "my_settings": "My Settings",
+    "dashboard": "Dashboard"
+  },
+  "dashboard": {
+    "total_sales": "Total Sales",
+    "total_products": "Total Products",
+    "low_stock": "Low Stock Items",
+    "recent_sales": "Recent Sales",
+    "view_all": "View All"
+  },
+  "superadmin": {
+    "system_overview": "System Overview",
+    "system_desc": "Global system statistics and tenant management.",
+    "registered_admins": "Registered Shop Admins",
+    "name": "Name",
+    "email": "Email",
+    "shop_assigned": "Shop Assigned",
+    "suspend": "Suspend",
+    "activate": "Activate",
+    "no_shops": "No shops created yet. Go to Manage Shops to onboard your first tenant."
+  },
+  "cashier": {
+    "point_of_sale": "Point of Sale",
+    "cart": "Cart",
+    "total": "Total",
+    "checkout": "Checkout",
+    "hold_cart": "Hold Cart",
+    "clear_cart": "Clear Cart",
+    "no_products": "No products found."
+  }
+}

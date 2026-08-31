@@ -3,6 +3,7 @@
 import { Store, ShieldAlert, CheckCircle } from "lucide-react"
 import { toggleUserStatusAction } from "@/app/actions/superadmin"
 import { toast } from "sonner"
+import { useTranslation } from "@/components/providers/language-provider"
 
 interface SuperAdminClientProps {
   stats: { label: string; value: string }[]
@@ -17,6 +18,8 @@ interface SuperAdminClientProps {
 }
 
 export function SuperAdminClient({ stats, admins, currentUserId }: SuperAdminClientProps) {
+  const { t } = useTranslation()
+
   async function handleToggleStatus(userId: string, currentStatus: string) {
     if (userId === currentUserId) return
     try {
@@ -31,9 +34,9 @@ export function SuperAdminClient({ stats, admins, currentUserId }: SuperAdminCli
     <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">System Overview</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t("superadmin.system_overview")}</h1>
           <p className="text-muted-foreground mt-2">
-            Global system statistics and tenant management.
+            {t("superadmin.system_desc")}
           </p>
         </div>
       </div>
@@ -51,25 +54,25 @@ export function SuperAdminClient({ stats, admins, currentUserId }: SuperAdminCli
         <div className="p-6 border-b border-border/50 bg-muted/10 shrink-0">
           <h2 className="text-xl font-semibold flex items-center gap-2">
             <Store className="h-5 w-5 text-primary" />
-            Registered Shop Admins
+            {t("superadmin.registered_admins")}
           </h2>
         </div>
         <div className="overflow-auto flex-1 relative">
           <table className="w-full text-sm text-left">
             <thead className="bg-muted/50 text-muted-foreground uppercase text-xs sticky top-0 z-10 shadow-sm border-b">
               <tr>
-                <th className="px-6 py-4 font-medium">Name</th>
-                <th className="px-6 py-4 font-medium">Email</th>
-                <th className="px-6 py-4 font-medium">Shop Assigned</th>
-                <th className="px-6 py-4 font-medium">Status</th>
-                <th className="px-6 py-4 font-medium text-right">Actions</th>
+                <th className="px-6 py-4 font-medium">{t("superadmin.name")}</th>
+                <th className="px-6 py-4 font-medium">{t("superadmin.email")}</th>
+                <th className="px-6 py-4 font-medium">{t("superadmin.shop_assigned")}</th>
+                <th className="px-6 py-4 font-medium">{t("common.status")}</th>
+                <th className="px-6 py-4 font-medium text-right">{t("common.actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
               {admins.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-8 text-center text-muted-foreground">
-                    No shops created yet. Go to Manage Shops to onboard your first tenant.
+                    {t("superadmin.no_shops")}
                   </td>
                 </tr>
               ) : (
@@ -89,7 +92,7 @@ export function SuperAdminClient({ stats, admins, currentUserId }: SuperAdminCli
                           : "bg-red-500/10 text-red-600 border-red-500/20"
                       }`}>
                         {admin.status === "ACTIVE" ? <CheckCircle className="h-3 w-3" /> : <ShieldAlert className="h-3 w-3" />}
-                        {admin.status}
+                        {admin.status === "ACTIVE" ? t("common.active") : t("common.blocked")}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -102,7 +105,7 @@ export function SuperAdminClient({ stats, admins, currentUserId }: SuperAdminCli
                               : "text-emerald-600 hover:bg-emerald-500/10"
                           }`}
                         >
-                          {admin.status === "ACTIVE" ? "Suspend" : "Activate"}
+                          {admin.status === "ACTIVE" ? t("superadmin.suspend") : t("superadmin.activate")}
                         </button>
                       )}
                     </td>

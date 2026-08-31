@@ -64,6 +64,7 @@ model User {
   name      String
   email     String   @unique
   password  String
+  language  String   @default("en") // en or rw
   status    String   @default("ACTIVE") // ACTIVE, BLOCKED, INACTIVE
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
