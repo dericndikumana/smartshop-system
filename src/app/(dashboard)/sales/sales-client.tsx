@@ -195,7 +195,6 @@ export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
             <div id="receipt-print-area" className="p-4 overflow-y-auto bg-white text-black font-mono text-sm print:overflow-visible mx-auto" style={{ width: '100%', maxWidth: '350px' }}>
               <div className="text-center mb-4">
                 <h1 className="text-xl font-bold uppercase">{selectedSale.shopName}</h1>
-                <p>Rwanda</p>
                 {selectedSale.shopPhone && <p>Tel: {selectedSale.shopPhone}</p>}
               </div>
 
@@ -203,6 +202,7 @@ export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
                 <p>Receipt #: <span className="font-bold">{selectedSale.receiptNumber}</span></p>
                 <p>Date: {new Date(selectedSale.createdAt).toLocaleString('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).replace(',', '')}</p>
                 {selectedSale.customerName && <p>Customer: {selectedSale.customerName.toUpperCase()}</p>}
+                <p>Cashier: {selectedSale.cashierName.toUpperCase()}</p>
               </div>
 
               <div className="border-t border-b border-black border-dashed py-2 mb-2">

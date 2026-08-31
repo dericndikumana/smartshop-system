@@ -15,7 +15,10 @@ export async function updateShopSettingsAction(formData: FormData) {
     const isVatEnabled = formData.get("isVatEnabled") === "on"
     const receiptPrefix = formData.get("receiptPrefix") as string
     const shopName = formData.get("shopName") as string
-    const shopPhone = formData.get("shopPhone") as string
+    
+    const countryCode = formData.get("countryCode") as string
+    const phoneNumber = formData.get("phoneNumber") as string
+    const shopPhone = phoneNumber ? `${countryCode}${phoneNumber}` : null
 
     await prisma.$transaction(async (tx) => {
       // Update Shop Name
