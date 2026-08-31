@@ -112,7 +112,49 @@ export async function toggleUserStatusAction(userId: string, currentStatus: stri
   }
 }
 
-export async function deleteShopAction(shopId: string) {
+export async function softDeleteShopAction(shopId: string) {
+  try {
+    const session = await auth()
+    if (!session || session.user.role !== "SUPER_ADMIN") {
+      return { success: false, error: "Unauthorized" }
+    }
+
+    await prisma.shop.update({
+      where: { id: shopId },
+      data: { status: "DELETED" }
+    })
+
+    revalidatePath("/superadmin/shops")
+    revalidatePath("/superadmin")
+    return { success: true }
+  } catch (error) {
+    console.error("Soft Delete Shop Error:", error)
+    return { success: false, error: "Failed to move shop to Recycle Bin" }
+  }
+}
+
+export async function restoreShopAction(shopId: string) {
+  try {
+    const session = await auth()
+    if (!session || session.user.role !== "SUPER_ADMIN") {
+      return { success: false, error: "Unauthorized" }
+    }
+
+    await prisma.shop.update({
+      where: { id: shopId },
+      data: { status: "ACTIVE" }
+    })
+
+    revalidatePath("/superadmin/shops")
+    revalidatePath("/superadmin")
+    return { success: true }
+  } catch (error) {
+    console.error("Restore Shop Error:", error)
+    return { success: false, error: "Failed to restore shop" }
+  }
+}
+
+export async function permanentDeleteShopAction(shopId: string) {
   try {
     const session = await auth()
     if (!session || session.user.role !== "SUPER_ADMIN") {
@@ -120,12 +162,28 @@ export async function deleteShopAction(shopId: string) {
     }
 
     await prisma.$transaction(async (tx) => {
-      // First delete all users associated with this shop manually because schema doesn't cascade
-      await tx.user.deleteMany({
-        where: { shopId }
-      })
-
-      // Then delete the shop (cascades everything else)
+      // Delete children first to prevent foreign key constraint errors
+      await tx.heldCartItem.deleteMany({ where: { heldCart: { shopId } } })
+      await tx.saleItem.deleteMany({ where: { sale: { shopId } } })
+      await tx.returnItem.deleteMany({ where: { return: { shopId } } })
+      await tx.stockTransaction.deleteMany({ where: { shopId } })
+      await tx.activityLog.deleteMany({ where: { shopId } })
+      await tx.payment.deleteMany({ where: { sale: { shopId } } })
+      await tx.receipt.deleteMany({ where: { shopId } })
+      
+      await tx.return.deleteMany({ where: { shopId } })
+      await tx.heldCart.deleteMany({ where: { shopId } })
+      await tx.sale.deleteMany({ where: { shopId } })
+      
+      await tx.product.deleteMany({ where: { shopId } })
+      await tx.category.deleteMany({ where: { shopId } })
+      await tx.customer.deleteMany({ where: { shopId } })
+      
+      await tx.user.deleteMany({ where: { shopId } })
+      await tx.vatSetting.deleteMany({ where: { shopId } })
+      await tx.shopSetting.deleteMany({ where: { shopId } })
+      
+      // Finally, delete the shop
       await tx.shop.delete({
         where: { id: shopId }
       })
@@ -135,8 +193,8 @@ export async function deleteShopAction(shopId: string) {
     revalidatePath("/superadmin")
     return { success: true }
   } catch (error) {
-    console.error("Delete Shop Error:", error)
-    return { success: false, error: "An unexpected error occurred" }
+    console.error("Permanent Delete Shop Error:", error)
+    return { success: false, error: "Database constraint error: could not permanently delete this shop" }
   }
 }
 

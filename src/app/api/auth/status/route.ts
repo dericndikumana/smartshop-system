@@ -13,7 +13,7 @@ export async function GET() {
     select: { status: true, shop: { select: { status: true } } }
   })
 
-  if (!user || user.status === "BLOCKED" || user.status === "INACTIVE" || user.shop?.status === "BLOCKED") {
+  if (!user || user.status === "BLOCKED" || user.status === "INACTIVE" || user.shop?.status === "BLOCKED" || user.shop?.status === "DELETED") {
     return NextResponse.json({ suspended: true })
   }
 

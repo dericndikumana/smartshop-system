@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { Store, Trash2, ShieldAlert, CheckCircle, Search, Plus, Edit, Key, ChevronLeft, ChevronRight } from "lucide-react"
-import { deleteShopAction, toggleShopStatusAction, createShopAction, editShopAdminAction, resetShopAdminPasswordAction, editShopAction } from "@/app/actions/superadmin"
+import { Store, Trash2, ShieldAlert, CheckCircle, Search, Plus, Edit, Key, ChevronLeft, ChevronRight, ArchiveRestore, AlertTriangle } from "lucide-react"
+import { softDeleteShopAction, restoreShopAction, permanentDeleteShopAction, toggleShopStatusAction, createShopAction, editShopAdminAction, resetShopAdminPasswordAction, editShopAction } from "@/app/actions/superadmin"
 import { toast } from "sonner"
 
 interface Shop {
@@ -26,6 +26,9 @@ export function ShopsClient({ shops: initialShops }: { shops: Shop[] }) {
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [editAdmin, setEditAdmin] = useState<Shop | null>(null)
   const [editShop, setEditShop] = useState<Shop | null>(null)
+  const [confirmPermanentDelete, setConfirmPermanentDelete] = useState<string | null>(null)
+  
+  const [activeTab, setActiveTab] = useState<"ACTIVE" | "RECYCLE_BIN">("ACTIVE")
   
   const [isLoading, setIsLoading] = useState(false)
 
@@ -93,10 +96,37 @@ export function ShopsClient({ shops: initialShops }: { shops: Shop[] }) {
     setIsLoading(false)
   }
 
-  async function handleDelete(shopId: string) {
+  async function handleSoftDelete(shopId: string) {
     setIsLoading(true)
-    await deleteShopAction(shopId)
-    toast.success("Shop deleted successfully.")
+    const result = await softDeleteShopAction(shopId)
+    if (result?.error) {
+      toast.error(result.error)
+    } else {
+      toast.success("Shop moved to Recycle Bin.")
+    }
+    setIsLoading(false)
+  }
+
+  async function handleRestore(shopId: string) {
+    setIsLoading(true)
+    const result = await restoreShopAction(shopId)
+    if (result?.error) {
+      toast.error(result.error)
+    } else {
+      toast.success("Shop restored successfully.")
+    }
+    setIsLoading(false)
+  }
+
+  async function handlePermanentDelete(shopId: string) {
+    setIsLoading(true)
+    const result = await permanentDeleteShopAction(shopId)
+    if (result?.error) {
+      toast.error(result.error)
+    } else {
+      setConfirmPermanentDelete(null)
+      toast.success("Shop permanently deleted.")
+    }
     setIsLoading(false)
   }
 
@@ -107,8 +137,13 @@ export function ShopsClient({ shops: initialShops }: { shops: Shop[] }) {
     setIsLoading(false)
   }
 
+  // Filter by tab
+  const tabFilteredShops = initialShops.filter(s => 
+    activeTab === "ACTIVE" ? s.status !== "DELETED" : s.status === "DELETED"
+  )
+
   // Pagination logic
-  const filteredShops = initialShops.filter(s => 
+  const filteredShops = tabFilteredShops.filter(s => 
     s.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
     s.adminEmail.toLowerCase().includes(searchTerm.toLowerCase())
   )
@@ -139,18 +174,34 @@ export function ShopsClient({ shops: initialShops }: { shops: Shop[] }) {
             <Store className="h-5 w-5 text-primary" />
             Registered Shops
           </h2>
-          <div className="relative w-full sm:w-64">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <input 
-              type="text" 
-              placeholder="Search shops..." 
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value)
-                setCurrentPage(1)
-              }}
-              className="w-full pl-9 rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" 
-            />
+          <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+            <div className="flex bg-background border rounded-lg p-1">
+              <button
+                onClick={() => { setActiveTab("ACTIVE"); setCurrentPage(1) }}
+                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${activeTab === "ACTIVE" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-muted"}`}
+              >
+                Active Shops
+              </button>
+              <button
+                onClick={() => { setActiveTab("RECYCLE_BIN"); setCurrentPage(1) }}
+                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${activeTab === "RECYCLE_BIN" ? "bg-red-500 text-white shadow-sm" : "text-muted-foreground hover:bg-muted"}`}
+              >
+                Recycle Bin
+              </button>
+            </div>
+            <div className="relative w-full sm:w-64">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <input 
+                type="text" 
+                placeholder="Search shops..." 
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value)
+                  setCurrentPage(1)
+                }}
+                className="w-full pl-9 rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" 
+              />
+            </div>
           </div>
         </div>
         <div className="overflow-x-auto">
@@ -219,36 +270,67 @@ export function ShopsClient({ shops: initialShops }: { shops: Shop[] }) {
                       <p className="text-xs text-muted-foreground mt-1"><span className="font-medium text-foreground">{shop.salesCount}</span> Sales</p>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border ${
-                        shop.status === "ACTIVE" 
-                          ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:bg-emerald-500/20 dark:text-emerald-400" 
-                          : "bg-red-500/10 text-red-600 border-red-500/20 dark:bg-red-500/20 dark:text-red-400"
-                      }`}>
-                        {shop.status === "ACTIVE" ? <CheckCircle className="h-3 w-3" /> : <ShieldAlert className="h-3 w-3" />}
-                        {shop.status}
-                      </span>
+                      {activeTab === "RECYCLE_BIN" ? (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border bg-red-500/10 text-red-600 border-red-500/20 dark:bg-red-500/20 dark:text-red-400">
+                          <Trash2 className="h-3 w-3" />
+                          DELETED
+                        </span>
+                      ) : (
+                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border ${
+                          shop.status === "ACTIVE" 
+                            ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:bg-emerald-500/20 dark:text-emerald-400" 
+                            : "bg-red-500/10 text-red-600 border-red-500/20 dark:bg-red-500/20 dark:text-red-400"
+                        }`}>
+                          {shop.status === "ACTIVE" ? <CheckCircle className="h-3 w-3" /> : <ShieldAlert className="h-3 w-3" />}
+                          {shop.status}
+                        </span>
+                      )}
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => handleToggleStatus(shop.id, shop.status)}
-                          disabled={isLoading}
-                          className={`text-xs font-medium px-3 py-1.5 rounded-md transition-colors disabled:opacity-50 ${
-                            shop.status === "ACTIVE" 
-                              ? "text-orange-600 hover:bg-orange-500/10" 
-                              : "text-emerald-600 hover:bg-emerald-500/10"
-                          }`}
-                        >
-                          {shop.status === "ACTIVE" ? "Suspend" : "Activate"}
-                        </button>
-                        <button
-                          onClick={() => handleDelete(shop.id)}
-                          disabled={isLoading}
-                          className="p-1.5 text-red-600 hover:bg-red-500/10 rounded-md transition-colors disabled:opacity-50"
-                          title="Delete Shop"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
+                        {activeTab === "ACTIVE" ? (
+                          <>
+                            <button
+                              onClick={() => handleToggleStatus(shop.id, shop.status)}
+                              disabled={isLoading}
+                              className={`text-xs font-medium px-3 py-1.5 rounded-md transition-colors disabled:opacity-50 ${
+                                shop.status === "ACTIVE" 
+                                  ? "text-orange-600 hover:bg-orange-500/10" 
+                                  : "text-emerald-600 hover:bg-emerald-500/10"
+                              }`}
+                            >
+                              {shop.status === "ACTIVE" ? "Suspend" : "Activate"}
+                            </button>
+                            <button
+                              onClick={() => handleSoftDelete(shop.id)}
+                              disabled={isLoading}
+                              className="p-1.5 text-red-600 hover:bg-red-500/10 rounded-md transition-colors disabled:opacity-50"
+                              title="Delete Shop"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              onClick={() => handleRestore(shop.id)}
+                              disabled={isLoading}
+                              className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-emerald-600 hover:bg-emerald-500/10 rounded-md transition-colors disabled:opacity-50"
+                            >
+                              <ArchiveRestore className="h-3.5 w-3.5" />
+                              Restore
+                            </button>
+                            <button
+                              onClick={() => setConfirmPermanentDelete(shop.id)}
+                              disabled={isLoading}
+                              className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-500/10 rounded-md transition-colors disabled:opacity-50"
+                              title="Delete Permanently"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                              Permanent Delete
+                            </button>
+                          </>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -391,6 +473,39 @@ export function ShopsClient({ shops: initialShops }: { shops: Shop[] }) {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Permanent Delete Confirmation Modal */}
+      {confirmPermanentDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in duration-200 p-4">
+          <div className="bg-card w-full max-w-sm rounded-xl shadow-lg border border-red-500/20 p-6 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center gap-3 text-red-500 mb-4">
+              <AlertTriangle className="h-8 w-8" />
+              <h2 className="text-xl font-bold">Warning</h2>
+            </div>
+            <p className="text-sm text-muted-foreground mb-6">
+              Are you absolutely sure? This will permanently destroy all data (products, sales, users) for this shop. This action <strong>cannot</strong> be undone.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button 
+                type="button" 
+                onClick={() => setConfirmPermanentDelete(null)}
+                className="px-4 py-2 text-sm font-medium rounded-md border hover:bg-muted transition-colors"
+                disabled={isLoading}
+              >
+                Cancel
+              </button>
+              <button 
+                type="button"
+                onClick={() => handlePermanentDelete(confirmPermanentDelete)}
+                disabled={isLoading}
+                className="px-4 py-2 text-sm font-medium rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50"
+              >
+                {isLoading ? "Deleting..." : "Permanently Delete"}
+              </button>
+            </div>
           </div>
         </div>
       )}
