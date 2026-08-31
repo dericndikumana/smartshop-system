@@ -340,7 +340,7 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                   
                   <div className="space-y-2">
                     <label className="text-sm font-medium">SKU (Optional)</label>
-                    <input name="sku" type="text" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g. PRD-12345" />
+                    <input name="sku" type="text" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Put SKU or leave empty (no matter)" />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -399,7 +399,7 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                   
                   <div className="space-y-2">
                     <label className="text-sm font-medium">SKU (Optional)</label>
-                    <input name="sku" type="text" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g. PRD-12345" />
+                    <input name="sku" type="text" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Put SKU or leave empty (no matter)" />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
