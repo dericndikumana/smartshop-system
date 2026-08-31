@@ -191,70 +191,85 @@ export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
               </div>
             </div>
             
-            <div id="receipt-print-area" className="p-6 overflow-y-auto bg-white text-black font-mono text-sm print:overflow-visible">
-              <div className="text-center mb-6">
-                <h1 className="text-2xl font-bold tracking-tight uppercase">{selectedSale.shopName}</h1>
-                <p className="text-gray-500 mt-1">Receipt: {selectedSale.receiptNumber}</p>
-                <p className="text-gray-500">Date: {new Date(selectedSale.createdAt).toLocaleString()}</p>
-                <p className="text-gray-500">Cashier: {selectedSale.cashierName}</p>
-                <p className="text-gray-500">Customer: {selectedSale.customerName || "Walk-in"}</p>
+            <div id="receipt-print-area" className="p-4 overflow-y-auto bg-white text-black font-mono text-sm print:overflow-visible mx-auto" style={{ width: '100%', maxWidth: '350px' }}>
+              <div className="text-center mb-4">
+                <h1 className="text-xl font-bold uppercase">{selectedSale.shopName}</h1>
+                <p className="mt-1 font-bold">
+                  {selectedSale.vatRate > 0 ? "TAX INVOICE" : "INVOICE"}
+                </p>
+                {selectedSale.vatRate > 0 && (
+                  <div className="flex justify-between text-xs mt-1">
+                    <span>VAT {selectedSale.vatRate}%</span>
+                  </div>
+                )}
+                {selectedSale.customerName && (
+                  <p className="text-left mt-2">Customer Name : {selectedSale.customerName.toUpperCase()}</p>
+                )}
               </div>
 
-              <div className="border-t border-dashed border-gray-300 py-4 mb-4">
-                <table className="w-full">
+              <div className="border-t border-b border-black py-2 mb-2">
+                <table className="w-full text-xs">
                   <thead>
-                    <tr className="text-left text-gray-500">
-                      <th className="pb-2 font-normal">Item</th>
-                      <th className="pb-2 text-right font-normal">Qty</th>
-                      <th className="pb-2 text-right font-normal">Total</th>
+                    <tr className="text-left">
+                      <th className="pb-1 font-normal w-1/2">Item</th>
+                      <th className="pb-1 text-center font-normal">Qty</th>
+                      <th className="pb-1 text-right font-normal">Price</th>
+                      <th className="pb-1 text-right font-normal">Value</th>
                     </tr>
                   </thead>
                   <tbody>
                     {selectedSale.items.map(item => (
-                      <tr key={item.id}>
-                        <td className="py-1">{item.name}</td>
-                        <td className="py-1 text-right">{item.quantity}</td>
-                        <td className="py-1 text-right">{item.currency} {item.subtotal.toLocaleString()}</td>
+                      <tr key={item.id} className="align-top">
+                        <td className="py-1 pr-1">{item.name}</td>
+                        <td className="py-1 text-center">{item.quantity}</td>
+                        <td className="py-1 text-right">{item.unitPrice.toFixed(2)}</td>
+                        <td className="py-1 text-right">{item.subtotal.toFixed(2)}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
 
-              <div className="border-t border-dashed border-gray-300 py-4 space-y-2">
-                <div className="flex justify-between text-gray-500">
-                  <span>Subtotals:</span>
-                  <div className="text-right">
-                    {Object.entries(selectedSale.totalsByCurrency).map(([currency, total]) => (
-                      <div key={currency}>{currency} {total.toLocaleString()}</div>
-                    ))}
-                  </div>
-                </div>
-                
-                {selectedSale.vatRate > 0 && (
-                  <div className="flex justify-between text-gray-500">
-                    <span>VAT ({selectedSale.vatRate}%):</span>
-                    <div className="text-right">
-                      {Object.entries(selectedSale.totalsByCurrency).map(([currency, total]) => (
-                        <div key={currency}>{currency} {(total * (selectedSale.vatRate / 100)).toLocaleString()}</div>
-                      ))}
+              <div className="py-1 space-y-1 text-xs">
+                {Object.entries(selectedSale.totalsByCurrency).map(([currency, total]) => {
+                  const vatAmount = total * (selectedSale.vatRate / 100)
+                  const grandTotal = total + vatAmount
+                  
+                  return (
+                    <div key={currency} className="mb-2">
+                      <div className="flex justify-end gap-4">
+                        <span className="w-16 text-right">Nett</span>
+                        <span className="w-20 text-right">{total.toFixed(2)}</span>
+                      </div>
+                      {selectedSale.vatRate > 0 && (
+                        <div className="flex justify-end gap-4">
+                          <span className="w-16 text-right">VAT INC</span>
+                          <span className="w-20 text-right">{vatAmount.toFixed(2)}</span>
+                        </div>
+                      )}
+                      <div className="border-t border-black my-1 border-dashed"></div>
+                      <div className="flex justify-between font-bold">
+                        <span>{currency}</span>
+                        <span>{grandTotal.toFixed(2)}</span>
+                      </div>
                     </div>
-                  </div>
-                )}
-                
-                <div className="flex justify-between font-bold text-lg pt-2 mt-2 border-t border-gray-300">
-                  <span>TOTAL DUE:</span>
-                  <div className="text-right">
-                    {Object.entries(selectedSale.totalsByCurrency).map(([currency, total]) => (
-                      <div key={currency}>{currency} {(total + (total * (selectedSale.vatRate / 100))).toLocaleString()}</div>
-                    ))}
-                  </div>
+                  )
+                })}
+              </div>
+
+              <div className="border-t border-black pt-2 mt-2 text-xs">
+                <p>CASH SALE Invoice # : {selectedSale.receiptNumber}</p>
+                <p>{selectedSale.items.length} Line Item(s)</p>
+                <p>{selectedSale.items.reduce((sum, item) => sum + item.quantity, 0)} Item(s)</p>
+                <p>Operator/Cashier : {selectedSale.cashierName.toUpperCase()}</p>
+                <div className="flex gap-4">
+                  <p>Server Date : {new Date(selectedSale.createdAt).toLocaleDateString('en-GB')}</p>
+                  <p>Time : {new Date(selectedSale.createdAt).toLocaleTimeString('en-GB', { hour12: false })}</p>
                 </div>
               </div>
 
-              <div className="text-center mt-8 text-gray-500">
-                <p>Thank you for your business!</p>
-                <p className="text-xs mt-1">Powered by SmartShop</p>
+              <div className="text-center mt-6 text-xs">
+                <p>& O E</p>
               </div>
             </div>
           </div>
