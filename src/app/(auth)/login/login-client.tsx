@@ -47,14 +47,14 @@ export default function LoginClient({ isSuspended }: { isSuspended: boolean }) {
           <ArrowRight className="relative h-5 w-5 transition-transform group-hover:translate-x-1" />
         </button>
 
-        <div className="mt-16 text-slate-400 text-sm flex flex-col items-center gap-2">
-          <p>Don&apos;t have an account? Contact the System Administrator:</p>
-          <div className="flex items-center gap-4 text-slate-300">
-            <span className="flex items-center gap-1.5 bg-white/5 px-3 py-1.5 rounded-full border border-white/5 backdrop-blur-sm">
-              <span className="text-emerald-400">WhatsApp</span> +250 781 096 567
+        <div className="mt-16 text-slate-400 text-sm flex flex-col items-center gap-4">
+          <p className="text-center px-4">Don&apos;t have an account? Contact the System Administrator:</p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 text-slate-300">
+            <span className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full border border-white/5 backdrop-blur-sm whitespace-nowrap">
+              <span className="text-emerald-400 font-semibold">WhatsApp</span> +250 781 096 567
             </span>
-            <span className="flex items-center gap-1.5 bg-white/5 px-3 py-1.5 rounded-full border border-white/5 backdrop-blur-sm">
-              <span className="text-cyan-400">Email</span> ndikumanaderic2@gmail.com
+            <span className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full border border-white/5 backdrop-blur-sm whitespace-nowrap">
+              <span className="text-cyan-400 font-semibold">Email</span> ndikumanaderic2@gmail.com
             </span>
           </div>
         </div>
