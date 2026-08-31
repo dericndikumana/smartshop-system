@@ -26,7 +26,7 @@ export default function LoginForm() {
       })
 
       if (res?.error) {
-        if (res.error === "Configuration" || res.error === "suspended" || res.error.includes("suspended")) {
+        if (res.error === "suspended") {
            setErrorMessage("Your account has been suspended. Please contact the System Administrator.")
         } else {
            setErrorMessage("Invalid email or password.")

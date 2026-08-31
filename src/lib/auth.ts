@@ -1,8 +1,12 @@
-import NextAuth from "next-auth"
+import NextAuth, { CredentialsSignin } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
 import prisma from "./prisma"
 import { authConfig } from "./auth.config"
+
+class SuspendedError extends CredentialsSignin {
+  code = "suspended"
+}
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   ...authConfig,
@@ -21,14 +25,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           include: { role: true, shop: true }
         })
 
-        if (!user) return null
+        if (!user) throw new CredentialsSignin()
 
         if (user.status === "BLOCKED" || user.status === "INACTIVE" || user.shop?.status === "BLOCKED") {
-          throw new Error("suspended")
+          throw new SuspendedError()
         }
 
         const isValid = await bcrypt.compare(credentials.password as string, user.password)
-        if (!isValid) return null
+        if (!isValid) throw new CredentialsSignin()
 
         return {
           id: user.id,
