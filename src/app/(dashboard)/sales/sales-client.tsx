@@ -210,7 +210,7 @@ export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
                   <thead>
                     <tr className="text-left font-bold">
                       <th className="pb-1 w-1/2">Item</th>
-                      <th className="pb-1 text-center">Nbr of Bundles</th>
+                      <th className="pb-1 text-center">Total Packs</th>
                       <th className="pb-1 text-right">P</th>
                       <th className="pb-1 text-right">Sub</th>
                     </tr>

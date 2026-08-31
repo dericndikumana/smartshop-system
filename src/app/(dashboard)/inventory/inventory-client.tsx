@@ -181,10 +181,10 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
             <thead className="bg-muted/50 text-muted-foreground uppercase text-[10px]">
               <tr>
                 <th className="px-3 py-3 font-medium">PRODUCT</th>
-                <th className="px-3 py-3 font-medium">Nbr of Bundles</th>
-                <th className="px-3 py-3 font-medium">Piece Per Bundle</th>
+                <th className="px-3 py-3 font-medium">Total Packs</th>
+                <th className="px-3 py-3 font-medium">Items per Pack</th>
                 <th className="px-3 py-3 font-medium">Total pieces</th>
-                <th className="px-3 py-3 font-medium">Price Per Bundle $</th>
+                <th className="px-3 py-3 font-medium">Pack Price</th>
                 <th className="px-3 py-3 font-medium">Amount</th>
                 <th className="px-3 py-3 font-medium">Selling Price</th>
                 {userRole !== "CASHIER" && <th className="px-3 py-3 font-medium text-right">Actions</th>}
@@ -332,9 +332,20 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                     <input name="sku" type="text" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Put SKU or leave empty (no matter)" />
                   </div>
 
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Total Packs</label>
+                      <input required name="quantity" type="number" min="0" defaultValue="0" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Items per Pack</label>
+                      <input required name="piecesPerBundle" type="number" min="1" defaultValue="1" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Price Per Bundle</label>
+                      <label className="text-sm font-medium">Pack Price</label>
                       <input name="buyingPrice" type="number" step="0.01" min="0" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="0.00" />
                     </div>
                     <div className="space-y-2">
@@ -348,17 +359,6 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                           <option key={c} value={c}>{c}</option>
                         ))}
                       </select>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Nbr of Bundles</label>
-                      <input required name="quantity" type="number" min="0" defaultValue="0" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Pieces Per Bundle</label>
-                      <input required name="piecesPerBundle" type="number" min="1" defaultValue="1" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
                     </div>
                   </div>
                   
@@ -391,9 +391,20 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                     <input name="sku" type="text" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Put SKU or leave empty (no matter)" />
                   </div>
 
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Total Packs</label>
+                      <input required name="quantity" type="number" min="0" defaultValue={editingProduct.quantity} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Items per Pack</label>
+                      <input required name="piecesPerBundle" type="number" min="1" defaultValue={editingProduct.piecesPerBundle || 1} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Price Per Bundle</label>
+                      <label className="text-sm font-medium">Pack Price</label>
                       <input name="buyingPrice" type="number" step="0.01" min="0" defaultValue={editingProduct.buyingPrice || ""} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="0.00" />
                     </div>
                     <div className="space-y-2">
@@ -407,17 +418,6 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                           <option key={c} value={c}>{c}</option>
                         ))}
                       </select>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Nbr of Bundles</label>
-                      <input required name="quantity" type="number" min="0" defaultValue={editingProduct.quantity} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Pieces Per Bundle</label>
-                      <input required name="piecesPerBundle" type="number" min="1" defaultValue={editingProduct.piecesPerBundle || 1} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
                     </div>
                   </div>
                   
