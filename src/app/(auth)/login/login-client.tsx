@@ -15,7 +15,6 @@ export default function LoginClient({ isSuspended }: { isSuspended: boolean }) {
         <div className="absolute -top-[40%] -left-[20%] w-[70%] h-[70%] rounded-full bg-violet-600/20 blur-[120px] animate-pulse" style={{ animationDuration: '8s' }} />
         <div className="absolute top-[20%] -right-[20%] w-[60%] h-[60%] rounded-full bg-fuchsia-600/20 blur-[120px] animate-pulse" style={{ animationDuration: '12s', animationDelay: '2s' }} />
         <div className="absolute -bottom-[30%] left-[10%] w-[80%] h-[80%] rounded-full bg-cyan-600/20 blur-[150px] animate-pulse" style={{ animationDuration: '10s', animationDelay: '4s' }} />
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150 mix-blend-overlay"></div>
       </div>
 
       {/* Main Landing Content */}
