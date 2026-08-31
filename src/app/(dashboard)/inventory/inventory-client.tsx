@@ -50,7 +50,7 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 5
+  const itemsPerPage = 10
 
   const filteredProducts = initialProducts.filter(p => 
     p.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -178,19 +178,22 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
-            <thead className="bg-muted/50 text-muted-foreground uppercase text-xs">
+            <thead className="bg-muted/50 text-muted-foreground uppercase text-[10px]">
               <tr>
-                <th className="px-6 py-4 font-medium">Product</th>
-                <th className="px-6 py-4 font-medium">Pieces / Bundle</th>
-                <th className="px-6 py-4 font-medium">Bundles & Amount</th>
-                <th className="px-6 py-4 font-medium">Total Pieces</th>
-                {userRole !== "CASHIER" && <th className="px-6 py-4 font-medium text-right">Actions</th>}
+                <th className="px-3 py-3 font-medium">PRODUCT</th>
+                <th className="px-3 py-3 font-medium">Nbr of Bundles</th>
+                <th className="px-3 py-3 font-medium">Piece Per Bundle</th>
+                <th className="px-3 py-3 font-medium">Total pieces</th>
+                <th className="px-3 py-3 font-medium">Price Per Bundle $</th>
+                <th className="px-3 py-3 font-medium">Amount</th>
+                <th className="px-3 py-3 font-medium">Selling Price</th>
+                {userRole !== "CASHIER" && <th className="px-3 py-3 font-medium text-right">Actions</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
               {paginatedProducts.length === 0 ? (
                 <tr>
-                  <td colSpan={userRole !== "CASHIER" ? 4 : 3} className="px-6 py-12 text-center text-muted-foreground">
+                  <td colSpan={userRole !== "CASHIER" ? 8 : 7} className="px-6 py-12 text-center text-muted-foreground">
                     <Package className="h-12 w-12 mx-auto mb-4 opacity-20" />
                     No products found. Add your first product to get started.
                   </td>
@@ -198,46 +201,31 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
               ) : (
                 paginatedProducts.map((product) => (
                   <tr key={product.id} className="hover:bg-muted/30 transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className={`h-10 w-10 rounded-md flex items-center justify-center text-white font-bold text-lg shadow-sm ${getInitialsColor(product.name)}`}>
+                    <td className="px-3 py-2">
+                      <div className="flex items-center gap-2">
+                        <div className={`h-6 w-6 rounded-md flex items-center justify-center text-white font-bold text-[10px] shadow-sm ${getInitialsColor(product.name)}`}>
                           {product.name.substring(0, 2).toUpperCase()}
                         </div>
-                        <div>
-                          <p className="font-medium text-base text-foreground">{product.name}</p>
-                          <p className="text-xs text-muted-foreground mt-0.5">ID: {product.id.slice(0, 8)}</p>
-                        </div>
+                        <p className="font-medium text-xs text-foreground truncate max-w-[150px]" title={product.name}>{product.name}</p>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col gap-1 text-sm">
-                        <p>
-                          <span className="text-muted-foreground">Price/Bundle:</span> {product.buyingPrice ? `${product.currency} ${product.buyingPrice.toLocaleString()}` : "-"}
-                        </p>
-                        <p className="font-semibold text-foreground">
-                          <span className="text-muted-foreground font-normal">Sell:</span> {product.currency} {product.sellingPrice > 0 ? product.sellingPrice.toLocaleString() : "Not Set"}
-                        </p>
-                        <p className="text-muted-foreground mt-1 text-xs">
-                          {product.piecesPerBundle || 1} pieces / bundle
-                        </p>
-                      </div>
+                    <td className="px-3 py-2 text-xs font-medium">
+                      {product.quantity}
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col gap-1">
-                        <span className={`inline-flex w-fit items-center px-2 py-0.5 rounded-full text-xs font-semibold border bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:bg-emerald-500/20 dark:text-emerald-400`}>
-                          {product.quantity} Bundles
-                        </span>
-                        {product.buyingPrice && product.quantity > 0 && (
-                          <p className="text-xs font-medium text-muted-foreground mt-1">
-                            Amount: {product.currency} {(product.buyingPrice * product.quantity).toLocaleString()}
-                          </p>
-                        )}
-                      </div>
+                    <td className="px-3 py-2 text-xs">
+                      {product.piecesPerBundle || 1}
                     </td>
-                    <td className="px-6 py-4">
-                      <p className="font-semibold text-foreground">
-                        {(product.quantity * (product.piecesPerBundle || 1)).toLocaleString()} pieces
-                      </p>
+                    <td className="px-3 py-2 text-xs">
+                      {(product.quantity * (product.piecesPerBundle || 1)).toLocaleString()}
+                    </td>
+                    <td className="px-3 py-2 text-xs">
+                      {product.buyingPrice ? `${product.currency} ${product.buyingPrice.toLocaleString()}` : "-"}
+                    </td>
+                    <td className="px-3 py-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                      {product.buyingPrice ? `${product.currency} ${(product.buyingPrice * product.quantity).toLocaleString()}` : "-"}
+                    </td>
+                    <td className="px-3 py-2 text-xs">
+                      {product.sellingPrice > 0 ? `${product.currency} ${product.sellingPrice.toLocaleString()}` : "Not Set"}
                     </td>
                     {userRole !== "CASHIER" && (
                       <td className="px-6 py-4 text-right flex justify-end gap-2">
