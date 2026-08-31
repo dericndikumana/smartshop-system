@@ -4,7 +4,7 @@ import { useState } from "react"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { AlertCircle } from "lucide-react"
+import { AlertCircle, RefreshCw } from "lucide-react"
 
 export default function LoginForm() {
   const router = useRouter()
@@ -87,9 +87,26 @@ export default function LoginForm() {
         />
       </div>
       
-      <Button className="w-full mt-6 font-medium" type="submit" disabled={loading}>
-        {loading ? "Signing in..." : "Sign in"}
-      </Button>
+      <div className="flex gap-2 mt-6">
+        <Button className="flex-1 font-medium" type="submit" disabled={loading}>
+          {loading ? "Signing in..." : "Sign in"}
+        </Button>
+        {errorMessage && (
+          <Button 
+            type="button" 
+            variant="outline" 
+            className="px-3 shrink-0 text-slate-500 hover:text-slate-900"
+            onClick={() => {
+              setEmail("")
+              setPassword("")
+              setErrorMessage(null)
+            }}
+            title="Refresh form"
+          >
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+        )}
+      </div>
     </form>
   )
 }
