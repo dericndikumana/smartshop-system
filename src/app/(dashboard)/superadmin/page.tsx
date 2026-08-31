@@ -15,15 +15,24 @@ export default async function SuperAdminPage() {
     redirect("/login")
   }
 
-  // Fetch real data
-  const totalShops = await prisma.shop.count()
+  // Fetch real data (excluding DELETED shops)
+  const totalShops = await prisma.shop.count({
+    where: { status: { not: "DELETED" } }
+  })
   const totalSystemSales = await prisma.sale.count()
+  
   const totalAdmins = await prisma.user.count({
-    where: { role: { name: "SHOP_ADMIN" } }
+    where: { 
+      role: { name: "SHOP_ADMIN" },
+      shop: { status: { not: "DELETED" } }
+    }
   })
   
   const allAdmins = await prisma.user.findMany({
-    where: { role: { name: "SHOP_ADMIN" } },
+    where: { 
+      role: { name: "SHOP_ADMIN" },
+      shop: { status: { not: "DELETED" } }
+    },
     include: { shop: true },
     orderBy: { createdAt: 'desc' }
   })
