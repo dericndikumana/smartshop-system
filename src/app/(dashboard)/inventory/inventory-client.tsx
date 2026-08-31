@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Package, Plus, Trash2, Search, AlertCircle, ArrowUp, Edit } from "lucide-react"
+import { Package, Plus, Trash2, Search, ArrowUp, Edit } from "lucide-react"
 import { createProductAction, deleteProductAction, addStockAction, editProductAction } from "@/app/actions/inventory"
 import { toast } from "sonner"
 
