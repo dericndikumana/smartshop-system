@@ -181,9 +181,10 @@ export async function restoreShopAction(shopId: string) {
     revalidatePath("/superadmin/shops")
     revalidatePath("/superadmin")
     return { success: true }
-  } catch (error: any) {
+  } catch (error) {
     console.error("Restore Shop Error:", error)
-    return { success: false, error: error.message || "Failed to restore shop" }
+    const errorMessage = error instanceof Error ? error.message : "Failed to restore shop"
+    return { success: false, error: errorMessage }
   }
 }
 
