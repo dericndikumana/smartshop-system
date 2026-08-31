@@ -23,6 +23,7 @@ export default async function InventoryPage() {
       id: p.id,
       name: p.name || "Unknown",
       sellingPrice: Number(p.sellingPrice || 0),
+      buyingPrice: p.buyingPrice ? Number(p.buyingPrice) : null,
       currency: p.currency || "RWF",
       quantity: Number(p.quantity || 0),
       minStock: Number(p.minStock || 0),

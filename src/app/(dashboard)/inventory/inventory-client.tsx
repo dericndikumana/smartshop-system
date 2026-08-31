@@ -16,6 +16,7 @@ const CURRENCIES = [
 interface Product {
   id: string
   name: string
+  buyingPrice?: number | null
   sellingPrice: number
   currency: string
   quantity: number
@@ -179,8 +180,8 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
             <thead className="bg-muted/50 text-muted-foreground uppercase text-xs">
               <tr>
                 <th className="px-6 py-4 font-medium">Product</th>
-                <th className="px-6 py-4 font-medium">Price</th>
-                <th className="px-6 py-4 font-medium">Stock Level</th>
+                <th className="px-6 py-4 font-medium">Price (Buy / Sell)</th>
+                <th className="px-6 py-4 font-medium">Stock & Value</th>
                 {userRole !== "CASHIER" && <th className="px-6 py-4 font-medium text-right">Actions</th>}
               </tr>
             </thead>
@@ -207,9 +208,14 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <p className="font-semibold text-foreground">
-                        {product.currency} {product.sellingPrice.toLocaleString()}
-                      </p>
+                      <div className="flex flex-col gap-1 text-sm">
+                        <p>
+                          <span className="text-muted-foreground">Buy:</span> {product.buyingPrice ? `${product.currency} ${product.buyingPrice.toLocaleString()}` : "-"}
+                        </p>
+                        <p className="font-semibold text-foreground">
+                          <span className="text-muted-foreground font-normal">Sell:</span> {product.currency} {product.sellingPrice.toLocaleString()}
+                        </p>
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-col gap-1">
@@ -218,10 +224,15 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                             ? "bg-red-500/10 text-red-600 border-red-500/20 dark:bg-red-500/20 dark:text-red-400"
                             : "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:bg-emerald-500/20 dark:text-emerald-400"
                         }`}>
-                          {product.quantity} in stock
+                          {product.quantity} units
                         </span>
+                        {product.buyingPrice && product.quantity > 0 && (
+                          <p className="text-xs font-medium text-muted-foreground mt-1">
+                            Value: {product.currency} {(product.buyingPrice * product.quantity).toLocaleString()}
+                          </p>
+                        )}
                         {product.quantity <= product.minStock && (
-                          <span className="text-[10px] text-red-500 font-medium flex items-center gap-1">
+                          <span className="text-[10px] text-red-500 font-medium flex items-center gap-1 mt-1">
                             <AlertCircle className="h-3 w-3" /> Low Stock
                           </span>
                         )}
@@ -332,9 +343,13 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                     <input name="sku" type="text" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g. PRD-12345" />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Price</label>
+                      <label className="text-sm font-medium">Buying Price</label>
+                      <input name="buyingPrice" type="number" step="0.01" min="0" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="0.00" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Selling Price</label>
                       <input required name="sellingPrice" type="number" step="0.01" min="0" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="0.00" />
                     </div>
                     <div className="space-y-2">
@@ -387,9 +402,13 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                     <input name="sku" type="text" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g. PRD-12345" />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Price</label>
+                      <label className="text-sm font-medium">Buying Price</label>
+                      <input name="buyingPrice" type="number" step="0.01" min="0" defaultValue={editingProduct.buyingPrice || ""} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="0.00" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Selling Price</label>
                       <input required name="sellingPrice" type="number" step="0.01" min="0" defaultValue={editingProduct.sellingPrice} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
                     </div>
                     <div className="space-y-2">

@@ -8,6 +8,7 @@ import { z } from "zod"
 const productSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   sku: z.string().optional(),
+  buyingPrice: z.coerce.number().min(0, "Buying price must be non-negative").optional(),
   sellingPrice: z.coerce.number().min(0, "Price must be positive"),
   currency: z.string().min(2, "Currency is required"),
   quantity: z.coerce.number().min(0, "Quantity must be non-negative"),
@@ -24,6 +25,7 @@ export async function createProductAction(formData: FormData) {
     const data = {
       name: formData.get("name") as string,
       sku: (formData.get("sku") as string) || undefined,
+      buyingPrice: formData.get("buyingPrice") ? formData.get("buyingPrice") : undefined,
       sellingPrice: formData.get("sellingPrice"),
       currency: formData.get("currency") as string,
       quantity: formData.get("quantity"),
@@ -36,6 +38,7 @@ export async function createProductAction(formData: FormData) {
       data: {
         name: validated.name,
         sku: validated.sku,
+        buyingPrice: validated.buyingPrice,
         sellingPrice: validated.sellingPrice,
         currency: validated.currency,
         quantity: validated.quantity,
@@ -68,6 +71,7 @@ export async function editProductAction(productId: string, formData: FormData) {
     const data = {
       name: formData.get("name") as string,
       sku: (formData.get("sku") as string) || undefined,
+      buyingPrice: formData.get("buyingPrice") ? formData.get("buyingPrice") : undefined,
       sellingPrice: formData.get("sellingPrice"),
       currency: formData.get("currency") as string,
       quantity: formData.get("quantity"),
@@ -84,6 +88,7 @@ export async function editProductAction(productId: string, formData: FormData) {
       data: {
         name: validated.name,
         sku: validated.sku,
+        buyingPrice: validated.buyingPrice,
         sellingPrice: validated.sellingPrice,
         currency: validated.currency,
         quantity: validated.quantity,
