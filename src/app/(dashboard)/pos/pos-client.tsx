@@ -391,8 +391,8 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
               <div key={item.id} className="flex flex-col gap-2 p-3 border rounded-lg bg-muted/10">
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="font-medium text-sm leading-tight">{item.name}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">{item.currency} {item.sellingPrice.toLocaleString()} each</p>
+                    <p className="font-medium text-[10px] leading-tight">{item.name}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">{item.currency} {item.sellingPrice.toLocaleString()} each</p>
                   </div>
                   <button onClick={() => removeFromCart(item.id)} className="text-muted-foreground hover:text-red-500 transition-colors">
                     <Trash2 className="h-4 w-4" />
@@ -494,8 +494,8 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
                   {heldCarts.map(hc => (
                     <div key={hc.id} className="p-4 border rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-primary/30 transition-colors">
                       <div>
-                        <p className="font-bold">{hc.name}</p>
-                        <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
+                        <p className="font-bold text-[10px]">{hc.name}</p>
+                        <p className="text-[10px] text-muted-foreground flex items-center gap-1 mt-1">
                           <Clock className="h-3 w-3" />
                           {new Date(hc.createdAt).toLocaleTimeString()}
                         </p>

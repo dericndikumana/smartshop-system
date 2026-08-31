@@ -32,7 +32,7 @@ export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
   
   // Pagination
   const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 5
+  const itemsPerPage = 10
 
   const filteredSales = initialSales.filter(s => 
     s.receiptNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -81,7 +81,7 @@ export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
         
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
-            <thead className="bg-muted/50 text-muted-foreground uppercase text-xs">
+            <thead className="bg-muted/50 text-muted-foreground uppercase text-[10px]">
               <tr>
                 <th className="px-6 py-4 font-medium">Receipt No</th>
                 <th className="px-6 py-4 font-medium">Customer Name</th>
@@ -100,7 +100,7 @@ export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
                 </tr>
               ) : (
                 paginatedSales.map((sale) => (
-                  <tr key={sale.id} className="hover:bg-muted/30 transition-colors">
+                  <tr key={sale.id} className="hover:bg-muted/30 transition-colors text-[10px]">
                     <td className="px-6 py-4 font-bold text-foreground">
                       {sale.receiptNumber}
                     </td>
@@ -206,11 +206,11 @@ export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
               </div>
 
               <div className="border-t border-b border-black border-dashed py-2 mb-2">
-                <table className="w-full text-xs">
+                <table className="w-full text-[10px]">
                   <thead>
                     <tr className="text-left font-bold">
                       <th className="pb-1 w-1/2">Item</th>
-                      <th className="pb-1 text-center">Qty</th>
+                      <th className="pb-1 text-center">Nbr of Bundles</th>
                       <th className="pb-1 text-right">P</th>
                       <th className="pb-1 text-right">Sub</th>
                     </tr>
@@ -228,7 +228,7 @@ export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
                 </table>
               </div>
 
-              <div className="py-1 space-y-1 text-xs">
+              <div className="py-1 space-y-1 text-[10px]">
                 {Object.entries(selectedSale.totalsByCurrency).map(([currency, total]) => {
                   const rate = selectedSale.vatRate;
                   let netTotal = total;
@@ -262,7 +262,7 @@ export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
                 })}
               </div>
 
-              <div className="border-t border-black border-dashed pt-2 mt-2 text-center text-xs">
+              <div className="border-t border-black border-dashed pt-2 mt-2 text-center text-[10px]">
                 <p>Thank you for shopping with us!</p>
                 <p>{new Date().toLocaleString('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).replace(',', '')}</p>
                 <p>Powered by {selectedSale.shopName}</p>

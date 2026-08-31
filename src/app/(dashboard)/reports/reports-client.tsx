@@ -27,7 +27,7 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
   const [endDate, setEndDate] = useState("")
   
   const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 5
+  const itemsPerPage = 10
 
   const printReport = () => {
     window.print()
@@ -182,7 +182,7 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
 
           <div className="rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden print:border-gray-300 print:shadow-none">
             <table className="w-full text-sm text-left">
-              <thead className="bg-muted/50 text-muted-foreground uppercase text-xs print:bg-gray-100">
+              <thead className="bg-muted/50 text-muted-foreground uppercase text-[10px] print:bg-gray-100">
                 <tr>
                   <th className="px-6 py-4 font-medium">Receipt #</th>
                   <th className="px-6 py-4 font-medium">Customer Name</th>
@@ -202,7 +202,7 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
                   </tr>
                 ) : (
                   paginatedTransactions.map((tx) => (
-                    <tr key={tx.id} className="hover:bg-muted/20 transition-colors">
+                    <tr key={tx.id} className="hover:bg-muted/20 transition-colors text-[10px]">
                       <td className="px-6 py-4 font-medium text-foreground">{tx.receiptNumber}</td>
                       <td className="px-6 py-4 text-foreground">{tx.customerName}</td>
                       <td className="px-6 py-4 text-muted-foreground text-xs">{tx.itemsSold}</td>

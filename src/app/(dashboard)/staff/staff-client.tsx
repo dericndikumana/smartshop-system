@@ -19,7 +19,7 @@ export function StaffClient({ cashiers: initialCashiers }: { cashiers: Cashier[]
 
   const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 5
+  const itemsPerPage = 10
 
   const filteredCashiers = initialCashiers.filter(c => 
     c.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -108,7 +108,7 @@ export function StaffClient({ cashiers: initialCashiers }: { cashiers: Cashier[]
       <div className="rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
-            <thead className="bg-muted/50 border-b">
+            <thead className="bg-muted/50 border-b text-[10px] uppercase text-muted-foreground">
               <tr>
                 <th className="px-4 py-3 font-medium">Name</th>
                 <th className="px-4 py-3 font-medium">Email</th>
@@ -125,7 +125,7 @@ export function StaffClient({ cashiers: initialCashiers }: { cashiers: Cashier[]
                 </tr>
               ) : (
                 paginatedCashiers.map((cashier) => (
-                  <tr key={cashier.id} className="border-b hover:bg-muted/20">
+                  <tr key={cashier.id} className="border-b hover:bg-muted/20 text-[10px]">
                     <td className="px-4 py-3 font-medium">{cashier.name}</td>
                     <td className="px-4 py-3">{cashier.email}</td>
                     <td className="px-4 py-3">
