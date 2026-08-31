@@ -19,7 +19,6 @@ export default async function SuperAdminPage() {
   const totalShops = await prisma.shop.count({
     where: { status: { not: "DELETED" } }
   })
-  const totalSystemSales = await prisma.sale.count()
   
   const totalAdmins = await prisma.user.count({
     where: { 
@@ -41,8 +40,7 @@ export default async function SuperAdminPage() {
   const stats = [
     { label: "Total Tenants (Shops)", value: totalShops.toString() },
     { label: "Total Shop Admins", value: totalAdmins.toString() },
-    { label: "System Health", value: "Optimal" },
-    { label: "Global System Sales", value: totalSystemSales.toString() } 
+    { label: "System Health", value: "Optimal" }
   ]
 
   const mappedAdmins = allAdmins.map((admin: AdminWithShop) => ({
