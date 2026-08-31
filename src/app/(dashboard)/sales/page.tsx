@@ -16,6 +16,7 @@ export default async function SalesPage() {
   const isCashier = session.user.role === "CASHIER"
 
   const sales = await prisma.sale.findMany({
+    take: 100,
     where: { 
       shopId: session.user.shopId,
       ...(isCashier ? { cashierId: session.user.id } : {})

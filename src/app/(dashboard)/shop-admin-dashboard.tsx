@@ -51,7 +51,7 @@ export function ShopAdminDashboard({ stats, revenueByCurrency }: ShopAdminDashbo
       </div>
       
       {/* Revenue Breakdown */}
-      <h2 className="text-xl font-bold mt-4 border-b pb-2">Revenue Breakdown (All Time)</h2>
+      <h2 className="text-xl font-bold mt-4 border-b pb-2">Revenue Breakdown (Today)</h2>
       
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {currencies.map(currency => (
