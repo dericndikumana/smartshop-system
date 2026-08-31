@@ -52,6 +52,10 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
   const [showHeldCarts, setShowHeldCarts] = useState(false)
   const [isHolding, setIsHolding] = useState(false)
 
+  // Quantity Modal states
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [manualQuantity, setManualQuantity] = useState("1")
+
   const filteredProducts = products.filter(p => {
     const term = searchTerm.toLowerCase()
     return p.name.toLowerCase().includes(term) || (p.sku && p.sku.toLowerCase().includes(term))
@@ -71,19 +75,44 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-  const addToCart = (product: Product) => {
+  const handleProductClick = (product: Product) => {
+    setSelectedProduct(product)
+    setManualQuantity("1")
+  }
+
+  const handleConfirmQuantity = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selectedProduct) return
+    
+    const qty = parseInt(manualQuantity, 10)
+    if (isNaN(qty) || qty <= 0) {
+      toast.error("Please enter a valid quantity")
+      return
+    }
+    
+    if (qty > selectedProduct.quantity) {
+      toast.error(`Only ${selectedProduct.quantity} available in stock`)
+      return
+    }
+
     setCart(prev => {
-      const existing = prev.find(item => item.id === product.id)
+      const existing = prev.find(item => item.id === selectedProduct.id)
       if (existing) {
-        if (existing.cartQuantity >= product.quantity) return prev // Can't add more than stock
+        const newTotal = existing.cartQuantity + qty
+        if (newTotal > selectedProduct.quantity) {
+          toast.error(`Cannot add ${qty}. Only ${selectedProduct.quantity - existing.cartQuantity} more available.`)
+          return prev
+        }
         return prev.map(item => 
-          item.id === product.id 
-            ? { ...item, cartQuantity: item.cartQuantity + 1 }
+          item.id === selectedProduct.id 
+            ? { ...item, cartQuantity: newTotal }
             : item
         )
       }
-      return [...prev, { ...product, cartQuantity: 1 }]
+      return [...prev, { ...selectedProduct, cartQuantity: qty }]
     })
+    
+    setSelectedProduct(null)
   }
 
   const updateQuantity = (id: string, delta: number) => {
@@ -264,7 +293,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
             {filteredProducts.map(product => (
               <button
                 key={product.id}
-                onClick={() => addToCart(product)}
+                onClick={() => handleProductClick(product)}
                 className="flex flex-col items-start p-3 border rounded-xl hover:border-primary/50 hover:bg-muted/30 transition-all text-left group"
               >
                 <div className={`w-full aspect-square rounded-lg flex items-center justify-center text-white font-bold text-3xl shadow-sm mb-3 group-hover:scale-105 transition-transform ${getInitialsColor(product.name)}`}>
@@ -500,6 +529,52 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
                 </div>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Quantity Modal */}
+      {selectedProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in duration-200 p-4">
+          <div className="bg-card w-full max-w-sm rounded-xl shadow-lg border p-6 animate-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center mb-4 pb-4 border-b">
+              <h2 className="text-xl font-bold line-clamp-1">{selectedProduct.name}</h2>
+              <button onClick={() => setSelectedProduct(null)} className="text-muted-foreground hover:text-foreground">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleConfirmQuantity} className="flex flex-col gap-4">
+              <div>
+                <label className="text-sm font-medium text-muted-foreground mb-1 block">
+                  Quantity (Max: {selectedProduct.quantity})
+                </label>
+                <div className="flex items-center gap-3">
+                  <button type="button" onClick={() => setManualQuantity(Math.max(1, parseInt(manualQuantity || "1") - 1).toString())} className="p-3 rounded-lg border hover:bg-muted transition-colors">
+                    <Minus className="h-5 w-5" />
+                  </button>
+                  <input
+                    type="number"
+                    min="1"
+                    max={selectedProduct.quantity}
+                    value={manualQuantity}
+                    onChange={(e) => setManualQuantity(e.target.value)}
+                    className="flex-1 rounded-lg border bg-background px-4 py-3 text-center text-xl font-bold focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+                    autoFocus
+                  />
+                  <button type="button" onClick={() => setManualQuantity(Math.min(selectedProduct.quantity, parseInt(manualQuantity || "0") + 1).toString())} className="p-3 rounded-lg border hover:bg-muted transition-colors">
+                    <Plus className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+              
+              <button
+                type="submit"
+                className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-bold hover:bg-primary/90 transition-colors shadow-sm"
+              >
+                Add to Order
+              </button>
+            </form>
           </div>
         </div>
       )}
