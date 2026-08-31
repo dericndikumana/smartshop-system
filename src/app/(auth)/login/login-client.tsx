@@ -86,6 +86,18 @@ export default function LoginClient({ isSuspended }: { isSuspended: boolean }) {
           <div className="[&_label]:text-slate-200 [&_input]:bg-slate-900/50 [&_input]:border-white/10 [&_input]:text-white [&_input]:placeholder:text-slate-500 [&_input:focus]:border-fuchsia-500 [&_input:focus]:ring-fuchsia-500/20 [&_button]:bg-white [&_button]:text-slate-900 [&_button:hover]:bg-slate-200 [&_button]:rounded-xl [&_button]:font-bold [&_button]:h-12">
             <LoginForm />
           </div>
+          
+          <div className="mt-6 pt-6 border-t border-white/10 text-center">
+            <p className="text-xs text-slate-400 mb-3">Don&apos;t have an account? Contact the System Administrator:</p>
+            <div className="flex flex-col items-center gap-2 text-xs text-slate-300">
+              <span className="flex items-center gap-1.5 bg-white/5 px-3 py-1.5 rounded-full border border-white/5 whitespace-nowrap">
+                <span className="text-emerald-400 font-semibold">WhatsApp</span> +250 781 096 567
+              </span>
+              <span className="flex items-center gap-1.5 bg-white/5 px-3 py-1.5 rounded-full border border-white/5 whitespace-nowrap">
+                <span className="text-cyan-400 font-semibold">Email</span> ndikumanaderic2@gmail.com
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
