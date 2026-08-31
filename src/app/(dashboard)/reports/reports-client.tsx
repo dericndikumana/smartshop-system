@@ -184,6 +184,7 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
             <table className="w-full text-sm text-left">
               <thead className="bg-muted/50 text-muted-foreground uppercase text-[10px] print:bg-gray-100">
                 <tr>
+                  <th className="px-6 py-4 font-medium w-12">#</th>
                   <th className="px-6 py-4 font-medium">Receipt #</th>
                   <th className="px-6 py-4 font-medium">Customer Name</th>
                   <th className="px-6 py-4 font-medium">Products Sold</th>
@@ -196,13 +197,16 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
               <tbody className="divide-y divide-border/50 print:divide-gray-200">
                 {paginatedTransactions.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="px-6 py-8 text-center text-muted-foreground">
+                    <td colSpan={5} className="px-6 py-8 text-center text-muted-foreground">
                       No transactions found for the selected criteria.
                     </td>
                   </tr>
                 ) : (
-                  paginatedTransactions.map((tx) => (
+                  paginatedTransactions.map((tx, index) => (
                     <tr key={tx.id} className="hover:bg-muted/20 transition-colors text-[10px]">
+                      <td className="px-6 py-4 text-muted-foreground font-medium">
+                        {(currentPage - 1) * itemsPerPage + index + 1}
+                      </td>
                       <td className="px-6 py-4 font-medium text-foreground">{tx.receiptNumber}</td>
                       <td className="px-6 py-4 text-foreground">{tx.customerName}</td>
                       <td className="px-6 py-4 text-muted-foreground text-xs">{tx.itemsSold}</td>
@@ -222,7 +226,7 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
               </tbody>
               <tfoot className="bg-muted/10 font-bold border-t border-border/50">
                 <tr>
-                  <td colSpan={userRole === "SHOP_ADMIN" && selectedCashier === "ALL" ? 4 : 3} className="px-6 py-4 text-right">
+                  <td colSpan={userRole === "SHOP_ADMIN" && selectedCashier === "ALL" ? 5 : 4} className="px-6 py-4 text-right">
                     Total:
                   </td>
                   <td className="px-6 py-4 text-right">

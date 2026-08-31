@@ -83,6 +83,7 @@ export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
           <table className="w-full text-sm text-left">
             <thead className="bg-muted/50 text-muted-foreground uppercase text-[10px]">
               <tr>
+                <th className="px-6 py-4 font-medium w-12">#</th>
                 <th className="px-6 py-4 font-medium">Receipt No</th>
                 <th className="px-6 py-4 font-medium">Customer Name</th>
                 <th className="px-6 py-4 font-medium">Date</th>
@@ -93,14 +94,17 @@ export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
             <tbody className="divide-y divide-border/50">
               {paginatedSales.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
+                  <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">
                     <Receipt className="h-12 w-12 mx-auto mb-4 opacity-20" />
                     No sales found.
                   </td>
                 </tr>
               ) : (
-                paginatedSales.map((sale) => (
+                paginatedSales.map((sale, index) => (
                   <tr key={sale.id} className="hover:bg-muted/30 transition-colors text-[10px]">
+                    <td className="px-6 py-4 text-muted-foreground font-medium">
+                      {(currentPage - 1) * itemsPerPage + index + 1}
+                    </td>
                     <td className="px-6 py-4 font-bold text-foreground">
                       {sale.receiptNumber}
                     </td>

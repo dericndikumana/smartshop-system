@@ -180,6 +180,7 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
           <table className="w-full text-sm text-left">
             <thead className="bg-muted/50 text-muted-foreground uppercase text-[10px]">
               <tr>
+                <th className="px-3 py-3 font-medium w-12">#</th>
                 <th className="px-3 py-3 font-medium">PRODUCT</th>
                 <th className="px-3 py-3 font-medium">Total Packs</th>
                 <th className="px-3 py-3 font-medium">Items per Pack</th>
@@ -193,14 +194,17 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
             <tbody className="divide-y divide-border/50">
               {paginatedProducts.length === 0 ? (
                 <tr>
-                  <td colSpan={userRole !== "CASHIER" ? 8 : 7} className="px-6 py-12 text-center text-muted-foreground">
+                  <td colSpan={userRole !== "CASHIER" ? 9 : 8} className="px-6 py-12 text-center text-muted-foreground">
                     <Package className="h-12 w-12 mx-auto mb-4 opacity-20" />
                     No products found. Add your first product to get started.
                   </td>
                 </tr>
               ) : (
-                paginatedProducts.map((product) => (
+                paginatedProducts.map((product, index) => (
                   <tr key={product.id} className="hover:bg-muted/30 transition-colors">
+                    <td className="px-3 py-2 text-xs text-muted-foreground font-medium">
+                      {(currentPage - 1) * itemsPerPage + index + 1}
+                    </td>
                     <td className="px-3 py-2">
                       <div className="flex items-center gap-2">
                         <div className={`h-6 w-6 rounded-md flex items-center justify-center text-white font-bold text-[10px] shadow-sm ${getInitialsColor(product.name)}`}>

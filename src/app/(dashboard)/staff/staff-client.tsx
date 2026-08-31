@@ -110,6 +110,7 @@ export function StaffClient({ cashiers: initialCashiers }: { cashiers: Cashier[]
           <table className="w-full text-sm text-left">
             <thead className="bg-muted/50 border-b text-[10px] uppercase text-muted-foreground">
               <tr>
+                <th className="px-4 py-3 font-medium w-12">#</th>
                 <th className="px-4 py-3 font-medium">Name</th>
                 <th className="px-4 py-3 font-medium">Email</th>
                 <th className="px-4 py-3 font-medium">Status</th>
@@ -119,13 +120,16 @@ export function StaffClient({ cashiers: initialCashiers }: { cashiers: Cashier[]
             <tbody>
               {paginatedCashiers.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-4 py-8 text-center text-muted-foreground">
+                  <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
                     No cashiers found.
                   </td>
                 </tr>
               ) : (
-                paginatedCashiers.map((cashier) => (
+                paginatedCashiers.map((cashier, index) => (
                   <tr key={cashier.id} className="border-b hover:bg-muted/20 text-[10px]">
+                    <td className="px-4 py-3 text-muted-foreground font-medium">
+                      {(currentPage - 1) * itemsPerPage + index + 1}
+                    </td>
                     <td className="px-4 py-3 font-medium">{cashier.name}</td>
                     <td className="px-4 py-3">{cashier.email}</td>
                     <td className="px-4 py-3">
