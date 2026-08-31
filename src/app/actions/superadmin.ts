@@ -119,9 +119,22 @@ export async function softDeleteShopAction(shopId: string) {
       return { success: false, error: "Unauthorized" }
     }
 
-    await prisma.shop.update({
-      where: { id: shopId },
-      data: { status: "DELETED" }
+    await prisma.$transaction(async (tx) => {
+      await tx.shop.update({
+        where: { id: shopId },
+        data: { status: "DELETED" }
+      })
+
+      const users = await tx.user.findMany({ where: { shopId } })
+      
+      for (const user of users) {
+        if (!user.email.includes(".deleted.")) {
+          await tx.user.update({
+            where: { id: user.id },
+            data: { email: `${user.email}.deleted.${shopId}` }
+          })
+        }
+      }
     })
 
     revalidatePath("/superadmin/shops")
@@ -140,17 +153,37 @@ export async function restoreShopAction(shopId: string) {
       return { success: false, error: "Unauthorized" }
     }
 
-    await prisma.shop.update({
-      where: { id: shopId },
-      data: { status: "ACTIVE" }
+    await prisma.$transaction(async (tx) => {
+      const users = await tx.user.findMany({ where: { shopId } })
+      
+      for (const user of users) {
+        if (user.email.includes(`.deleted.${shopId}`)) {
+          const originalEmail = user.email.replace(`.deleted.${shopId}`, "")
+          
+          const existing = await tx.user.findUnique({ where: { email: originalEmail } })
+          if (existing) {
+            throw new Error(`Cannot restore: Email ${originalEmail} is now in use by another account.`)
+          }
+          
+          await tx.user.update({
+            where: { id: user.id },
+            data: { email: originalEmail }
+          })
+        }
+      }
+
+      await tx.shop.update({
+        where: { id: shopId },
+        data: { status: "ACTIVE" }
+      })
     })
 
     revalidatePath("/superadmin/shops")
     revalidatePath("/superadmin")
     return { success: true }
-  } catch (error) {
+  } catch (error: any) {
     console.error("Restore Shop Error:", error)
-    return { success: false, error: "Failed to restore shop" }
+    return { success: false, error: error.message || "Failed to restore shop" }
   }
 }
 
