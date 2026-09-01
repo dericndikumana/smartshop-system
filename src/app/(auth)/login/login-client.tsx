@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import LoginForm from "@/components/auth/login-form"
-import { X, ArrowRight, Store, Package, Zap, BarChart3 } from "lucide-react"
+import { X, ArrowRight, Package, Zap, BarChart3 } from "lucide-react"
 import { useTranslation } from "@/components/providers/language-provider"
 import { LanguageSwitcher } from "@/components/layout/language-switcher"
 
@@ -23,9 +23,9 @@ export default function LoginClient({ isSuspended }: { isSuspended: boolean }) {
       {/* Header */}
       <header className="fixed top-0 left-0 w-full z-40 bg-[#0f172a]/80 backdrop-blur-md border-b border-white/10">
         <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="p-2 bg-white/5 rounded-xl border border-white/10">
-              <Store className="h-6 w-6 text-fuchsia-400" />
+          <div className="flex items-center gap-3">
+            <div className="p-1.5 bg-white/5 rounded-xl border border-white/10 drop-shadow-md">
+              <img src="/logo.ico" alt="SmartShop Logo" className="h-7 w-7 object-contain" />
             </div>
             <span className="text-2xl font-bold tracking-tight text-white">SmartShop</span>
           </div>
@@ -106,8 +106,8 @@ export default function LoginClient({ isSuspended }: { isSuspended: boolean }) {
             <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/10 blur-[100px] rounded-full pointer-events-none translate-x-1/3 -translate-y-1/3" />
             
             <div className="relative z-10 flex flex-col items-center">
-              <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center mb-6 border border-white/10 mx-auto">
-                <Store className="h-6 w-6 text-indigo-300" />
+              <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center mb-6 border border-white/10 mx-auto drop-shadow-xl">
+                <img src="/logo.ico" alt="SmartShop Logo" className="h-9 w-9 object-contain" />
               </div>
               <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white leading-tight max-w-2xl">{t('login_page.banner_title') || "Everything your shop needs"}</h2>
               <p className="text-indigo-200/80 text-lg md:text-xl leading-relaxed mb-12 max-w-3xl">
@@ -178,7 +178,7 @@ export default function LoginClient({ isSuspended }: { isSuspended: boolean }) {
 
           <div className="mb-8 text-center">
             <div className="inline-flex items-center justify-center p-3 bg-white/10 rounded-2xl border border-white/10 mb-4 shadow-xl">
-              <Store className="h-8 w-8 text-fuchsia-400" />
+              <img src="/logo.ico" alt="SmartShop Logo" className="h-10 w-10 object-contain drop-shadow-lg" />
             </div>
             <h2 className="text-2xl font-bold text-white mb-2">{t('login_page.welcome') || "Welcome back"}</h2>
             <p className="text-slate-300 text-sm">{t('login_page.subtitle') || "Log in to your account"}</p>

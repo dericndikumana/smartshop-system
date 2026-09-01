@@ -57,11 +57,11 @@ export function Sidebar({ role, onNavClick, isCollapsed, onToggleCollapse }: Sid
         {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
       </button>
 
-      <div className={`p-6 border-b flex items-center justify-center transition-all ${isCollapsed ? "px-2" : "px-6"}`}>
+      <div className={`p-6 border-b flex items-center justify-center gap-3 transition-all ${isCollapsed ? "px-2" : "px-6"}`}>
+        <img src="/logo.ico" alt="Logo" className="h-8 w-8 object-contain flex-shrink-0 drop-shadow-md" />
         <h1 className={`text-2xl font-bold tracking-tight text-primary transition-all ${isCollapsed ? "scale-0 hidden" : "scale-100"}`}>
           SmartShop
         </h1>
-        {isCollapsed && <Store className="h-8 w-8 text-primary" />}
       </div>
       
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
