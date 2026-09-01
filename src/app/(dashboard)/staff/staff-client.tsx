@@ -257,6 +257,10 @@ export function StaffClient({ cashiers: initialCashiers }: { cashiers: Cashier[]
                 <label className="text-sm font-medium">{t('staff_page.email')}</label>
                 <input required name="email" type="email" defaultValue={editCashier.email} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
               </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">{t('staff_page.password')}</label>
+                <input name="password" type="password" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Leave blank to keep current" />
+              </div>
               
               <div className="flex justify-end gap-3 mt-6">
                 <button 

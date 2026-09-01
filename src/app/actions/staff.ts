@@ -2,6 +2,7 @@
 
 import { auth } from "@/lib/auth"
 import prisma from "@/lib/prisma"
+import { Prisma } from "@prisma/client"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 import bcrypt from "bcryptjs"
@@ -118,6 +119,7 @@ const editCashierSchema = z.object({
   userId: z.string(),
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters").optional().or(z.literal("")),
 })
 
 export async function editCashierAction(formData: FormData) {
@@ -131,6 +133,7 @@ export async function editCashierAction(formData: FormData) {
       userId: formData.get("userId") as string,
       name: formData.get("name") as string,
       email: formData.get("email") as string,
+      password: formData.get("password") as string,
     }
 
     const validated = editCashierSchema.parse(data)
@@ -143,12 +146,17 @@ export async function editCashierAction(formData: FormData) {
       return { success: false, error: "Email is already taken by another user." }
     }
 
+    const updateData: Prisma.UserUpdateInput = { name: validated.name, email: validated.email }
+    if (validated.password) {
+      updateData.password = await bcrypt.hash(validated.password, 10)
+    }
+
     await prisma.user.update({
       where: { 
         id: validated.userId,
         shopId: session.user.shopId
       },
-      data: { name: validated.name, email: validated.email }
+      data: updateData
     })
 
     revalidatePath("/staff")
