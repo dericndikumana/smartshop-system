@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react"
 import { Printer, Receipt } from "lucide-react"
+import { useTranslation } from "@/components/providers/language-provider"
 
 interface Transaction {
   id: string
@@ -21,6 +22,7 @@ interface ReportsClientProps {
 }
 
 export function ReportsClient({ transactions, cashiers, userRole }: ReportsClientProps) {
+  const { t } = useTranslation()
   const [selectedCashier, setSelectedCashier] = useState<string>("ALL")
   const [customerSearch, setCustomerSearch] = useState("")
   const [startDate, setStartDate] = useState("")
@@ -84,9 +86,9 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-5xl mx-auto w-full">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 print:hidden">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Sales Reports</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t('reports_page.sales_reports')}</h1>
           <p className="text-muted-foreground mt-2">
-            Detailed transaction records and staff performance.
+            {t('reports_page.subtitle')}
           </p>
         </div>
         <button 
@@ -94,7 +96,7 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
           className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors shadow-sm"
         >
           <Printer className="h-4 w-4" />
-          Print Report
+          {t('sales_page.print')}
         </button>
       </div>
 
@@ -115,12 +117,12 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
           <div className="flex flex-col gap-4 mb-6">
             <h2 className="text-xl font-bold flex items-center gap-2 border-b pb-2">
               <Receipt className="h-5 w-5 text-primary print:text-black" />
-              Transaction Details
+              {t('reports_page.transaction_details')}
             </h2>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 print:hidden">
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium text-muted-foreground">Search Customer/Receipt</label>
+                <label className="text-sm font-medium text-muted-foreground">{t('reports_page.search_customer')}</label>
                 <input 
                   type="text" 
                   value={customerSearch}
@@ -134,7 +136,7 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium text-muted-foreground">Start Date</label>
+                <label className="text-sm font-medium text-muted-foreground">{t('reports_page.start_date')}</label>
                 <input 
                   type="date" 
                   value={startDate}
@@ -147,7 +149,7 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium text-muted-foreground">End Date</label>
+                <label className="text-sm font-medium text-muted-foreground">{t('reports_page.end_date')}</label>
                 <input 
                   type="date" 
                   value={endDate}
@@ -161,7 +163,7 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
 
               {userRole === "SHOP_ADMIN" && (
                 <div className="flex flex-col gap-1">
-                  <label className="text-sm font-medium text-muted-foreground">Filter by Cashier</label>
+                  <label className="text-sm font-medium text-muted-foreground">{t('reports_page.filter_cashier')}</label>
                   <select 
                     value={selectedCashier}
                     onChange={(e) => {
@@ -170,7 +172,7 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
                     }}
                     className="rounded-md border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary w-full"
                   >
-                    <option value="ALL">All Cashiers</option>
+                    <option value="ALL">{t('reports_page.all_cashiers')}</option>
                     {cashiers.map(c => (
                       <option key={c.id} value={c.id}>{c.name}</option>
                     ))}
@@ -185,20 +187,20 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
               <thead className="bg-muted/50 text-muted-foreground uppercase text-[10px] print:bg-gray-100">
                 <tr>
                   <th className="px-6 py-4 font-medium w-12">#</th>
-                  <th className="px-6 py-4 font-medium">Receipt #</th>
-                  <th className="px-6 py-4 font-medium">Customer Name</th>
-                  <th className="px-6 py-4 font-medium">Products Sold</th>
+                  <th className="px-6 py-4 font-medium">{t('reports_page.receipt_no')}</th>
+                  <th className="px-6 py-4 font-medium">{t('reports_page.customer_name')}</th>
+                  <th className="px-6 py-4 font-medium">{t('reports_page.products_sold')}</th>
                   {userRole === "SHOP_ADMIN" && selectedCashier === "ALL" && (
-                    <th className="px-6 py-4 font-medium">Cashier</th>
+                    <th className="px-6 py-4 font-medium">{t('sales_page.cashier')}</th>
                   )}
-                  <th className="px-6 py-4 font-medium text-right">Total Amount</th>
+                  <th className="px-6 py-4 font-medium text-right">{t('reports_page.total_amount')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50 print:divide-gray-200">
                 {paginatedTransactions.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="px-6 py-8 text-center text-muted-foreground">
-                      No transactions found for the selected criteria.
+                      {t('reports_page.no_transactions')}
                     </td>
                   </tr>
                 ) : (
@@ -227,7 +229,7 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
               <tfoot className="bg-muted/10 font-bold border-t border-border/50">
                 <tr>
                   <td colSpan={userRole === "SHOP_ADMIN" && selectedCashier === "ALL" ? 5 : 4} className="px-6 py-4 text-right">
-                    Total:
+                    {t('reports_page.total')}
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex flex-col gap-1 justify-end items-end">

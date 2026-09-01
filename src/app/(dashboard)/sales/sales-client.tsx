@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { Receipt, Search, Printer, Calendar, User, Eye, X } from "lucide-react"
+import { useTranslation } from "@/components/providers/language-provider"
 
 interface SaleItem {
   id: string
@@ -27,6 +28,7 @@ interface Sale {
 }
 
 export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
+  const { t } = useTranslation()
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedSale, setSelectedSale] = useState<Sale | null>(null)
   
@@ -51,9 +53,9 @@ export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 print:hidden">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Sales & Receipts</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t('sales_page.title')}</h1>
           <p className="text-muted-foreground mt-2">
-            View transaction history and print receipts.
+            {t('sales_page.subtitle')}
           </p>
         </div>
       </div>
@@ -62,13 +64,13 @@ export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
         <div className="p-4 border-b border-border/50 bg-muted/10 flex flex-col sm:flex-row items-center justify-between gap-4">
           <h2 className="text-xl font-semibold flex items-center gap-2">
             <Receipt className="h-5 w-5 text-primary" />
-            Transaction History
+            {t('sales_page.title')}
           </h2>
           <div className="relative w-full sm:w-72">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <input 
               type="text" 
-              placeholder="Search receipt, cashier, customer..." 
+              placeholder={t('sales_page.search_receipt')} 
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value)
@@ -84,11 +86,11 @@ export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
             <thead className="bg-muted/50 text-muted-foreground uppercase text-[10px]">
               <tr>
                 <th className="px-6 py-4 font-medium w-12">#</th>
-                <th className="px-6 py-4 font-medium">Receipt No</th>
-                <th className="px-6 py-4 font-medium">Customer Name</th>
-                <th className="px-6 py-4 font-medium">Date</th>
-                <th className="px-6 py-4 font-medium">Cashier</th>
-                <th className="px-6 py-4 font-medium text-right">Actions</th>
+                <th className="px-6 py-4 font-medium">{t('sales_page.receipt')}</th>
+                <th className="px-6 py-4 font-medium">{t('sales_page.customer')}</th>
+                <th className="px-6 py-4 font-medium">{t('sales_page.date')}</th>
+                <th className="px-6 py-4 font-medium">{t('sales_page.cashier')}</th>
+                <th className="px-6 py-4 font-medium text-right">{t('sales_page.actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
@@ -96,7 +98,7 @@ export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">
                     <Receipt className="h-12 w-12 mx-auto mb-4 opacity-20" />
-                    No sales found.
+                    {t('sales_page.no_sales')}
                   </td>
                 </tr>
               ) : (
@@ -115,7 +117,7 @@ export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
                           {sale.customerName}
                         </div>
                       ) : (
-                        <span className="italic opacity-50">Walk-in</span>
+                        <span className="italic opacity-50">{t('sales_page.walk_in')}</span>
                       )}
                     </td>
                     <td className="px-6 py-4 text-muted-foreground">
@@ -177,7 +179,7 @@ export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in duration-200 p-4 print:p-0 print:bg-white print:static print:inset-auto">
           <div className="bg-card w-full max-w-sm rounded-xl shadow-xl border overflow-hidden flex flex-col max-h-[90vh] print:shadow-none print:border-none print:w-full print:max-w-none print:h-auto print:max-h-none">
             <div className="flex items-center justify-between p-4 border-b bg-muted/10 print:hidden">
-              <h2 className="font-bold text-lg">Receipt Details</h2>
+              <h2 className="font-bold text-lg">{t('sales_page.receipt_details')}</h2>
               <div className="flex items-center gap-2">
 
                 <button 

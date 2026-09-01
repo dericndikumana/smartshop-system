@@ -4,6 +4,7 @@ import { useState } from "react"
 import { toggleCashierStatusAction, deleteCashierAction, createCashierAction, editCashierAction } from "@/app/actions/staff"
 import { Search, CheckCircle, ShieldAlert, Trash2, Plus } from "lucide-react"
 import { toast } from "sonner"
+import { useTranslation } from "@/components/providers/language-provider"
 
 interface Cashier {
   id: string
@@ -13,6 +14,7 @@ interface Cashier {
 }
 
 export function StaffClient({ cashiers: initialCashiers }: { cashiers: Cashier[] }) {
+  const { t } = useTranslation()
   const [isLoading, setIsLoading] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editCashier, setEditCashier] = useState<Cashier | null>(null)
@@ -87,7 +89,7 @@ export function StaffClient({ cashiers: initialCashiers }: { cashiers: Cashier[]
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
           <input 
             type="text" 
-            placeholder="Search cashiers..." 
+            placeholder={t('staff_page.search')} 
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value)
@@ -101,7 +103,7 @@ export function StaffClient({ cashiers: initialCashiers }: { cashiers: Cashier[]
           className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium"
         >
           <Plus className="h-4 w-4" />
-          Add Cashier
+          {t('staff_page.add_cashier')}
         </button>
       </div>
 
@@ -111,17 +113,17 @@ export function StaffClient({ cashiers: initialCashiers }: { cashiers: Cashier[]
             <thead className="bg-muted/50 border-b text-[10px] uppercase text-muted-foreground">
               <tr>
                 <th className="px-4 py-3 font-medium w-12">#</th>
-                <th className="px-4 py-3 font-medium">Name</th>
-                <th className="px-4 py-3 font-medium">Email</th>
-                <th className="px-4 py-3 font-medium">Status</th>
-                <th className="px-4 py-3 font-medium text-right">Actions</th>
+                <th className="px-4 py-3 font-medium">{t('staff_page.col_name')}</th>
+                <th className="px-4 py-3 font-medium">{t('staff_page.col_email')}</th>
+                <th className="px-4 py-3 font-medium">{t('staff_page.col_status')}</th>
+                <th className="px-4 py-3 font-medium text-right">{t('staff_page.col_actions')}</th>
               </tr>
             </thead>
             <tbody>
               {paginatedCashiers.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
-                    No cashiers found.
+                    {t('staff_page.no_cashiers')}
                   </td>
                 </tr>
               ) : (
@@ -148,7 +150,7 @@ export function StaffClient({ cashiers: initialCashiers }: { cashiers: Cashier[]
                         disabled={isLoading}
                         className="text-xs font-medium px-3 py-1.5 rounded-md text-primary hover:bg-primary/10 transition-colors disabled:opacity-50 mr-2"
                       >
-                        Edit
+                        {t('common.edit')}
                       </button>
                       <button 
                         onClick={() => handleToggleStatus(cashier.id, cashier.status)}
@@ -159,7 +161,7 @@ export function StaffClient({ cashiers: initialCashiers }: { cashiers: Cashier[]
                             : "text-emerald-600 hover:bg-emerald-500/10"
                         } disabled:opacity-50`}
                       >
-                        {cashier.status === "ACTIVE" ? "Suspend" : "Activate"}
+                        {cashier.status === "ACTIVE" ? t('staff_page.suspend') : t('staff_page.activate')}
                       </button>
                       <button 
                         onClick={() => handleDelete(cashier.id)}
@@ -167,7 +169,7 @@ export function StaffClient({ cashiers: initialCashiers }: { cashiers: Cashier[]
                         className="text-xs font-medium px-3 py-1.5 rounded-md text-red-600 hover:bg-red-500/10 transition-colors disabled:opacity-50 inline-flex items-center gap-1"
                       >
                         <Trash2 className="h-3 w-3" />
-                        Delete
+                        {t('staff_page.delete')}
                       </button>
                     </td>
                   </tr>
@@ -206,18 +208,18 @@ export function StaffClient({ cashiers: initialCashiers }: { cashiers: Cashier[]
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in duration-200 p-4">
           <div className="bg-card w-full max-w-md rounded-xl shadow-lg border p-6 animate-in zoom-in-95 duration-200">
-            <h2 className="text-xl font-bold mb-4">Add New Cashier</h2>
+            <h2 className="text-xl font-bold mb-4">{t('staff_page.add_modal_title')}</h2>
             <form onSubmit={handleCreateCashier} className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Cashier Name</label>
+                <label className="text-sm font-medium">{t('staff_page.full_name')}</label>
                 <input required name="name" type="text" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g. Jane Doe" />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Email Address</label>
+                <label className="text-sm font-medium">{t('staff_page.email')}</label>
                 <input required name="email" type="email" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g. jane@shop.com" />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Password</label>
+                <label className="text-sm font-medium">{t('staff_page.password')}</label>
                 <input required name="password" type="password" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Minimum 6 characters" />
               </div>
               
@@ -227,14 +229,14 @@ export function StaffClient({ cashiers: initialCashiers }: { cashiers: Cashier[]
                   onClick={() => setIsModalOpen(false)}
                   className="px-4 py-2 text-sm font-medium rounded-md border hover:bg-muted transition-colors"
                 >
-                  Cancel
+                  {t('staff_page.cancel')}
                 </button>
                 <button 
                   type="submit" 
                   disabled={isLoading}
                   className="px-4 py-2 text-sm font-medium rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
                 >
-                  {isLoading ? "Saving..." : "Add Cashier"}
+                  {isLoading ? "..." : t('staff_page.add_cashier')}
                 </button>
               </div>
             </form>
@@ -245,14 +247,14 @@ export function StaffClient({ cashiers: initialCashiers }: { cashiers: Cashier[]
       {editCashier && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in duration-200 p-4">
           <div className="bg-card w-full max-w-md rounded-xl shadow-lg border p-6 animate-in zoom-in-95 duration-200">
-            <h2 className="text-xl font-bold mb-4">Edit Cashier</h2>
+            <h2 className="text-xl font-bold mb-4">{t('common.edit')}</h2>
             <form onSubmit={handleEditCashier} className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Cashier Name</label>
+                <label className="text-sm font-medium">{t('staff_page.full_name')}</label>
                 <input required name="name" type="text" defaultValue={editCashier.name} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Email Address</label>
+                <label className="text-sm font-medium">{t('staff_page.email')}</label>
                 <input required name="email" type="email" defaultValue={editCashier.email} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
               </div>
               
@@ -262,14 +264,14 @@ export function StaffClient({ cashiers: initialCashiers }: { cashiers: Cashier[]
                   onClick={() => setEditCashier(null)}
                   className="px-4 py-2 text-sm font-medium rounded-md border hover:bg-muted transition-colors"
                 >
-                  Cancel
+                  {t('staff_page.cancel')}
                 </button>
                 <button 
                   type="submit" 
                   disabled={isLoading}
                   className="px-4 py-2 text-sm font-medium rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
                 >
-                  {isLoading ? "Saving..." : "Save Changes"}
+                  {isLoading ? "..." : t('staff_page.save')}
                 </button>
               </div>
             </form>

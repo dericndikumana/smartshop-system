@@ -5,6 +5,7 @@ import { Search, ShoppingCart, Minus, Plus, Trash2, CreditCard, User, Clock, X, 
 import { checkoutAction } from "@/app/actions/pos"
 import { holdCartAction, deleteHeldCartAction } from "@/app/actions/held-cart"
 import { toast } from "sonner"
+import { useTranslation } from "@/components/providers/language-provider"
 
 interface Product {
   id: string
@@ -39,6 +40,7 @@ interface HeldCart {
 }
 
 export function POSClient({ products, customers, vatRate, heldCarts = [] }: { products: Product[], customers: Customer[], vatRate: number, heldCarts?: HeldCart[] }) {
+  const { t } = useTranslation()
   const [searchTerm, setSearchTerm] = useState("")
   const [cart, setCart] = useState<CartItem[]>([])
   const [isCheckingOut, setIsCheckingOut] = useState(false)
@@ -86,12 +88,12 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
     
     const qty = parseInt(manualQuantity, 10)
     if (isNaN(qty) || qty <= 0) {
-      toast.error("Please enter a valid quantity")
+      toast.error(t('pos_page.invalid_quantity'))
       return
     }
     
     if (qty > selectedProduct.quantity) {
-      toast.error(`Only ${selectedProduct.quantity} available in stock`)
+      toast.error(t('pos_page.only_available').replace('{0}', selectedProduct.quantity.toString()))
       return
     }
 
@@ -100,7 +102,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
       if (existing) {
         const newTotal = existing.cartQuantity + qty
         if (newTotal > selectedProduct.quantity) {
-          toast.error(`Cannot add ${qty}. Only ${selectedProduct.quantity - existing.cartQuantity} more available.`)
+          toast.error(t('pos_page.cannot_add').replace('{0}', qty.toString()).replace('{1}', (selectedProduct.quantity - existing.cartQuantity).toString()))
           return prev
         }
         return prev.map(item => 
@@ -157,7 +159,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
     } else {
       setCart([])
       setCustomerSearch("")
-      toast.success("Order placed on hold.")
+      toast.success(t('pos_page.order_held'))
     }
     
     setIsHolding(false)
@@ -188,9 +190,9 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
 
       await deleteHeldCartAction(heldCart.id)
       setShowHeldCarts(false)
-      toast.success("Order resumed successfully.")
+      toast.success(t('pos_page.order_resumed'))
     } else {
-      toast.error("Could not resume order: products may no longer be available.")
+      toast.error(t('pos_page.resume_error'))
     }
   }
 
@@ -223,7 +225,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
       toast.error(result.error)
     } else {
       await deleteHeldCartAction(heldCart.id)
-      toast.success(`Sale completed successfully! Receipt generated.`)
+      toast.success(t('pos_page.sale_completed'))
       if (heldCarts.length <= 1) setShowHeldCarts(false)
     }
     
@@ -252,7 +254,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
     } else {
       setCart([])
       setCustomerSearch("")
-      toast.success(`Sale completed successfully! Receipt generated.`)
+      toast.success(t('pos_page.sale_completed'))
     }
     
     setIsCheckingOut(false)
@@ -280,7 +282,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <input 
               type="text" 
-              placeholder="Search products..." 
+              placeholder={t('pos_page.search_products')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 rounded-md border bg-background px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary transition-all" 
@@ -310,7 +312,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
             ))}
             {filteredProducts.length === 0 && (
               <div className="col-span-full py-12 text-center text-muted-foreground">
-                No products found.
+                {t('pos_page.no_products')}
               </div>
             )}
           </div>
@@ -322,7 +324,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
         <div className="p-4 border-b bg-muted/10 flex items-center justify-between">
           <h2 className="font-semibold flex items-center gap-2">
             <ShoppingCart className="h-5 w-5 text-primary" />
-            Current Order
+            {t('pos_page.current_order')}
           </h2>
           <div className="flex items-center gap-3">
             {heldCarts.length > 0 && (
@@ -331,11 +333,11 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
                 className="text-xs font-bold text-primary flex items-center gap-1 hover:underline"
               >
                 <Clock className="h-3 w-3" />
-                {heldCarts.length} Waiting
+                {heldCarts.length} {t('pos_page.waiting')}
               </button>
             )}
             <span className="bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded-full">
-              {cart.reduce((sum, item) => sum + item.cartQuantity, 0)} items
+              {cart.reduce((sum, item) => sum + item.cartQuantity, 0)} {t('pos_page.items')}
             </span>
           </div>
         </div>
@@ -346,7 +348,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
             <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
             <input 
               type="text" 
-              placeholder="Customer Name (Optional)" 
+              placeholder={t('pos_page.customer_optional')}
               value={customerSearch}
               onChange={(e) => {
                 setCustomerSearch(e.target.value)
@@ -373,7 +375,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
                 ))
               ) : (
                 <div className="px-3 py-2 text-sm text-muted-foreground italic">
-                  Create new customer &quot;{customerSearch}&quot;
+                  {t('pos_page.create_customer')} &quot;{customerSearch}&quot;
                 </div>
               )}
             </div>
@@ -384,7 +386,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
           {cart.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground opacity-50">
               <ShoppingCart className="h-12 w-12 mb-2" />
-              <p>Cart is empty</p>
+              <p>{t('pos_page.cart_empty')}</p>
             </div>
           ) : (
             cart.map(item => (
@@ -392,7 +394,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="font-medium text-[10px] leading-tight">{item.name}</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">{item.currency} {item.sellingPrice.toLocaleString()} each</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">{item.currency} {item.sellingPrice.toLocaleString()} {t('pos_page.each')}</p>
                   </div>
                   <button onClick={() => removeFromCart(item.id)} className="text-muted-foreground hover:text-red-500 transition-colors">
                     <Trash2 className="h-4 w-4" />
@@ -416,7 +418,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
         <div className="p-4 border-t bg-muted/10">
           <div className="space-y-2 mb-4">
             <div className="flex justify-between text-sm text-muted-foreground">
-              <span>Subtotals</span>
+              <span>{t('pos_page.subtotals')}</span>
               <div className="text-right flex flex-col">
                 {Object.entries(totalsByCurrency).length === 0 ? <span>0.00</span> : (
                   Object.entries(totalsByCurrency).map(([currency, total]) => (
@@ -428,7 +430,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
             
             {vatRate > 0 && Object.entries(totalsByCurrency).length > 0 && (
               <div className="flex justify-between text-sm text-muted-foreground border-t border-border/50 pt-2">
-                <span>VAT ({vatRate}%) Included</span>
+                <span>{t('pos_page.vat_included').replace('{0}', vatRate.toString())}</span>
                 <div className="text-right flex flex-col">
                   {Object.entries(totalsByCurrency).map(([currency, total]) => (
                     <span key={currency}>{currency} {(total - (total / (1 + vatRate / 100))).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
@@ -438,7 +440,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
             )}
 
             <div className="flex justify-between font-bold text-lg pt-2 border-t mt-2">
-              <span>Total</span>
+              <span>{t('pos_page.total')}</span>
               <div className="text-right flex flex-col">
                 {Object.entries(totalsByCurrency).length === 0 ? <span>0.00</span> : (
                   Object.entries(totalsByCurrency).map(([currency, total]) => (
@@ -456,7 +458,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
               className="flex items-center justify-center gap-2 border border-border py-3 rounded-lg font-bold hover:bg-muted transition-colors disabled:opacity-50"
             >
               <Save className="h-5 w-5 text-muted-foreground" />
-              Hold Order
+              {t('pos_page.hold_order')}
             </button>
             <button
               onClick={handleCheckout}
@@ -464,7 +466,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
               className="flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3 rounded-lg font-bold hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-50"
             >
               <CreditCard className="h-5 w-5" />
-              {isCheckingOut ? "Processing..." : "Complete Sale"}
+              {isCheckingOut ? t('pos_page.processing') : t('pos_page.complete_sale')}
             </button>
           </div>
         </div>
@@ -477,7 +479,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
             <div className="flex justify-between items-center mb-4 pb-4 border-b">
               <h2 className="text-xl font-bold flex items-center gap-2">
                 <Clock className="h-5 w-5 text-primary" />
-                Waiting Orders
+                {t('pos_page.waiting_orders')}
               </h2>
               <button onClick={() => setShowHeldCarts(false)} className="text-muted-foreground hover:text-foreground">
                 <X className="h-5 w-5" />
@@ -487,7 +489,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
             <div className="flex-1 overflow-y-auto">
               {heldCarts.length === 0 ? (
                 <div className="py-12 text-center text-muted-foreground">
-                  No waiting orders found.
+                  {t('pos_page.no_products')}
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -506,14 +508,14 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
                           disabled={isCheckingOut}
                           className="px-3 py-1.5 text-sm font-medium border border-red-200 text-red-600 rounded-md hover:bg-red-50 transition-colors disabled:opacity-50"
                         >
-                          Discard
+                          {t('pos_page.discard')}
                         </button>
                         <button 
                           onClick={() => handleResumeCart(hc)}
                           disabled={isCheckingOut}
                           className="px-3 py-1.5 text-sm font-medium bg-primary/10 text-primary rounded-md hover:bg-primary/20 transition-colors disabled:opacity-50"
                         >
-                          Resume
+                          {t('pos_page.resume')}
                         </button>
                         <button 
                           onClick={() => handleDirectCheckout(hc)}
@@ -521,7 +523,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
                           className="px-3 py-1.5 text-sm font-medium bg-emerald-500/10 text-emerald-600 rounded-md hover:bg-emerald-500/20 transition-colors flex items-center gap-1 disabled:opacity-50"
                         >
                           <CreditCard className="h-3.5 w-3.5" />
-                          Checkout
+                          {t('pos_page.checkout')}
                         </button>
                       </div>
                     </div>
@@ -547,7 +549,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
             <form onSubmit={handleConfirmQuantity} className="flex flex-col gap-4">
               <div>
                 <label className="text-sm font-medium text-muted-foreground mb-1 block">
-                  Quantity (Max: {selectedProduct.quantity})
+                  {t('pos_page.quantity_max').replace('{0}', selectedProduct.quantity.toString())}
                 </label>
                 <div className="flex items-center gap-3">
                   <button type="button" onClick={() => setManualQuantity(Math.max(1, parseInt(manualQuantity || "1") - 1).toString())} className="p-3 rounded-lg border hover:bg-muted transition-colors">
@@ -572,7 +574,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
                 type="submit"
                 className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-bold hover:bg-primary/90 transition-colors shadow-sm"
               >
-                Add to Order
+                {t('pos_page.add_to_order')}
               </button>
             </form>
           </div>

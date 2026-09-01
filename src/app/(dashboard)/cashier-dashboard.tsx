@@ -1,6 +1,7 @@
 "use client"
 
 import { Receipt, DollarSign, Package } from "lucide-react"
+import { useTranslation } from "@/components/providers/language-provider"
 
 interface CashierDashboardProps {
   salesCount: number
@@ -9,15 +10,16 @@ interface CashierDashboardProps {
 }
 
 export function CashierDashboard({ salesCount, totalItemsSold, revenueByCurrency }: CashierDashboardProps) {
+  const { t } = useTranslation()
   const hasSales = salesCount > 0
   const currencies = Object.entries(revenueByCurrency)
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Cashier Dashboard</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{t('dashboard.cashier_title')}</h1>
         <p className="text-muted-foreground mt-2">
-          Track your overall performance.
+          {t('dashboard.cashier_subtitle')}
         </p>
       </div>
       
@@ -26,7 +28,7 @@ export function CashierDashboard({ salesCount, totalItemsSold, revenueByCurrency
           <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-6 flex flex-col gap-2">
             <div className="flex items-center gap-2 text-muted-foreground">
               <Receipt className="h-5 w-5 text-primary" />
-              <h3 className="font-medium text-sm">Total Transactions</h3>
+              <h3 className="font-medium text-sm">{t('dashboard.total_transactions')}</h3>
             </div>
             <p className="text-2xl font-bold">{salesCount}</p>
           </div>
@@ -34,7 +36,7 @@ export function CashierDashboard({ salesCount, totalItemsSold, revenueByCurrency
           <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-6 flex flex-col gap-2">
             <div className="flex items-center gap-2 text-muted-foreground">
               <Package className="h-5 w-5 text-primary" />
-              <h3 className="font-medium text-sm">Items Sold</h3>
+              <h3 className="font-medium text-sm">{t('dashboard.items_sold')}</h3>
             </div>
             <p className="text-2xl font-bold">{totalItemsSold}</p>
           </div>
@@ -43,7 +45,7 @@ export function CashierDashboard({ salesCount, totalItemsSold, revenueByCurrency
             <div key={currency} className="rounded-xl border bg-card text-card-foreground shadow-sm p-6 flex flex-col gap-2">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <DollarSign className="h-5 w-5 text-primary" />
-                <h3 className="font-medium text-sm">Revenue ({currency})</h3>
+                <h3 className="font-medium text-sm">{t('dashboard.revenue').replace('{0}', currency)}</h3>
               </div>
               <p className="text-2xl font-bold text-primary">{total.toLocaleString()}</p>
             </div>
@@ -51,7 +53,7 @@ export function CashierDashboard({ salesCount, totalItemsSold, revenueByCurrency
         </div>
       ) : (
         <div className="rounded-xl border bg-card text-card-foreground shadow-sm p-12 text-center text-muted-foreground">
-          No sales registered yet. Head over to the POS to start selling!
+          {t('dashboard.no_sales')}
         </div>
       )}
     </div>
