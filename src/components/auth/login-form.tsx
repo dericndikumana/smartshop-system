@@ -4,12 +4,13 @@ import { useState } from "react"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { AlertCircle, RefreshCw } from "lucide-react"
+import { AlertCircle, RefreshCw, Eye, EyeOff } from "lucide-react"
 
 export default function LoginForm({ initialSuspended }: { initialSuspended?: boolean }) {
   const router = useRouter()
-  const [email, setEmail] = useState("")
+  const [identifier, setIdentifier] = useState("")
   const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(
     initialSuspended ? "Your account has been suspended. Please contact the System Administrator." : null
@@ -22,7 +23,7 @@ export default function LoginForm({ initialSuspended }: { initialSuspended?: boo
 
     try {
       const res = await signIn("credentials", {
-        email,
+        identifier,
         password,
         redirect: false,
       })
@@ -31,7 +32,7 @@ export default function LoginForm({ initialSuspended }: { initialSuspended?: boo
         if (res.error === "suspended") {
            setErrorMessage("Your account has been suspended. Please contact the System Administrator.")
         } else {
-           setErrorMessage("Invalid email or password.")
+           setErrorMessage("Invalid credentials.")
         }
       } else {
         router.push("/")
@@ -54,20 +55,20 @@ export default function LoginForm({ initialSuspended }: { initialSuspended?: boo
       )}
 
       <div className="space-y-2">
-        <label className="text-sm font-medium leading-none" htmlFor="email">
-          Email Address
+        <label className="text-sm font-medium leading-none" htmlFor="identifier">
+          Email or Username
         </label>
         <input 
-          id="email" 
-          type="email" 
-          value={email}
+          id="identifier" 
+          type="text" 
+          value={identifier}
           onChange={(e) => {
-            setEmail(e.target.value)
+            setIdentifier(e.target.value)
             setErrorMessage(null)
           }}
           required
           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors" 
-          placeholder="name@example.com" 
+          placeholder="name@example.com or Username" 
         />
       </div>
       
@@ -75,18 +76,28 @@ export default function LoginForm({ initialSuspended }: { initialSuspended?: boo
         <label className="text-sm font-medium leading-none" htmlFor="password">
           Password
         </label>
-        <input 
-          id="password" 
-          type="password" 
-          value={password}
-          onChange={(e) => {
-            setPassword(e.target.value)
-            setErrorMessage(null)
-          }}
-          required
-          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors" 
-          placeholder="••••••••" 
-        />
+        <div className="relative">
+          <input 
+            id="password" 
+            type={showPassword ? "text" : "password"} 
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value)
+              setErrorMessage(null)
+            }}
+            required
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 pr-10 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors" 
+            placeholder="••••••••" 
+          />
+          <button
+            type="button"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+            onClick={() => setShowPassword(!showPassword)}
+            tabIndex={-1}
+          >
+            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </button>
+        </div>
       </div>
       
       <div className="flex gap-2 mt-6">
@@ -99,7 +110,7 @@ export default function LoginForm({ initialSuspended }: { initialSuspended?: boo
             variant="outline" 
             className="px-3 shrink-0 text-slate-500 hover:text-slate-900"
             onClick={() => {
-              setEmail("")
+              setIdentifier("")
               setPassword("")
               setErrorMessage(null)
             }}
