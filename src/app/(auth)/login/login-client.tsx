@@ -62,7 +62,7 @@ export default function LoginClient({ isSuspended }: { isSuspended: boolean }) {
 
         {/* Footer Contact Info */}
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-full text-center px-6">
-          <p className="text-slate-400 text-sm mb-4">Don't have an account? Contact the System Administrator:</p>
+          <p className="text-slate-400 text-sm mb-4">Don&apos;t have an account? Contact the System Administrator:</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-slate-300 text-sm">
             <span className="flex items-center gap-2 bg-[#1e1b36]/60 px-5 py-2.5 rounded-full border border-white/5 backdrop-blur-md">
               <span className="text-[#00e676] font-semibold">WhatsApp</span> +250 781 096 567
@@ -102,7 +102,7 @@ export default function LoginClient({ isSuspended }: { isSuspended: boolean }) {
           </div>
           
           <div className="mt-6 pt-6 border-t border-white/10 text-center">
-            <p className="text-xs text-slate-400 mb-3">Don't have an account? Contact the System Administrator:</p>
+            <p className="text-xs text-slate-400 mb-3">Don&apos;t have an account? Contact the System Administrator:</p>
             <div className="flex flex-col items-center gap-2 text-xs text-slate-300">
               <span className="flex items-center gap-1.5 bg-white/5 px-3 py-1.5 rounded-full border border-white/5 whitespace-nowrap">
                 <span className="text-[#00e676] font-semibold">WhatsApp</span> +250 781 096 567
