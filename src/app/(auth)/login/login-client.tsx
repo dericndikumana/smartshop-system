@@ -68,31 +68,31 @@ export default function LoginClient({ isSuspended }: { isSuspended: boolean }) {
 
         {/* Feature Cards */}
         <div className="container mx-auto px-6 grid md:grid-cols-3 gap-6 mb-32 max-w-6xl">
-          <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-8 rounded-3xl hover:bg-white/10 transition-colors">
-            <div className="w-12 h-12 bg-fuchsia-500/20 text-fuchsia-400 rounded-2xl flex items-center justify-center mb-6 border border-fuchsia-500/20">
+          <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-8 rounded-3xl hover:bg-white/10 hover:shadow-2xl hover:shadow-fuchsia-500/10 hover:-translate-y-2 transition-all duration-300 group cursor-pointer">
+            <div className="w-12 h-12 bg-fuchsia-500/20 text-fuchsia-400 rounded-2xl flex items-center justify-center mb-6 border border-fuchsia-500/20 group-hover:scale-110 transition-transform duration-300">
               <Package className="h-6 w-6" />
             </div>
-            <h3 className="text-xl font-bold mb-3 text-white">{t('login_page.feat1_title') || "Live inventory"}</h3>
+            <h3 className="text-xl font-bold mb-3 text-white group-hover:text-fuchsia-400 transition-colors">{t('login_page.feat1_title') || "Live inventory"}</h3>
             <p className="text-slate-400 leading-relaxed">
               {t('login_page.feat1_desc') || "Stock levels update the moment a sale is rung up — no manual reconciliation, no surprises at close."}
             </p>
           </div>
           
-          <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-8 rounded-3xl hover:bg-white/10 transition-colors">
-            <div className="w-12 h-12 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center mb-6 border border-amber-500/20">
+          <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-8 rounded-3xl hover:bg-white/10 hover:shadow-2xl hover:shadow-amber-500/10 hover:-translate-y-2 transition-all duration-300 group cursor-pointer">
+            <div className="w-12 h-12 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center mb-6 border border-amber-500/20 group-hover:scale-110 transition-transform duration-300">
               <Zap className="h-6 w-6" />
             </div>
-            <h3 className="text-xl font-bold mb-3 text-white">{t('login_page.feat2_title') || "Fast point of sale"}</h3>
+            <h3 className="text-xl font-bold mb-3 text-white group-hover:text-amber-400 transition-colors">{t('login_page.feat2_title') || "Fast point of sale"}</h3>
             <p className="text-slate-400 leading-relaxed">
               {t('login_page.feat2_desc') || "A checkout built for tapping through orders quickly, with receipts that print in one click."}
             </p>
           </div>
           
-          <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-8 rounded-3xl hover:bg-white/10 transition-colors">
-            <div className="w-12 h-12 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mb-6 border border-emerald-500/20">
+          <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-8 rounded-3xl hover:bg-white/10 hover:shadow-2xl hover:shadow-emerald-500/10 hover:-translate-y-2 transition-all duration-300 group cursor-pointer">
+            <div className="w-12 h-12 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mb-6 border border-emerald-500/20 group-hover:scale-110 transition-transform duration-300">
               <BarChart3 className="h-6 w-6" />
             </div>
-            <h3 className="text-xl font-bold mb-3 text-white">{t('login_page.feat3_title') || "Real reporting"}</h3>
+            <h3 className="text-xl font-bold mb-3 text-white group-hover:text-emerald-400 transition-colors">{t('login_page.feat3_title') || "Real reporting"}</h3>
             <p className="text-slate-400 leading-relaxed">
               {t('login_page.feat3_desc') || "Daily, weekly, and monthly revenue pulled straight from your sales — not a static mock."}
             </p>
@@ -101,40 +101,38 @@ export default function LoginClient({ isSuspended }: { isSuspended: boolean }) {
 
         {/* Wide Banner */}
         <div className="container mx-auto px-6 max-w-6xl mb-24">
-          <div className="w-full bg-gradient-to-br from-indigo-950/80 to-slate-900/90 border border-indigo-500/20 rounded-[2.5rem] p-10 md:p-16 backdrop-blur-md shadow-2xl relative overflow-hidden">
+          <div className="w-full bg-gradient-to-br from-indigo-950/80 to-slate-900/90 border border-indigo-500/20 rounded-[2.5rem] p-10 md:p-16 backdrop-blur-md shadow-2xl relative overflow-hidden text-center">
             {/* Inner glow */}
             <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/10 blur-[100px] rounded-full pointer-events-none translate-x-1/3 -translate-y-1/3" />
             
-            <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-12">
-              <div className="max-w-xl">
-                <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center mb-6 border border-white/10">
-                  <Store className="h-6 w-6 text-indigo-300" />
-                </div>
-                <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white leading-tight">{t('login_page.banner_title') || "Everything your shop needs"}</h2>
-                <p className="text-indigo-200/80 text-lg md:text-xl leading-relaxed mb-8 md:mb-0">
-                  {t('login_page.banner_desc') || "SmartShop brings sales, inventory, customers, and reporting together in one simple system."}
-                </p>
+            <div className="relative z-10 flex flex-col items-center">
+              <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center mb-6 border border-white/10 mx-auto">
+                <Store className="h-6 w-6 text-indigo-300" />
               </div>
+              <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white leading-tight max-w-2xl">{t('login_page.banner_title') || "Everything your shop needs"}</h2>
+              <p className="text-indigo-200/80 text-lg md:text-xl leading-relaxed mb-12 max-w-3xl">
+                {t('login_page.banner_desc') || "SmartShop brings sales, inventory, customers, and reporting together in one simple system."}
+              </p>
               
-              <div className="flex flex-col gap-4 flex-1 w-full max-w-lg">
-                <div className="bg-indigo-950/50 p-5 rounded-2xl border border-indigo-500/20 flex gap-4 items-start shadow-inner">
-                  <div className="text-2xl pt-1">🔐</div>
+              <div className="grid md:grid-cols-3 gap-6 w-full text-left">
+                <div className="bg-indigo-950/50 hover:bg-indigo-900/80 p-6 rounded-2xl border border-indigo-500/20 flex flex-col gap-3 shadow-inner hover:shadow-2xl hover:shadow-indigo-500/20 hover:-translate-y-2 transition-all duration-300 cursor-pointer group">
+                  <div className="text-3xl group-hover:scale-110 transition-transform origin-left">🔐</div>
                   <div>
-                    <h4 className="font-bold text-white mb-1 text-lg">{t('login_page.banner_card1_title') || "Secure Access"}</h4>
+                    <h4 className="font-bold text-white mb-2 text-lg group-hover:text-indigo-300 transition-colors">{t('login_page.banner_card1_title') || "Secure Access"}</h4>
                     <p className="text-indigo-200/80 text-sm leading-relaxed">{t('login_page.banner_card1_desc') || "Each user gets access based on their assigned role and permissions."}</p>
                   </div>
                 </div>
-                <div className="bg-indigo-950/50 p-5 rounded-2xl border border-indigo-500/20 flex gap-4 items-start shadow-inner">
-                  <div className="text-2xl pt-1">📦</div>
+                <div className="bg-indigo-950/50 hover:bg-indigo-900/80 p-6 rounded-2xl border border-indigo-500/20 flex flex-col gap-3 shadow-inner hover:shadow-2xl hover:shadow-indigo-500/20 hover:-translate-y-2 transition-all duration-300 cursor-pointer group">
+                  <div className="text-3xl group-hover:scale-110 transition-transform origin-left">📦</div>
                   <div>
-                    <h4 className="font-bold text-white mb-1 text-lg">{t('login_page.banner_card2_title') || "Smart Inventory"}</h4>
+                    <h4 className="font-bold text-white mb-2 text-lg group-hover:text-indigo-300 transition-colors">{t('login_page.banner_card2_title') || "Smart Inventory"}</h4>
                     <p className="text-indigo-200/80 text-sm leading-relaxed">{t('login_page.banner_card2_desc') || "Track stock levels, stock movements, and product value in real time."}</p>
                   </div>
                 </div>
-                <div className="bg-indigo-950/50 p-5 rounded-2xl border border-indigo-500/20 flex gap-4 items-start shadow-inner">
-                  <div className="text-2xl pt-1">📊</div>
+                <div className="bg-indigo-950/50 hover:bg-indigo-900/80 p-6 rounded-2xl border border-indigo-500/20 flex flex-col gap-3 shadow-inner hover:shadow-2xl hover:shadow-indigo-500/20 hover:-translate-y-2 transition-all duration-300 cursor-pointer group">
+                  <div className="text-3xl group-hover:scale-110 transition-transform origin-left">📊</div>
                   <div>
-                    <h4 className="font-bold text-white mb-1 text-lg">{t('login_page.banner_card3_title') || "Clear Business Insights"}</h4>
+                    <h4 className="font-bold text-white mb-2 text-lg group-hover:text-indigo-300 transition-colors">{t('login_page.banner_card3_title') || "Clear Business Insights"}</h4>
                     <p className="text-indigo-200/80 text-sm leading-relaxed">{t('login_page.banner_card3_desc') || "Understand your sales, revenue, and stock performance with simple reports."}</p>
                   </div>
                 </div>
