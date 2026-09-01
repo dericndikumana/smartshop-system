@@ -35,7 +35,7 @@ export default function LoginClient({ isSuspended }: { isSuspended: boolean }) {
               onClick={() => setIsModalOpen(true)}
               className="hidden sm:inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-bold text-white bg-white/10 hover:bg-white/20 border border-white/10 rounded-full transition-all"
             >
-              Access Your Shop
+              {t('login_page.access_shop') || "Access Your Shop"}
               <ArrowRight className="h-4 w-4" />
             </button>
           </div>
@@ -48,20 +48,20 @@ export default function LoginClient({ isSuspended }: { isSuspended: boolean }) {
         {/* Hero Section */}
         <div className="container mx-auto px-6 text-center max-w-4xl mb-24 mt-10">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-fuchsia-400 text-sm font-semibold tracking-widest uppercase mb-8">
-            Everything you need
+            {t('login_page.hero_tag') || "Everything you need"}
           </div>
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/70 drop-shadow-sm leading-tight">
-            Built for how shops actually run
+            {t('login_page.hero_title') || "Built for how shops actually run"}
           </h1>
           <p className="text-xl md:text-2xl text-slate-300 font-medium mb-12 leading-relaxed max-w-2xl mx-auto">
-            The all-in-one multi-tenant retail platform. Run the counter and the back office from one screen.
+            {t('login_page.hero_desc') || "The all-in-one multi-tenant retail platform. Run the counter and the back office from one screen."}
           </p>
           <button
             onClick={() => setIsModalOpen(true)}
             className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 text-base font-bold text-white bg-gradient-to-r from-fuchsia-600 to-violet-600 rounded-full overflow-hidden shadow-lg shadow-violet-500/25 transition-transform hover:scale-105 active:scale-95 sm:hidden mb-12"
           >
             <span className="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-30 bg-gradient-to-b from-transparent via-transparent to-black"></span>
-            <span className="relative">Access Your Shop</span>
+            <span className="relative">{t('login_page.access_shop') || "Access Your Shop"}</span>
             <ArrowRight className="relative h-5 w-5 transition-transform group-hover:translate-x-1" />
           </button>
         </div>
@@ -72,9 +72,9 @@ export default function LoginClient({ isSuspended }: { isSuspended: boolean }) {
             <div className="w-12 h-12 bg-fuchsia-500/20 text-fuchsia-400 rounded-2xl flex items-center justify-center mb-6 border border-fuchsia-500/20">
               <Package className="h-6 w-6" />
             </div>
-            <h3 className="text-xl font-bold mb-3 text-white">Live inventory</h3>
+            <h3 className="text-xl font-bold mb-3 text-white">{t('login_page.feat1_title') || "Live inventory"}</h3>
             <p className="text-slate-400 leading-relaxed">
-              Stock levels update the moment a sale is rung up — no manual reconciliation, no surprises at close.
+              {t('login_page.feat1_desc') || "Stock levels update the moment a sale is rung up — no manual reconciliation, no surprises at close."}
             </p>
           </div>
           
@@ -82,9 +82,9 @@ export default function LoginClient({ isSuspended }: { isSuspended: boolean }) {
             <div className="w-12 h-12 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center mb-6 border border-amber-500/20">
               <Zap className="h-6 w-6" />
             </div>
-            <h3 className="text-xl font-bold mb-3 text-white">Fast point of sale</h3>
+            <h3 className="text-xl font-bold mb-3 text-white">{t('login_page.feat2_title') || "Fast point of sale"}</h3>
             <p className="text-slate-400 leading-relaxed">
-              A checkout built for tapping through orders quickly, with receipts that print in one click.
+              {t('login_page.feat2_desc') || "A checkout built for tapping through orders quickly, with receipts that print in one click."}
             </p>
           </div>
           
@@ -92,9 +92,9 @@ export default function LoginClient({ isSuspended }: { isSuspended: boolean }) {
             <div className="w-12 h-12 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mb-6 border border-emerald-500/20">
               <BarChart3 className="h-6 w-6" />
             </div>
-            <h3 className="text-xl font-bold mb-3 text-white">Real reporting</h3>
+            <h3 className="text-xl font-bold mb-3 text-white">{t('login_page.feat3_title') || "Real reporting"}</h3>
             <p className="text-slate-400 leading-relaxed">
-              Daily, weekly, and monthly revenue pulled straight from your sales — not a static mock.
+              {t('login_page.feat3_desc') || "Daily, weekly, and monthly revenue pulled straight from your sales — not a static mock."}
             </p>
           </div>
         </div>
@@ -105,25 +105,38 @@ export default function LoginClient({ isSuspended }: { isSuspended: boolean }) {
             {/* Inner glow */}
             <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/10 blur-[100px] rounded-full pointer-events-none translate-x-1/3 -translate-y-1/3" />
             
-            <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-12">
+            <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-12">
               <div className="max-w-xl">
                 <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center mb-6 border border-white/10">
-                  <ShieldCheck className="h-6 w-6 text-indigo-300" />
+                  <Store className="h-6 w-6 text-indigo-300" />
                 </div>
-                <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white leading-tight">One dashboard, every shop.</h2>
+                <h2 className="text-3xl md:text-5xl font-bold mb-6 text-white leading-tight">{t('login_page.banner_title') || "Everything your shop needs"}</h2>
                 <p className="text-indigo-200/80 text-lg md:text-xl leading-relaxed mb-8 md:mb-0">
-                  Super admins get a single view across every tenant — create shops, manage owners and cashiers, and suspend access without touching a database.
+                  {t('login_page.banner_desc') || "SmartShop brings sales, inventory, customers, and reporting together in one simple system."}
                 </p>
               </div>
               
-              <div className="flex flex-col gap-4 min-w-[200px]">
-                <div className="flex items-center gap-3 text-indigo-200">
-                  <ShieldCheck className="h-5 w-5 text-indigo-400" />
-                  <span className="font-medium">Role-based access</span>
+              <div className="flex flex-col gap-4 flex-1 w-full max-w-lg">
+                <div className="bg-indigo-950/50 p-5 rounded-2xl border border-indigo-500/20 flex gap-4 items-start shadow-inner">
+                  <div className="text-2xl pt-1">🔐</div>
+                  <div>
+                    <h4 className="font-bold text-white mb-1 text-lg">{t('login_page.banner_card1_title') || "Secure Access"}</h4>
+                    <p className="text-indigo-200/80 text-sm leading-relaxed">{t('login_page.banner_card1_desc') || "Each user gets access based on their assigned role and permissions."}</p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-3 text-indigo-200">
-                  <ShieldCheck className="h-5 w-5 text-indigo-400" />
-                  <span className="font-medium">Isolated tenant data</span>
+                <div className="bg-indigo-950/50 p-5 rounded-2xl border border-indigo-500/20 flex gap-4 items-start shadow-inner">
+                  <div className="text-2xl pt-1">📦</div>
+                  <div>
+                    <h4 className="font-bold text-white mb-1 text-lg">{t('login_page.banner_card2_title') || "Smart Inventory"}</h4>
+                    <p className="text-indigo-200/80 text-sm leading-relaxed">{t('login_page.banner_card2_desc') || "Track stock levels, stock movements, and product value in real time."}</p>
+                  </div>
+                </div>
+                <div className="bg-indigo-950/50 p-5 rounded-2xl border border-indigo-500/20 flex gap-4 items-start shadow-inner">
+                  <div className="text-2xl pt-1">📊</div>
+                  <div>
+                    <h4 className="font-bold text-white mb-1 text-lg">{t('login_page.banner_card3_title') || "Clear Business Insights"}</h4>
+                    <p className="text-indigo-200/80 text-sm leading-relaxed">{t('login_page.banner_card3_desc') || "Understand your sales, revenue, and stock performance with simple reports."}</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -133,7 +146,7 @@ export default function LoginClient({ isSuspended }: { isSuspended: boolean }) {
         {/* Footer */}
         <div className="container mx-auto px-6">
           <div className="mt-16 text-slate-400 text-sm flex flex-col items-center gap-6 pb-10">
-            <p className="text-center px-4">Don&apos;t have an account? Contact the System Administrator:</p>
+            <p className="text-center px-4">{t('login_page.footer_contact') || "Don't have an account? Contact the System Administrator:"}</p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-slate-300">
               <span className="flex items-center gap-2 bg-white/5 px-5 py-3 rounded-full border border-white/10 backdrop-blur-sm whitespace-nowrap shadow-lg">
                 <span className="text-emerald-400 font-bold">WhatsApp</span> +250 781 096 567
@@ -142,7 +155,7 @@ export default function LoginClient({ isSuspended }: { isSuspended: boolean }) {
                 <span className="text-cyan-400 font-bold">Email</span> ndikumanaderic2@gmail.com
               </span>
             </div>
-            <p className="text-slate-500 text-xs mt-8">© {new Date().getFullYear()} SmartShop. All rights reserved.</p>
+            <p className="text-slate-500 text-xs mt-8">{(t('login_page.footer_rights') || "© {year} SmartShop. All rights reserved.").replace('{year}', new Date().getFullYear().toString())}</p>
           </div>
         </div>
       </main>
