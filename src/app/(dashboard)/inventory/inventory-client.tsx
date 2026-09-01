@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Package, Plus, Trash2, Search, ArrowUp, Edit } from "lucide-react"
 import { createProductAction, deleteProductAction, addStockAction, editProductAction } from "@/app/actions/inventory"
 import { toast } from "sonner"
+import { useTranslation } from "@/components/providers/language-provider"
 
 const CURRENCIES = [
   "RWF", "KES", "UGX", "TZS", "BIF", "CDF", "NGN", "GHS", "ZAR", "EGP", 
@@ -16,11 +17,11 @@ const CURRENCIES = [
 interface Product {
   id: string
   name: string
+  sku?: string | null
   buyingPrice?: number | null
   sellingPrice: number
   currency: string
   quantity: number
-  piecesPerBundle?: number
   minStock: number
 }
 
@@ -36,6 +37,7 @@ const getInitialsColor = (name: string) => {
 }
 
 export function InventoryClient({ products: initialProducts, userRole }: { products: Product[], userRole?: string }) {
+  const { t } = useTranslation()
   const [searchTerm, setSearchTerm] = useState("")
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<"new" | "existing" | "edit">("new")
@@ -53,7 +55,8 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
   const itemsPerPage = 10
 
   const filteredProducts = initialProducts.filter(p => 
-    p.name.toLowerCase().includes(searchTerm.toLowerCase())
+    p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    (p.sku && p.sku.toLowerCase().includes(searchTerm.toLowerCase()))
   )
 
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage)
@@ -64,6 +67,7 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
     setIsLoading(true)
     
     const formData = new FormData(e.currentTarget)
+    // Remove piecesPerBundle, default to 1 on backend or handle it properly there
     const result = await createProductAction(formData)
     
     if (result?.error) {
@@ -137,9 +141,9 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Inventory Management</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t("inventory_page.title")}</h1>
           <p className="text-muted-foreground mt-2">
-            Manage your shop&apos;s products, stock levels, and pricing.
+            {t("inventory_page.subtitle")}
           </p>
         </div>
         {userRole !== "CASHIER" && (
@@ -151,7 +155,7 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
             className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors shadow-sm"
           >
             <Plus className="h-5 w-5" />
-            Add / Update Stock
+            {t("inventory_page.add_stock")}
           </button>
         )}
       </div>
@@ -160,13 +164,13 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
         <div className="p-4 border-b border-border/50 bg-muted/10 flex flex-col sm:flex-row items-center justify-between gap-4">
           <h2 className="text-xl font-semibold flex items-center gap-2">
             <Package className="h-5 w-5 text-primary" />
-            Product Catalog
+            {t("inventory_page.catalog")}
           </h2>
           <div className="relative w-full sm:w-72">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <input 
               type="text" 
-              placeholder="Search products by name..." 
+              placeholder={t("inventory_page.search")}
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value)
@@ -181,22 +185,19 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
             <thead className="bg-muted/50 text-muted-foreground uppercase text-[10px]">
               <tr>
                 <th className="px-3 py-3 font-medium w-12">#</th>
-                <th className="px-3 py-3 font-medium">PRODUCT</th>
-                <th className="px-3 py-3 font-medium">Total Packs</th>
-                <th className="px-3 py-3 font-medium">Items per Pack</th>
-                <th className="px-3 py-3 font-medium">Total pieces</th>
-                <th className="px-3 py-3 font-medium">Pack Price</th>
-                <th className="px-3 py-3 font-medium">Amount</th>
-                <th className="px-3 py-3 font-medium">Selling Price</th>
-                {userRole !== "CASHIER" && <th className="px-3 py-3 font-medium text-right">Actions</th>}
+                <th className="px-3 py-3 font-medium">{t("inventory_page.col_product")}</th>
+                <th className="px-3 py-3 font-medium">{t("inventory_page.col_total_items")}</th>
+                <th className="px-3 py-3 font-medium">{t("inventory_page.col_buying_price")}</th>
+                <th className="px-3 py-3 font-medium">{t("inventory_page.col_selling_price")}</th>
+                {userRole !== "CASHIER" && <th className="px-3 py-3 font-medium text-right">{t("inventory_page.col_actions")}</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
               {paginatedProducts.length === 0 ? (
                 <tr>
-                  <td colSpan={userRole !== "CASHIER" ? 9 : 8} className="px-6 py-12 text-center text-muted-foreground">
+                  <td colSpan={userRole !== "CASHIER" ? 6 : 5} className="px-6 py-12 text-center text-muted-foreground">
                     <Package className="h-12 w-12 mx-auto mb-4 opacity-20" />
-                    No products found. Add your first product to get started.
+                    {t("inventory_page.no_products")}
                   </td>
                 </tr>
               ) : (
@@ -210,23 +211,17 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                         <div className={`h-6 w-6 rounded-md flex items-center justify-center text-white font-bold text-[10px] shadow-sm ${getInitialsColor(product.name)}`}>
                           {product.name.substring(0, 2).toUpperCase()}
                         </div>
-                        <p className="font-medium text-xs text-foreground truncate max-w-[150px]" title={product.name}>{product.name}</p>
+                        <div className="flex flex-col">
+                          <p className="font-medium text-xs text-foreground truncate max-w-[150px]" title={product.name}>{product.name}</p>
+                          {product.sku && <p className="text-[10px] text-muted-foreground truncate">{product.sku}</p>}
+                        </div>
                       </div>
                     </td>
                     <td className="px-3 py-2 text-xs font-medium">
                       {product.quantity}
                     </td>
                     <td className="px-3 py-2 text-xs">
-                      {product.piecesPerBundle || 1}
-                    </td>
-                    <td className="px-3 py-2 text-xs">
-                      {(product.quantity * (product.piecesPerBundle || 1)).toLocaleString()}
-                    </td>
-                    <td className="px-3 py-2 text-xs">
                       {product.buyingPrice ? `${product.currency} ${product.buyingPrice.toLocaleString()}` : "-"}
-                    </td>
-                    <td className="px-3 py-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                      {product.buyingPrice ? `${product.currency} ${(product.buyingPrice * product.quantity).toLocaleString()}` : "-"}
                     </td>
                     <td className="px-3 py-2 text-xs">
                       {product.sellingPrice > 0 ? `${product.currency} ${product.sellingPrice.toLocaleString()}` : "Not Set"}
@@ -303,7 +298,7 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
             <div className="flex border-b">
               {activeTab === "edit" ? (
                 <button className="flex-1 py-3 text-sm font-medium bg-muted/50 border-b-2 border-primary text-primary">
-                  Edit Product
+                  {t("inventory_page.edit_product")}
                 </button>
               ) : (
                 <>
@@ -311,13 +306,13 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                     className={`flex-1 py-3 text-sm font-medium ${activeTab === "new" ? "bg-muted/50 border-b-2 border-primary text-primary" : "text-muted-foreground hover:bg-muted/30"}`}
                     onClick={() => setActiveTab("new")}
                   >
-                    Create New Product
+                    {t("inventory_page.create_new")}
                   </button>
                   <button 
                     className={`flex-1 py-3 text-sm font-medium ${activeTab === "existing" ? "bg-muted/50 border-b-2 border-primary text-primary" : "text-muted-foreground hover:bg-muted/30"}`}
                     onClick={() => setActiveTab("existing")}
                   >
-                    Add Stock to Existing
+                    {t("inventory_page.add_stock_modal")}
                   </button>
                 </>
               )}
@@ -327,37 +322,32 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
               {activeTab === "new" ? (
                 <form onSubmit={handleCreateProduct} className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Product Name</label>
+                    <label className="text-sm font-medium">{t("inventory_page.product_name")}</label>
                     <input required name="name" type="text" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g. Premium Coffee Beans" />
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">SKU (Optional)</label>
-                    <input name="sku" type="text" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Put SKU or leave empty (no matter)" />
+                    <label className="text-sm font-medium">{t("inventory_page.sku")}</label>
+                    <input name="sku" type="text" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="SKU" />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Total Packs</label>
-                      <input required name="quantity" type="number" min="0" defaultValue="0" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Items per Pack</label>
-                      <input required name="piecesPerBundle" type="number" min="1" defaultValue="1" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
-                    </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">{t("inventory_page.items_number")}</label>
+                    <input required name="quantity" type="number" min="0" defaultValue="0" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                    <input type="hidden" name="piecesPerBundle" value="1" />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Pack Price</label>
+                      <label className="text-sm font-medium">{t("inventory_page.col_buying_price")}</label>
                       <input name="buyingPrice" type="number" step="0.01" min="0" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="0.00" />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Selling Price</label>
+                      <label className="text-sm font-medium">{t("inventory_page.col_selling_price")}</label>
                       <input name="sellingPrice" type="number" step="0.01" min="0" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="0.00" />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Currency</label>
+                      <label className="text-sm font-medium">{t("inventory_page.currency")}</label>
                       <select required name="currency" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
                         {CURRENCIES.map(c => (
                           <option key={c} value={c}>{c}</option>
@@ -372,51 +362,46 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                       onClick={() => setIsModalOpen(false)}
                       className="px-4 py-2 text-sm font-medium rounded-md border hover:bg-muted transition-colors"
                     >
-                      Cancel
+                      {t("inventory_page.cancel")}
                     </button>
                     <button 
                       type="submit" 
                       disabled={isLoading}
                       className="px-4 py-2 text-sm font-medium rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-50"
                     >
-                      {isLoading ? "Saving..." : "Create Product"}
+                      {isLoading ? "Saving..." : t("inventory_page.save")}
                     </button>
                   </div>
                 </form>
               ) : activeTab === "edit" && editingProduct ? (
                 <form onSubmit={handleEditProduct} className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Product Name</label>
+                    <label className="text-sm font-medium">{t("inventory_page.product_name")}</label>
                     <input required name="name" type="text" defaultValue={editingProduct.name} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">SKU (Optional)</label>
-                    <input name="sku" type="text" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Put SKU or leave empty (no matter)" />
+                    <label className="text-sm font-medium">{t("inventory_page.sku")}</label>
+                    <input name="sku" type="text" defaultValue={editingProduct.sku || ""} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="SKU" />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Total Packs</label>
-                      <input required name="quantity" type="number" min="0" defaultValue={editingProduct.quantity} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Items per Pack</label>
-                      <input required name="piecesPerBundle" type="number" min="1" defaultValue={editingProduct.piecesPerBundle || 1} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
-                    </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">{t("inventory_page.items_number")}</label>
+                    <input required name="quantity" type="number" min="0" defaultValue={editingProduct.quantity} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                    <input type="hidden" name="piecesPerBundle" value="1" />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Pack Price</label>
+                      <label className="text-sm font-medium">{t("inventory_page.col_buying_price")}</label>
                       <input name="buyingPrice" type="number" step="0.01" min="0" defaultValue={editingProduct.buyingPrice || ""} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="0.00" />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Selling Price</label>
+                      <label className="text-sm font-medium">{t("inventory_page.col_selling_price")}</label>
                       <input name="sellingPrice" type="number" step="0.01" min="0" defaultValue={editingProduct.sellingPrice} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Currency</label>
+                      <label className="text-sm font-medium">{t("inventory_page.currency")}</label>
                       <select required name="currency" defaultValue={editingProduct.currency} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
                         {CURRENCIES.map(c => (
                           <option key={c} value={c}>{c}</option>
@@ -431,21 +416,21 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                       onClick={() => setIsModalOpen(false)}
                       className="px-4 py-2 text-sm font-medium rounded-md border hover:bg-muted transition-colors"
                     >
-                      Cancel
+                      {t("inventory_page.cancel")}
                     </button>
                     <button 
                       type="submit" 
                       disabled={isLoading}
                       className="px-4 py-2 text-sm font-medium rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-50"
                     >
-                      {isLoading ? "Saving..." : "Update Product"}
+                      {isLoading ? "Saving..." : t("inventory_page.save")}
                     </button>
                   </div>
                 </form>
               ) : (
                 <form onSubmit={handleAddStock} className="space-y-6">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Select Product</label>
+                    <label className="text-sm font-medium">{t("inventory_page.select_product")}</label>
                     <select 
                       required 
                       value={selectedProductId}
@@ -462,7 +447,7 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Quantity to Add</label>
+                    <label className="text-sm font-medium">{t("inventory_page.items_number")}</label>
                     <input 
                       required 
                       type="number" 
@@ -479,14 +464,14 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                       onClick={() => setIsModalOpen(false)}
                       className="px-4 py-2 text-sm font-medium rounded-md border hover:bg-muted transition-colors"
                     >
-                      Cancel
+                      {t("inventory_page.cancel")}
                     </button>
                     <button 
                       type="submit" 
                       disabled={isLoading || !selectedProductId}
                       className="px-4 py-2 text-sm font-medium rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-50"
                     >
-                      {isLoading ? "Saving..." : "Add Stock"}
+                      {isLoading ? "Saving..." : t("inventory_page.add_stock")}
                     </button>
                   </div>
                 </form>
@@ -498,4 +483,3 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
     </div>
   )
 }
-

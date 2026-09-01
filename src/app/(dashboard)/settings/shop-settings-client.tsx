@@ -4,6 +4,8 @@ import { useState } from "react"
 import { updateShopSettingsAction } from "@/app/actions/shop-settings"
 import { Store, Percent } from "lucide-react"
 import { toast } from "sonner"
+import { useTranslation } from "@/components/providers/language-provider"
+import { useRouter } from "next/navigation"
 
 const africanCountryCodes = [
   { code: "+213", name: "Algeria" }, { code: "+244", name: "Angola" }, { code: "+229", name: "Benin" }, { code: "+267", name: "Botswana" },
@@ -35,6 +37,8 @@ export function ShopSettingsClient({
   isVatEnabled: boolean
   initialPrefix: string 
 }) {
+  const { t } = useTranslation()
+  const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -48,6 +52,7 @@ export function ShopSettingsClient({
       toast.error(result.error)
     } else if (result.success) {
       toast.success("Shop settings updated successfully.")
+      router.refresh() // Refresh page to show new shop name in header if necessary
     }
     
     setIsLoading(false)
@@ -57,19 +62,19 @@ export function ShopSettingsClient({
     <div>
       <h3 className="text-lg font-medium text-primary flex items-center gap-2">
         <Store className="h-5 w-5" />
-        Store Configuration
+        {t('settings_page.store_config')}
       </h3>
-      <p className="text-sm text-muted-foreground mb-6">Manage global settings for your shop tenant.</p>
+      <p className="text-sm text-muted-foreground mb-6">{t('settings_page.store_desc')}</p>
       
       <form onSubmit={handleSubmit} className="space-y-6 max-w-sm">
         
         <div className="space-y-4 p-4 border rounded-lg bg-muted/10">
           <div className="flex items-center gap-2 font-medium text-foreground">
             <Store className="h-4 w-4 text-primary" />
-            General Information
+            {t('settings_page.gen_info')}
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium">Shop Name (Displayed on Receipts)</label>
+            <label className="text-sm font-medium">{t('settings_page.shop_name')}</label>
             <input 
               name="shopName"
               type="text" 
@@ -79,7 +84,7 @@ export function ShopSettingsClient({
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium">Shop Phone (Displayed on Receipts)</label>
+            <label className="text-sm font-medium">{t('settings_page.shop_phone')}</label>
             <div className="flex gap-2">
               <select 
                 name="countryCode" 
@@ -106,7 +111,7 @@ export function ShopSettingsClient({
         <div className="space-y-4 p-4 border rounded-lg bg-muted/10">
           <div className="flex items-center gap-2 font-medium text-foreground">
             <Percent className="h-4 w-4 text-primary" />
-            Tax & VAT Settings
+            {t('settings_page.tax_settings')}
           </div>
           
           <div className="flex items-center gap-2">
@@ -118,12 +123,12 @@ export function ShopSettingsClient({
               className="rounded border-input text-primary focus:ring-primary"
             />
             <label htmlFor="isVatEnabled" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-              Enable VAT Collection
+              {t('settings_page.enable_vat')}
             </label>
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Standard VAT Rate (%)</label>
+            <label className="text-sm font-medium">{t('settings_page.vat_rate')}</label>
             <input 
               name="vatRate"
               type="number" 
@@ -137,10 +142,10 @@ export function ShopSettingsClient({
 
         <div className="space-y-4 p-4 border rounded-lg bg-muted/10">
           <div className="flex items-center gap-2 font-medium text-foreground">
-            Receipt Settings
+            {t('settings_page.receipt_settings')}
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium">Receipt Prefix</label>
+            <label className="text-sm font-medium">{t('settings_page.receipt_prefix')}</label>
             <input 
               name="receiptPrefix"
               type="text" 
@@ -157,7 +162,7 @@ export function ShopSettingsClient({
           disabled={isLoading}
           className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium disabled:opacity-50 w-full"
         >
-          {isLoading ? "Saving..." : "Save Configuration"}
+          {isLoading ? "..." : t('settings_page.save_config')}
         </button>
       </form>
     </div>

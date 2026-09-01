@@ -22,11 +22,11 @@ export default async function InventoryPage() {
     const serializedProducts = products.map((p: Product) => ({
       id: p.id,
       name: p.name || "Unknown",
+      sku: p.sku || null,
       sellingPrice: Number(p.sellingPrice || 0),
       buyingPrice: p.buyingPrice ? Number(p.buyingPrice) : null,
       currency: p.currency || "RWF",
       quantity: Number(p.quantity || 0),
-      piecesPerBundle: Number(p.piecesPerBundle || 1),
       minStock: Number(p.minStock || 0),
     }))
 

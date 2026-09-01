@@ -4,6 +4,8 @@ import { useState } from "react"
 import { updatePasswordAction, updateProfileInfoAction } from "@/app/actions/user"
 import { Lock, User } from "lucide-react"
 import { toast } from "sonner"
+import { useTranslation } from "@/components/providers/language-provider"
+import { useSession } from "next-auth/react"
 
 interface SettingsClientProps {
   userRole: string
@@ -12,6 +14,8 @@ interface SettingsClientProps {
 }
 
 export function SettingsClient({ userRole, initialName, initialEmail }: SettingsClientProps) {
+  const { t } = useTranslation()
+  const { update } = useSession()
   const [isPwdLoading, setIsPwdLoading] = useState(false)
   const [isProfLoading, setIsProfLoading] = useState(false)
 
@@ -20,12 +24,15 @@ export function SettingsClient({ userRole, initialName, initialEmail }: Settings
     setIsProfLoading(true)
 
     const formData = new FormData(e.currentTarget)
+    const newName = formData.get("name") as string
+    const newEmail = formData.get("email") as string
     const result = await updateProfileInfoAction(formData)
 
     if (result.error) {
       toast.error(result.error)
     } else if (result.success) {
       toast.success(result.message || "Profile updated successfully.")
+      await update({ name: newName, email: newEmail }) // Sync session locally
     }
     
     setIsProfLoading(false)
@@ -53,13 +60,13 @@ export function SettingsClient({ userRole, initialName, initialEmail }: Settings
       <div className="border-t pt-6">
         <h3 className="text-lg font-medium flex items-center gap-2">
           <User className="h-4 w-4" />
-          Edit Profile
+          {t('settings_page.edit_profile')}
         </h3>
-        <p className="text-sm text-muted-foreground mb-4">Update your name and email address.</p>
+        <p className="text-sm text-muted-foreground mb-4">{t('settings_page.profile_desc')}</p>
         
         <form onSubmit={handleProfileSubmit} className="space-y-4 max-w-sm">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Full Name</label>
+            <label className="text-sm font-medium">{t('settings_page.full_name')}</label>
             <input 
               required
               name="name"
@@ -69,7 +76,7 @@ export function SettingsClient({ userRole, initialName, initialEmail }: Settings
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium">Email Address</label>
+            <label className="text-sm font-medium">{t('settings_page.email')}</label>
             <input 
               required
               name="email"
@@ -83,7 +90,7 @@ export function SettingsClient({ userRole, initialName, initialEmail }: Settings
             disabled={isProfLoading}
             className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium disabled:opacity-50"
           >
-            {isProfLoading ? "Updating..." : "Update Profile"}
+            {isProfLoading ? "..." : t('settings_page.update_profile')}
           </button>
         </form>
       </div>
@@ -92,13 +99,13 @@ export function SettingsClient({ userRole, initialName, initialEmail }: Settings
         <div className="border-t pt-6">
           <h3 className="text-lg font-medium text-destructive flex items-center gap-2">
             <Lock className="h-4 w-4" />
-            Security
+            {t('settings_page.security')}
           </h3>
-          <p className="text-sm text-muted-foreground mb-4">Update your account password.</p>
+          <p className="text-sm text-muted-foreground mb-4">{t('settings_page.security_desc')}</p>
           
           <form onSubmit={handlePasswordSubmit} className="space-y-4 max-w-sm">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Current Password</label>
+              <label className="text-sm font-medium">{t('settings_page.current_pwd')}</label>
               <input 
                 required
                 name="currentPassword"
@@ -107,7 +114,7 @@ export function SettingsClient({ userRole, initialName, initialEmail }: Settings
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">New Password</label>
+              <label className="text-sm font-medium">{t('settings_page.new_pwd')}</label>
               <input 
                 required
                 name="newPassword"
@@ -117,7 +124,7 @@ export function SettingsClient({ userRole, initialName, initialEmail }: Settings
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Confirm New Password</label>
+              <label className="text-sm font-medium">{t('settings_page.confirm_pwd')}</label>
               <input 
                 required
                 name="confirmPassword"
@@ -130,7 +137,7 @@ export function SettingsClient({ userRole, initialName, initialEmail }: Settings
               disabled={isPwdLoading}
               className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium disabled:opacity-50"
             >
-              {isPwdLoading ? "Updating..." : "Update Password"}
+              {isPwdLoading ? "..." : t('settings_page.update_pwd')}
             </button>
           </form>
         </div>

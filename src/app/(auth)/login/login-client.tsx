@@ -3,13 +3,19 @@
 import { useState } from "react"
 import LoginForm from "@/components/auth/login-form"
 import { X, ArrowRight, Store } from "lucide-react"
+import { useTranslation } from "@/components/providers/language-provider"
+import { LanguageSwitcher } from "@/components/layout/language-switcher"
 
 export default function LoginClient({ isSuspended }: { isSuspended: boolean }) {
   const [isModalOpen, setIsModalOpen] = useState(isSuspended)
+  const { t } = useTranslation()
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#0f172a] text-slate-50 flex flex-col items-center justify-center selection:bg-fuchsia-500/30">
       
+      <div className="absolute top-6 right-6 z-50 bg-slate-900/50 rounded-lg">
+        <LanguageSwitcher />
+      </div>
       {/* Dynamic Animated Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-[40%] -left-[20%] w-[70%] h-[70%] rounded-full bg-violet-600/20 blur-[120px] animate-pulse" style={{ animationDuration: '8s' }} />
@@ -72,8 +78,8 @@ export default function LoginClient({ isSuspended }: { isSuspended: boolean }) {
           </button>
 
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-white mb-2">Welcome Back</h2>
-            <p className="text-slate-300 text-sm">Enter your credentials to continue to your dashboard.</p>
+            <h2 className="text-2xl font-bold text-white mb-2">{t('login_page.welcome')}</h2>
+            <p className="text-slate-300 text-sm">{t('login_page.subtitle')}</p>
           </div>
 
           <div className="[&_label]:text-slate-200 [&_input]:bg-slate-900/50 [&_input]:border-white/10 [&_input]:text-white [&_input]:placeholder:text-slate-500 [&_input:focus]:border-fuchsia-500 [&_input:focus]:ring-fuchsia-500/20 [&_button]:bg-white [&_button]:text-slate-900 [&_button:hover]:bg-slate-200 [&_button]:rounded-xl [&_button]:font-bold [&_button]:h-12">

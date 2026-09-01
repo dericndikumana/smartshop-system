@@ -21,7 +21,7 @@ export default async function DashboardLayout({
   
   const dbUser = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { status: true, shopId: true, shop: { select: { status: true, name: true } } }
+    select: { name: true, email: true, status: true, shopId: true, shop: { select: { status: true, name: true } } }
   })
 
   if (!dbUser || dbUser.status === "BLOCKED" || dbUser.status === "INACTIVE" || dbUser.shop?.status === "BLOCKED") {
@@ -31,7 +31,7 @@ export default async function DashboardLayout({
   const shopName = dbUser.shop?.name
 
   return (
-    <DashboardShell user={session.user} shopName={shopName}>
+    <DashboardShell user={{ ...session.user, name: dbUser.name, email: dbUser.email }} shopName={shopName}>
       <SessionGuard />
       {children}
     </DashboardShell>

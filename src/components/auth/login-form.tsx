@@ -5,9 +5,11 @@ import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { AlertCircle, RefreshCw, Eye, EyeOff } from "lucide-react"
+import { useTranslation } from "@/components/providers/language-provider"
 
 export default function LoginForm({ initialSuspended }: { initialSuspended?: boolean }) {
   const router = useRouter()
+  const { t } = useTranslation()
   const [identifier, setIdentifier] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -56,7 +58,7 @@ export default function LoginForm({ initialSuspended }: { initialSuspended?: boo
 
       <div className="space-y-2">
         <label className="text-sm font-medium leading-none" htmlFor="identifier">
-          Username or Email
+          {t('login_page.email')}
         </label>
         <input 
           id="identifier" 
@@ -75,7 +77,7 @@ export default function LoginForm({ initialSuspended }: { initialSuspended?: boo
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <label className="text-sm font-medium leading-none" htmlFor="password">
-            Password
+            {t('login_page.password')}
           </label>
           <button
             type="button"
@@ -112,7 +114,7 @@ export default function LoginForm({ initialSuspended }: { initialSuspended?: boo
       
       <div className="flex gap-2 mt-6">
         <Button className="flex-1 font-medium" type="submit" disabled={loading}>
-          {loading ? "Signing in..." : "Sign in"}
+          {loading ? "..." : t('login_page.signin')}
         </Button>
         {errorMessage && (
           <Button 
