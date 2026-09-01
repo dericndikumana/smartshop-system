@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import LoginForm from "@/components/auth/login-form"
-import { X, ArrowRight, Store, Package, Zap, BarChart3, ShieldCheck } from "lucide-react"
+import { X, ArrowRight, Store, Package, Zap, BarChart3 } from "lucide-react"
 import { useTranslation } from "@/components/providers/language-provider"
 import { LanguageSwitcher } from "@/components/layout/language-switcher"
 
