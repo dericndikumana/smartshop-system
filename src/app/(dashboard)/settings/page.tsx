@@ -7,7 +7,8 @@ import {
   Package, 
   Users, 
   Receipt,
-  User
+  User,
+  ShoppingCart
 } from "lucide-react"
 
 export const dynamic = 'force-dynamic'
@@ -18,6 +19,7 @@ export default async function SettingsPage() {
 
   const menuItems = [
     { name: "Account Details", href: "/settings/account", icon: User },
+    { name: "Order", href: "/pos", icon: ShoppingCart },
     { name: "All Sales", href: "/sales", icon: ListOrdered },
     { name: "Manage Cashiers", href: "/staff", icon: Users },
     { name: "Stock", href: "/inventory", icon: Package },

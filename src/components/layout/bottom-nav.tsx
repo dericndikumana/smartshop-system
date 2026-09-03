@@ -5,16 +5,19 @@ import { usePathname } from "next/navigation"
 import { Home, ShoppingCart, ListOrdered, Package, Users, Settings } from "lucide-react"
 import { cn } from "@/lib/utils"
 
+import { useTranslation } from "@/components/providers/language-provider"
+
 export function BottomNav() {
   const pathname = usePathname()
+  const { t } = useTranslation()
 
   const navItems = [
-    { name: "Home", href: "/", icon: Home },
-    { name: "POS", href: "/pos", icon: ShoppingCart },
-    { name: "All Sales", href: "/sales", icon: ListOrdered },
-    { name: "Product", href: "/inventory", icon: Package },
-    { name: "Custome info", href: "/customers", icon: Users },
-    { name: "Settings", href: "/settings", icon: Settings },
+    { name: t("nav.home"), href: "/", icon: Home },
+    { name: t("nav.pos"), href: "/pos", icon: ShoppingCart },
+    { name: t("nav.all_sales"), href: "/sales", icon: ListOrdered },
+    { name: t("nav.product"), href: "/inventory", icon: Package },
+    { name: t("nav.customer_info"), href: "/customers", icon: Users },
+    { name: t("nav.settings"), href: "/settings", icon: Settings },
   ]
 
   return (

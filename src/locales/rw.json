@@ -1,4 +1,12 @@
 {
+  "nav": {
+    "home": "Ahabanza",
+    "pos": "Kugurisha (POS)",
+    "all_sales": "Ibyagurishijwe Byose",
+    "product": "Ibicuruzwa",
+    "customer_info": "Amakuru y'Umukiriya",
+    "settings": "Igenamiterere"
+  },
   "common": {
     "dashboard": "Incamake",
     "shops": "Amaduka",

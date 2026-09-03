@@ -1,7 +1,7 @@
 "use client"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, ShoppingCart, Package, Users, FileText, Settings, LogOut, Receipt, Store, ChevronLeft, ChevronRight } from "lucide-react"
+import { LayoutDashboard, ShoppingCart, Package, Users, Settings, LogOut, Receipt, Store, ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { signOut } from "next-auth/react"
 import { useTranslation } from "@/components/providers/language-provider"
@@ -26,24 +26,15 @@ export function Sidebar({ role, onNavClick, isCollapsed, onToggleCollapse }: Sid
       { name: t("sidebar.manage_shops"), href: "/superadmin/shops", icon: Store },
       { name: t("sidebar.settings"), href: "/settings", icon: Settings },
     ]
-  } else if (role === "SHOP_ADMIN") {
+  } else {
+    // Both SHOP_ADMIN and CASHIER share the exact same 6 navigation items
     navItems = [
-      { name: t("sidebar.shop_dashboard"), href: "/", icon: LayoutDashboard },
-      { name: t("sidebar.pos_terminal"), href: "/pos", icon: ShoppingCart },
-      { name: t("sidebar.inventory"), href: "/inventory", icon: Package },
-      { name: t("sidebar.sales_receipts"), href: "/sales", icon: Receipt },
-      { name: t("sidebar.manage_cashiers"), href: "/staff", icon: Users },
-      { name: t("sidebar.reports"), href: "/reports", icon: FileText },
-      { name: t("sidebar.settings"), href: "/settings", icon: Settings },
-    ]
-  } else if (role === "CASHIER") {
-    navItems = [
-      { name: t("sidebar.dashboard"), href: "/", icon: LayoutDashboard },
-      { name: t("sidebar.pos_terminal"), href: "/pos", icon: ShoppingCart },
-      { name: t("sidebar.inventory"), href: "/inventory", icon: Package },
-      { name: t("sidebar.my_receipts"), href: "/sales", icon: Receipt },
-      { name: t("sidebar.reports"), href: "/reports", icon: FileText },
-      { name: t("sidebar.my_settings"), href: "/settings", icon: Settings },
+      { name: t("nav.home"), href: "/", icon: LayoutDashboard },
+      { name: t("nav.pos"), href: "/pos", icon: ShoppingCart },
+      { name: t("nav.all_sales"), href: "/sales", icon: Receipt },
+      { name: t("nav.product"), href: "/inventory", icon: Package },
+      { name: t("nav.customer_info"), href: "/customers", icon: Users },
+      { name: t("nav.settings"), href: "/settings", icon: Settings },
     ]
   }
 

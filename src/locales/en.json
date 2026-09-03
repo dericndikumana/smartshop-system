@@ -1,4 +1,12 @@
 {
+  "nav": {
+    "home": "Home",
+    "pos": "POS",
+    "all_sales": "All Sales",
+    "product": "Product",
+    "customer_info": "Customer info",
+    "settings": "Settings"
+  },
   "common": {
     "dashboard": "Dashboard",
     "shops": "Shops",

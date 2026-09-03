@@ -53,7 +53,7 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 10
+  const itemsPerPage = 6
 
   const filteredProducts = initialProducts.filter(p => 
     p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -181,103 +181,75 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
             />
           </div>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
-            <thead className="bg-muted/50 text-muted-foreground uppercase text-[10px]">
-              <tr>
-                <th className="px-3 py-3 font-medium w-12">#</th>
-                <th className="px-3 py-3 font-medium">{t("inventory_page.col_product")}</th>
-                <th className="px-3 py-3 font-medium">{t("inventory_page.col_total_items")}</th>
-                <th className="px-3 py-3 font-medium">{t("inventory_page.col_buying_price")}</th>
-                <th className="px-3 py-3 font-medium">{t("inventory_page.col_selling_price")}</th>
-                {userRole !== "CASHIER" && <th className="px-3 py-3 font-medium text-right">{t("inventory_page.col_actions")}</th>}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border/50">
-              {paginatedProducts.length === 0 ? (
-                <tr>
-                  <td colSpan={userRole !== "CASHIER" ? 6 : 5} className="px-6 py-12 text-center text-muted-foreground">
-                    <Package className="h-12 w-12 mx-auto mb-4 opacity-20" />
-                    {t("inventory_page.no_products")}
-                  </td>
-                </tr>
-              ) : (
-                paginatedProducts.map((product, index) => (
-                  <tr key={product.id} className="hover:bg-muted/30 transition-colors">
-                    <td className="px-3 py-2 text-xs text-muted-foreground font-medium">
-                      {(currentPage - 1) * itemsPerPage + index + 1}
-                    </td>
-                    <td className="px-3 py-2">
-                      <div className="flex items-center gap-2">
-                        <div className={`h-6 w-6 rounded-md flex items-center justify-center text-white font-bold text-[10px] shadow-sm ${getInitialsColor(product.name)}`}>
-                          {product.name.substring(0, 2).toUpperCase()}
-                        </div>
-                        <div className="flex flex-col">
-                          <p className="font-medium text-xs text-foreground truncate max-w-[150px]" title={product.name}>
-                            {product.name} {product.piecesPerBundle && product.piecesPerBundle > 1 ? `(${product.piecesPerBundle}pcs)` : ""}
-                          </p>
-                          {product.sku && <p className="text-[10px] text-muted-foreground truncate">{product.sku}</p>}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-3 py-2 text-xs font-medium">
-                      <div className="flex flex-col">
-                        <span className={product.quantity <= 5 ? "text-red-500 font-bold" : ""}>
-                          {product.quantity}
-                        </span>
-                        {product.quantity <= 5 && (
-                          <span className="text-[10px] text-red-500 font-semibold mt-0.5">
-                            {product.quantity === 0 ? t("inventory_page.ended") : t("inventory_page.low_stock")}
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-3 py-2 text-xs">
-                      {product.buyingPrice ? `${product.currency} ${product.buyingPrice.toLocaleString()}` : "-"}
-                    </td>
-                    <td className="px-3 py-2 text-xs">
-                      {product.sellingPrice > 0 ? `${product.currency} ${product.sellingPrice.toLocaleString()}` : "Not Set"}
-                    </td>
-                    {userRole !== "CASHIER" && (
-                      <td className="px-6 py-4 text-right flex justify-end gap-2">
-                        <button
-                          onClick={() => {
-                            setActiveTab("edit")
-                            setEditingProduct(product)
-                            setIsModalOpen(true)
-                          }}
-                          className="p-2 text-primary hover:bg-primary/10 rounded-md transition-colors inline-flex items-center justify-center"
-                          title="Edit Product"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={() => {
-                            setActiveTab("existing")
-                            setSelectedProductId(product.id)
-                            setIsModalOpen(true)
-                          }}
-                          className="p-2 text-primary hover:bg-primary/10 rounded-md transition-colors inline-flex items-center justify-center"
-                          title="Add Stock"
-                        >
-                          <ArrowUp className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(product.id)}
-                          disabled={isLoading}
-                          className="p-2 text-red-600 hover:bg-red-500/10 rounded-md transition-colors inline-flex items-center justify-center"
-                          title="Delete Product"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </td>
-                    )}
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+
+        <div className="flex flex-col gap-3 p-4">
+          {paginatedProducts.length === 0 ? (
+            <div className="py-12 text-center text-muted-foreground bg-card rounded-xl border border-dashed">
+              <Package className="h-12 w-12 mx-auto mb-4 opacity-20" />
+              {t("inventory_page.no_products")}
+            </div>
+          ) : (
+            paginatedProducts.map((product) => (
+              <div key={product.id} className="bg-card border rounded-xl p-4 flex items-center justify-between gap-4 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-center gap-4 flex-1 min-w-0">
+                  <div className={`h-12 w-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-sm flex-shrink-0 ${getInitialsColor(product.name)}`}>
+                    {product.name.substring(0, 2).toUpperCase()}
+                  </div>
+                  <div className="flex flex-col flex-1 min-w-0">
+                    <h3 className="font-bold text-foreground truncate">
+                      {product.name} {product.piecesPerBundle && product.piecesPerBundle > 1 ? `(${product.piecesPerBundle}pcs)` : ""}
+                    </h3>
+                    <p className="text-sm text-muted-foreground truncate mt-0.5">
+                      Qty: <span className={product.quantity <= 5 ? "text-red-500 font-bold" : "font-medium"}>{product.quantity}</span> {product.sku ? `| SKU: ${product.sku}` : ""}
+                    </p>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                      <span>In: {product.buyingPrice ? `${product.currency} ${product.buyingPrice.toLocaleString()}` : "-"}</span>
+                      <span>•</span>
+                      <span>Out: {product.sellingPrice > 0 ? `${product.currency} ${product.sellingPrice.toLocaleString()}` : "Not Set"}</span>
+                    </div>
+                  </div>
+                </div>
+                {userRole !== "CASHIER" && (
+                  <div className="flex flex-col items-end justify-center gap-2">
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          setActiveTab("edit")
+                          setEditingProduct(product)
+                          setIsModalOpen(true)
+                        }}
+                        className="p-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors inline-flex items-center justify-center"
+                        title="Edit Product"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          setActiveTab("existing")
+                          setSelectedProductId(product.id)
+                          setIsModalOpen(true)
+                        }}
+                        className="p-2 text-primary hover:bg-primary/10 rounded-md transition-colors inline-flex items-center justify-center"
+                        title="Add Stock"
+                      >
+                        <ArrowUp className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(product.id)}
+                        disabled={isLoading}
+                        className="p-2 text-red-600 hover:bg-red-500/10 rounded-md transition-colors inline-flex items-center justify-center"
+                        title="Delete Product"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))
+          )}
         </div>
+
         {/* Pagination Controls */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between px-6 py-3 border-t bg-muted/10">

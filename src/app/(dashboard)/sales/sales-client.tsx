@@ -81,71 +81,45 @@ export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
           </div>
         </div>
         
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
-            <thead className="bg-muted/50 text-muted-foreground uppercase text-[10px]">
-              <tr>
-                <th className="px-6 py-4 font-medium w-12">#</th>
-                <th className="px-6 py-4 font-medium">{t('sales_page.receipt')}</th>
-                <th className="px-6 py-4 font-medium">{t('sales_page.customer')}</th>
-                <th className="px-6 py-4 font-medium">{t('sales_page.date')}</th>
-                <th className="px-6 py-4 font-medium">{t('sales_page.cashier')}</th>
-                <th className="px-6 py-4 font-medium text-right">{t('sales_page.actions')}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border/50">
-              {paginatedSales.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">
-                    <Receipt className="h-12 w-12 mx-auto mb-4 opacity-20" />
-                    {t('sales_page.no_sales')}
-                  </td>
-                </tr>
-              ) : (
-                paginatedSales.map((sale, index) => (
-                  <tr key={sale.id} className="hover:bg-muted/30 transition-colors text-[10px]">
-                    <td className="px-6 py-4 text-muted-foreground font-medium">
-                      {(currentPage - 1) * itemsPerPage + index + 1}
-                    </td>
-                    <td className="px-6 py-4 font-bold text-foreground">
-                      {sale.receiptNumber}
-                    </td>
-                    <td className="px-6 py-4 text-muted-foreground">
-                      {sale.customerName ? (
-                        <div className="flex items-center gap-2">
-                          <User className="h-4 w-4" />
-                          {sale.customerName}
-                        </div>
-                      ) : (
-                        <span className="italic opacity-50">{t('sales_page.walk_in')}</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-muted-foreground">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
-                        {new Date(sale.createdAt).toLocaleDateString()}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-muted-foreground">
-                      <div className="flex items-center gap-2">
-                        <User className="h-4 w-4" />
-                        {sale.cashierName}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <button
-                        onClick={() => setSelectedSale(sale)}
-                        className="p-2 text-primary hover:bg-primary/10 rounded-md transition-colors inline-flex items-center justify-center"
-                        title="View Receipt"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+        <div className="flex flex-col gap-3 p-4">
+          {paginatedSales.length === 0 ? (
+            <div className="py-12 text-center text-muted-foreground bg-card rounded-xl border border-dashed">
+              <Receipt className="h-12 w-12 mx-auto mb-4 opacity-20" />
+              {t('sales_page.no_sales')}
+            </div>
+          ) : (
+            paginatedSales.map((sale) => (
+              <div key={sale.id} className="bg-card border rounded-xl p-4 flex items-center justify-between gap-4 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-center gap-4 flex-1 min-w-0">
+                  <div className={`h-12 w-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-sm flex-shrink-0 bg-emerald-600`}>
+                    <Receipt className="h-6 w-6" />
+                  </div>
+                  <div className="flex flex-col flex-1 min-w-0">
+                    <h3 className="font-bold text-foreground truncate">{sale.receiptNumber}</h3>
+                    <p className="text-sm text-muted-foreground truncate">
+                      Name: <span className="font-medium underline underline-offset-2">{sale.customerName || t('sales_page.walk_in')}</span>
+                    </p>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                      <Calendar className="h-3 w-3" />
+                      {new Date(sale.createdAt).toLocaleDateString()}
+                      <User className="h-3 w-3 ml-2" />
+                      {sale.cashierName}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-col items-end justify-center gap-2">
+                  <span className="font-bold text-primary">{sale.primaryCurrency} {(sale.totalsByCurrency[sale.primaryCurrency] || 0).toLocaleString()}</span>
+                  <button
+                    onClick={() => setSelectedSale(sale)}
+                    className="p-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors"
+                    title="View Receipt"
+                  >
+                    <Eye className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
         </div>
 
         {/* Pagination Controls */}
