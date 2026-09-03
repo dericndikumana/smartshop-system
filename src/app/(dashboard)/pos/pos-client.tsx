@@ -19,6 +19,7 @@ interface Product {
 interface Customer {
   id: string
   fullName: string
+  balance?: number
 }
 
 interface CartItem extends Product {
@@ -39,11 +40,12 @@ interface HeldCart {
   }[]
 }
 
-export function POSClient({ products, customers, vatRate, heldCarts = [] }: { products: Product[], customers: Customer[], vatRate: number, heldCarts?: HeldCart[] }) {
+export function POSClient({ products, customers, vatRate, heldCarts = [], cashierName, shopName }: { products: Product[], customers: Customer[], vatRate: number, heldCarts?: HeldCart[], cashierName?: string, shopName?: string }) {
   const { t } = useTranslation()
   const [searchTerm, setSearchTerm] = useState("")
   const [cart, setCart] = useState<CartItem[]>([])
   const [isCheckingOut, setIsCheckingOut] = useState(false)
+  const [amountReceived, setAmountReceived] = useState("")
   
   // Customer states
   const [customerSearch, setCustomerSearch] = useState("")
@@ -245,7 +247,8 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
       })),
       vatRate,
       primaryCurrency: Object.keys(totalsByCurrency)[0] || "RWF", // Use first currency as primary for the sale record
-      customerName: customerSearch.trim() || undefined
+      customerName: customerSearch.trim() || undefined,
+      amountReceived: amountReceived ? parseFloat(amountReceived) : undefined
     }
 
     const result = await checkoutAction(payload)
@@ -254,6 +257,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
     } else {
       setCart([])
       setCustomerSearch("")
+      setAmountReceived("")
       toast.success(t('pos_page.sale_completed'))
     }
     
@@ -272,11 +276,27 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
     return colors[index % colors.length]
   }
 
+  const selectedCustomerObj = customers.find(c => c.fullName.toLowerCase() === customerSearch.toLowerCase())
+  const customerDebt = selectedCustomerObj?.balance || 0
+
   return (
     <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-8rem)] animate-in fade-in slide-in-from-bottom-4 duration-500">
       
       {/* Products Section */}
       <div className="flex-1 flex flex-col bg-card rounded-xl border shadow-sm overflow-hidden min-h-[50vh]">
+        
+        {/* Mobile-style Header (Matches Design) */}
+        <div className="flex flex-col items-center py-3 border-b bg-background/50">
+          <h1 className="text-red-500 font-bold tracking-widest text-lg uppercase">{cashierName || "CASHIER"}</h1>
+          <div className="flex items-center gap-1 text-sm font-bold mt-1">
+            <span className="uppercase">{shopName || "SHOP"}</span>
+            <span className="text-xs">▼</span>
+          </div>
+          <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground cursor-pointer hover:text-foreground">
+            <span className="text-yellow-400 text-lg">★</span> Pick Default Account
+          </div>
+        </div>
+
         <div className="p-4 border-b bg-muted/10">
           <div className="relative">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -448,6 +468,34 @@ export function POSClient({ products, customers, vatRate, heldCarts = [] }: { pr
                   ))
                 )}
               </div>
+            </div>
+
+            <div className="mt-4 pt-4 border-t flex flex-col gap-2">
+              <div className="flex items-center justify-between gap-4 p-2 border rounded-lg bg-background shadow-sm">
+                <span className="bg-red-500 text-white px-3 py-1.5 rounded-md text-sm font-bold flex-shrink-0">
+                  dettes {customerDebt.toLocaleString()}
+                </span>
+                <div className="flex-1 flex items-center justify-end relative">
+                  <input
+                    type="number"
+                    placeholder="Ayo Yishyuye..."
+                    value={amountReceived}
+                    onChange={(e) => setAmountReceived(e.target.value)}
+                    className="w-full text-right rounded-md border-none bg-transparent px-3 py-1.5 text-sm font-medium focus:outline-none placeholder:text-muted-foreground/60"
+                  />
+                  {!amountReceived && <span className="absolute right-3 text-orange-400/80 pointer-events-none">⚠️</span>}
+                </div>
+              </div>
+              {amountReceived && Object.keys(totalsByCurrency).length > 0 && (
+                <div className="text-right text-xs font-medium">
+                  {(() => {
+                    const diff = parseFloat(amountReceived) - Object.values(totalsByCurrency)[0]
+                    if (diff > 0) return <span className="text-emerald-500">Change / Credit: {diff.toLocaleString()}</span>
+                    if (diff < 0) return <span className="text-red-500">Remaining Debt: {Math.abs(diff).toLocaleString()}</span>
+                    return <span className="text-muted-foreground">Exact Amount</span>
+                  })()}
+                </div>
+              )}
             </div>
           </div>
 

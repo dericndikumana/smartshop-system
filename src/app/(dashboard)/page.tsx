@@ -2,7 +2,6 @@ import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import prisma from "@/lib/prisma"
 import { CashierDashboard } from "./cashier-dashboard"
-import { ShopAdminDashboard } from "./shop-admin-dashboard"
 import { Sale, SaleItem } from "@prisma/client"
 
 type SaleWithItems = Sale & { items: SaleItem[] }
@@ -69,47 +68,7 @@ export default async function DashboardPage() {
   }
 
   if (session.user.role === "SHOP_ADMIN") {
-    // 2. SHOP ADMIN DASHBOARD DATA
-    const [totalProducts, totalCustomers, todaySalesData] = await Promise.all([
-      prisma.product.count({ where: { shopId: session.user.shopId } }),
-      prisma.customer.count({ where: { shopId: session.user.shopId } }),
-      prisma.sale.findMany({
-        where: {
-          shopId: session.user.shopId,
-          createdAt: { gte: today }
-        },
-        orderBy: { createdAt: 'desc' },
-        include: {
-          cashier: true,
-          items: true
-        }
-      })
-    ])
-
-    const todaySalesCount = todaySalesData.length
-
-    // Calculate revenue grouped by currency
-    const revenueByCurrency: Record<string, number> = {}
-    todaySalesData.forEach((sale: SaleWithItems) => {
-      // It's safer to sum from items directly to respect multiple currencies if any exist
-      // But sale.currency holds the primary currency for the sale
-      // Let's use items to accurately group
-      sale.items.forEach((item: SaleItem) => {
-        const itemSubtotalWithVat = item.subtotal + (item.subtotal * (sale.vatRate / 100))
-        revenueByCurrency[item.currency] = (revenueByCurrency[item.currency] || 0) + itemSubtotalWithVat
-      })
-    })
-
-    return (
-      <ShopAdminDashboard 
-        stats={{
-          totalProducts,
-          totalCustomers,
-          todaySalesCount
-        }}
-        revenueByCurrency={revenueByCurrency}
-      />
-    )
+    redirect("/pos")
   }
 
   return (

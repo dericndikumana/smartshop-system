@@ -130,6 +130,7 @@ model Customer {
   phone     String?
   email     String?
   address   String?
+  balance   Float    @default(0) // Tracks debts (positive) and credits (negative)
   
   shopId    String
   shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)

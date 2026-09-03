@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Sidebar } from "./sidebar"
 import { Header } from "./header"
 import { Footer } from "./footer"
-import { MobileSidebarOverlay, MobileMenuButton } from "./mobile-nav"
+import { BottomNav } from "./bottom-nav"
 
 import { IdleTimer } from "./idle-timer"
 
@@ -17,24 +17,17 @@ export function DashboardShell({
   user: { role?: string, email?: string | null, name?: string | null }
   shopName?: string
 }) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isDesktopCollapsed, setIsDesktopCollapsed] = useState(false)
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
       <IdleTimer />
-      {/* Mobile Overlay */}
-      <MobileSidebarOverlay 
-        isOpen={isSidebarOpen} 
-        onClose={() => setIsSidebarOpen(false)} 
-      />
-      
+
       {/* Sidebar Wrapper */}
       <div className={`
         print:hidden
-        fixed inset-y-0 left-0 z-50 transform transition-all duration-300 ease-in-out md:relative md:translate-x-0
-        ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
-        ${isDesktopCollapsed ? "md:w-20" : "md:w-64"} w-64
+        hidden md:block fixed inset-y-0 left-0 z-50 transform transition-all duration-300 ease-in-out md:relative md:translate-x-0
+        ${isDesktopCollapsed ? "md:w-20" : "md:w-64"}
       `}>
         <Sidebar 
           role={user.role || ""} 
@@ -47,7 +40,6 @@ export function DashboardShell({
       {/* Main Content */}
       <div className="flex flex-col flex-1 overflow-hidden min-w-0">
         <div className="flex items-center px-4 md:px-0 bg-background border-b md:border-b-0 sticky top-0 z-10 shadow-sm md:shadow-none print:hidden">
-          <MobileMenuButton onClick={() => setIsSidebarOpen(true)} />
           <div className="flex-1">
             <Header user={user} shopName={shopName} hideBorder />
           </div>
@@ -59,6 +51,7 @@ export function DashboardShell({
           <Footer />
         </div>
       </div>
+      <BottomNav />
     </div>
   )
 }

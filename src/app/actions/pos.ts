@@ -14,7 +14,8 @@ const checkoutSchema = z.object({
   })).min(1, "Cart cannot be empty"),
   vatRate: z.number().min(0),
   primaryCurrency: z.string(),
-  customerName: z.string().optional()
+  customerName: z.string().optional(),
+  amountReceived: z.number().optional()
 })
 
 export async function checkoutAction(data: z.infer<typeof checkoutSchema>) {
@@ -78,6 +79,18 @@ export async function checkoutAction(data: z.infer<typeof checkoutSchema>) {
       if (vatRate > 0) {
         const netTotal = rawTotal / (1 + vatRate / 100)
         vatAmount = rawTotal - netTotal
+      }
+
+      // Handle balance/debt update for customer if amountReceived is provided
+      if (customerId && validated.amountReceived !== undefined) {
+        const amountReceived = validated.amountReceived
+        const diff = rawTotal - amountReceived
+        if (diff !== 0) {
+          await tx.customer.update({
+            where: { id: customerId },
+            data: { balance: { increment: diff } }
+          })
+        }
       }
 
       // 2. Create Sale
