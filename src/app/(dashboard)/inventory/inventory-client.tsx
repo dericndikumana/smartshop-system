@@ -203,7 +203,7 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                       Qty:{product.quantity} X {product.sellingPrice}={(product.quantity * product.sellingPrice).toLocaleString()}
                     </p>
                     <p className="text-sm text-muted-foreground truncate mt-1 font-medium">
-                      Name:<span className="underline uppercase">{product.name}</span>
+                      Name:<span className="underline uppercase">{product.sku || product.name}</span>
                     </p>
                   </div>
                 </div>
