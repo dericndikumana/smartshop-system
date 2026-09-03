@@ -51,16 +51,14 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
   
   // Customer states
   const [customerSearch, setCustomerSearch] = useState("")
-  const [customerPhone, setCustomerPhone] = useState("")
-  const [customerCountryCode, setCustomerCountryCode] = useState("+250")
   const [showCustomerDropdown, setShowCustomerDropdown] = useState(false)
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
   const customerDropdownRef = useRef<HTMLDivElement>(null)
 
   // Held Cart states
   const [showHeldCarts, setShowHeldCarts] = useState(false)
   const [isHolding, setIsHolding] = useState(false)
   const [showDebtConfirm, setShowDebtConfirm] = useState(false)
-  const [hasAutoFilled, setHasAutoFilled] = useState(false)
 
   // Quantity Modal states
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
@@ -85,12 +83,15 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
+  // Auto-sync amountReceived with Cart Total
   useEffect(() => {
-    if (cashierName && !hasAutoFilled) {
-      setCustomerSearch(cashierName)
-      setHasAutoFilled(true)
+    const rawTotal = cart.reduce((acc, item) => acc + (item.sellingPrice * item.cartQuantity), 0)
+    if (rawTotal > 0) {
+      setAmountReceived(rawTotal.toString())
+    } else {
+      setAmountReceived("")
     }
-  }, [cashierName, hasAutoFilled])
+  }, [cart])
 
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product)
@@ -260,8 +261,8 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
       })),
       vatRate,
       primaryCurrency: Object.keys(totalsByCurrency)[0] || "RWF", // Use first currency as primary for the sale record
-      customerName: customerSearch.trim() || undefined,
-      customerPhone: customerPhone.trim() ? `${customerCountryCode}${customerPhone.trim()}` : undefined,
+      customerName: selectedCustomer ? selectedCustomer.fullName : (shopName || undefined),
+      customerPhone: (selectedCustomer ? selectedCustomer.phone : undefined) || undefined,
       amountReceived: amountReceived ? parseFloat(amountReceived) : undefined
     }
 
@@ -270,8 +271,9 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
       toast.error(result.error)
     } else {
       setCart([])
-      // Don't reset customer search since it's prefilled with cashier name
-      setCustomerPhone("")
+      // Reset Customer
+      setSelectedCustomer(null)
+      setCustomerSearch("")
       setAmountReceived("")
       toast.success(t('pos_page.sale_completed'))
     }
@@ -310,8 +312,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
     return colors[index % colors.length]
   }
 
-  const selectedCustomerObj = customers.find(c => c.fullName.toLowerCase() === customerSearch.trim().toLowerCase())
-  const customerDebt = selectedCustomerObj?.balance || 0
+  const customerDebt = selectedCustomer?.balance || 0
   
   const rawTotal = Object.values(totalsByCurrency).reduce((a, b) => a + b, 0)
   const amt = amountReceived ? parseFloat(amountReceived) : rawTotal
@@ -400,72 +401,56 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
 
         {/* Customer Selection Desktop */}
         <div className="p-4 border-b relative" ref={customerDropdownRef}>
-          <div className="relative">
-            <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-            <input 
-              type="text" 
-              placeholder={t('pos_page.customer_optional')}
-              value={customerSearch}
-              onChange={(e) => {
-                setCustomerSearch(e.target.value)
-                setShowCustomerDropdown(true)
-              }}
-              onFocus={() => setShowCustomerDropdown(true)}
-              className="w-full pl-9 rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all" 
-            />
-          </div>
+          <button 
+            onClick={() => {
+              setCustomerSearch("")
+              setShowCustomerDropdown(!showCustomerDropdown)
+            }}
+            className="w-full flex items-center justify-between bg-muted/20 hover:bg-muted/30 border rounded-md px-3 py-2 transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <User className="h-4 w-4 text-primary" />
+              <span className="font-medium text-sm">
+                {selectedCustomer ? selectedCustomer.fullName : (shopName || "Walk-in Customer")}
+              </span>
+            </div>
+            <span className="text-xs text-muted-foreground">▼</span>
+          </button>
+          
           {showCustomerDropdown && (
-            <div className="absolute z-10 w-[calc(100%-2rem)] mt-1 bg-card border rounded-md shadow-lg overflow-y-auto p-2 max-h-60">
-              {filteredCustomers.length > 0 ? (
-                filteredCustomers.map(c => (
+            <div className="absolute z-20 w-[calc(100%-2rem)] mt-1 bg-card border rounded-md shadow-xl p-2 max-h-80 flex flex-col gap-2">
+              <input 
+                type="text"
+                autoFocus
+                placeholder="Search customers..."
+                value={customerSearch}
+                onChange={e => setCustomerSearch(e.target.value)}
+                className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+              <div className="overflow-y-auto flex flex-col gap-1 max-h-48">
+                <button
+                  onClick={() => {
+                    setSelectedCustomer(null)
+                    setShowCustomerDropdown(false)
+                  }}
+                  className="w-full text-left px-3 py-2 text-sm hover:bg-muted transition-colors rounded-md font-medium text-primary"
+                >
+                  {shopName || "Walk-in Customer"} (Default)
+                </button>
+                {filteredCustomers.map(c => (
                   <button
                     key={c.id}
                     onClick={() => {
-                      setCustomerSearch(c.fullName)
-                      if (c.phone) setCustomerPhone("") 
+                      setSelectedCustomer(c)
                       setShowCustomerDropdown(false)
                     }}
                     className="w-full text-left px-3 py-2 text-sm hover:bg-muted transition-colors rounded-md"
                   >
                     <span className="font-medium">{c.fullName}</span>
-                    {c.phone && <span className="text-muted-foreground ml-2">({c.phone})</span>}
+                    {c.phone && <span className="text-muted-foreground ml-2 text-xs">({c.phone})</span>}
                   </button>
-                ))
-              ) : (
-                <div className="p-2">
-                  <div className="text-sm font-medium mb-2">New Customer: {customerSearch}</div>
-                  <div className="flex gap-2">
-                    <select 
-                      value={customerCountryCode}
-                      onChange={(e) => setCustomerCountryCode(e.target.value)}
-                      className="rounded-md border bg-background px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary w-24"
-                    >
-                      <option value="+250">+250 (RW)</option>
-                      <option value="+254">+254 (KE)</option>
-                      <option value="+255">+255 (TZ)</option>
-                      <option value="+256">+256 (UG)</option>
-                      <option value="+257">+257 (BI)</option>
-                      <option value="+243">+243 (CD)</option>
-                      <option value="+27">+27 (ZA)</option>
-                      <option value="+234">+234 (NG)</option>
-                      <option value="+233">+233 (GH)</option>
-                    </select>
-                    <input 
-                      type="tel"
-                      placeholder="Phone number"
-                      value={customerPhone}
-                      onChange={(e) => setCustomerPhone(e.target.value)}
-                      className="flex-1 rounded-md border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                    />
-                  </div>
-                  <button 
-                    onClick={() => setShowCustomerDropdown(false)}
-                    className="mt-3 w-full bg-primary/10 text-primary py-1.5 rounded-md text-sm font-medium hover:bg-primary/20 transition-colors"
-                  >
-                    Confirm Info
-                  </button>
-                </div>
-              )}
+                ))}
+              </div>
             </div>
           )}
         </div>
@@ -625,8 +610,8 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
                   className="flex items-center justify-between p-3 border-b hover:bg-muted/30 cursor-pointer"
                 >
                   <div>
-                    <h4 className="font-bold text-sm text-[#1a237e] uppercase">
-                      {product.sku || product.name}(<span className="text-[#1976d2] underline">{product.piecesPerBundle || 1}</span> Pcs)1X <span className="text-[#1976d2] underline">{product.sellingPrice}</span>
+                    <h4 className="font-bold text-sm text-primary uppercase">
+                      {product.sku || product.name}(<span className="text-blue-600 dark:text-blue-400 underline">{product.piecesPerBundle || 1}</span> Pcs)1X <span className="text-blue-600 dark:text-blue-400 underline">{product.sellingPrice}</span>
                     </h4>
                     <span className="text-xs text-muted-foreground font-medium">{product.quantity} in stock</span>
                   </div>
@@ -642,43 +627,55 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
 
         {/* Mobile Customer Selection */}
         <div className="py-4 border-b flex flex-col items-center relative" ref={customerDropdownRef}>
-          <div className="flex items-center gap-4 text-primary font-medium">
-            <User className="h-5 w-5 text-orange-500" />
-            <span>{customerSearch || "Customer"}</span>
+          <div className="flex items-center gap-4 text-primary font-medium w-full px-4 justify-between">
+            <button 
+              onClick={() => {
+                setCustomerSearch("")
+                setShowCustomerDropdown(!showCustomerDropdown)
+              }}
+              className="flex items-center gap-2 bg-muted/20 px-3 py-1.5 rounded-md border text-sm"
+            >
+              <User className="h-4 w-4 text-orange-500" />
+              <span>{selectedCustomer ? selectedCustomer.fullName : (shopName || "Walk-in")}</span>
+              <span className="text-[10px] ml-1">▼</span>
+            </button>
             <span className="w-5 h-5 border-2 border-pink-500 text-pink-500 rounded-sm flex items-center justify-center text-[10px]">QR</span>
           </div>
           
-          <input 
-            type="text" 
-            placeholder={t("pos_page.customer_optional") || "Search Customer"}
-            value={customerSearch}
-            onChange={e => {
-              setCustomerSearch(e.target.value)
-              setShowCustomerDropdown(true)
-            }}
-            onFocus={() => setShowCustomerDropdown(true)}
-            className="mt-2 text-center text-sm bg-transparent border-b border-dashed focus:outline-none px-2 py-1 w-48"
-          />
           {showCustomerDropdown && (
-            <div className="absolute top-full z-30 w-64 bg-card border rounded-md shadow-lg overflow-y-auto p-2 max-h-60 mt-1 left-1/2 -translate-x-1/2">
-              {filteredCustomers.length > 0 ? (
-                filteredCustomers.map(c => (
+            <div className="absolute top-full z-30 w-64 bg-card border rounded-md shadow-xl p-2 flex flex-col gap-2 mt-1 left-4">
+              <input 
+                type="text"
+                autoFocus
+                placeholder="Search customers..."
+                value={customerSearch}
+                onChange={e => setCustomerSearch(e.target.value)}
+                className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+              <div className="overflow-y-auto flex flex-col gap-1 max-h-48">
+                <button
+                  onClick={() => {
+                    setSelectedCustomer(null)
+                    setShowCustomerDropdown(false)
+                  }}
+                  className="w-full text-left px-3 py-2 text-sm hover:bg-muted transition-colors rounded-md font-medium text-primary"
+                >
+                  {shopName || "Walk-in Customer"} (Default)
+                </button>
+                {filteredCustomers.map(c => (
                   <button
                     key={c.id}
                     onClick={() => {
-                      setCustomerSearch(c.fullName)
-                      if (c.phone) setCustomerPhone("") 
+                      setSelectedCustomer(c)
                       setShowCustomerDropdown(false)
                     }}
-                    className="w-full text-left px-3 py-2 text-sm hover:bg-muted transition-colors rounded-md border-b last:border-0"
+                    className="w-full text-left px-3 py-2 text-sm hover:bg-muted transition-colors rounded-md"
                   >
                     <span className="font-medium">{c.fullName}</span>
                     {c.phone && <span className="text-muted-foreground ml-2 text-xs">({c.phone})</span>}
                   </button>
-                ))
-              ) : (
-                <div className="p-2 text-sm text-center text-muted-foreground">New Customer</div>
-              )}
+                ))}
+              </div>
             </div>
           )}
         </div>

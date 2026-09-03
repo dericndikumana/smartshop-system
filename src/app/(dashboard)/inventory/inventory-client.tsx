@@ -196,8 +196,8 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                     {product.name.substring(0, 2).toUpperCase()}
                   </div>
                   <div className="flex flex-col flex-1 min-w-0">
-                    <h3 className="font-bold text-sm text-[#1a237e] truncate uppercase">
-                      {product.name}(<span className="text-[#1976d2] underline">{product.piecesPerBundle || 1}</span> Pcs)1X <span className="text-[#1976d2] underline">{product.sellingPrice}</span>
+                    <h3 className="font-bold text-sm text-primary truncate uppercase">
+                      {product.name}(<span className="text-blue-600 dark:text-blue-400 underline">{product.piecesPerBundle || 1}</span> Pcs)1X <span className="text-blue-600 dark:text-blue-400 underline">{product.sellingPrice}</span>
                     </h3>
                     <p className="text-sm text-muted-foreground truncate mt-1 font-medium">
                       Qty:{product.quantity} X {product.sellingPrice}={(product.quantity * product.sellingPrice).toLocaleString()}
