@@ -1,6 +1,5 @@
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
-import prisma from "@/lib/prisma"
 import Link from "next/link"
 import { LogOutButton } from "./logout-button"
 import { 
