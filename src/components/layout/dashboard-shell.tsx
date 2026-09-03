@@ -31,7 +31,6 @@ export function DashboardShell({
       `}>
         <Sidebar 
           role={user.role || ""} 
-          onNavClick={() => setIsSidebarOpen(false)} 
           isCollapsed={isDesktopCollapsed}
           onToggleCollapse={() => setIsDesktopCollapsed(!isDesktopCollapsed)}
         />
