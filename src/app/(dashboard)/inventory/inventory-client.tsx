@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Package, Plus, Trash2, Search, ArrowUp, Edit } from "lucide-react"
+import { Search, Plus, Package, Save, Send, Trash2 } from "lucide-react"
 import { createProductAction, deleteProductAction, addStockAction, editProductAction } from "@/app/actions/inventory"
 import { toast } from "sonner"
 import { useTranslation } from "@/components/providers/language-provider"
@@ -190,57 +190,55 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
             </div>
           ) : (
             paginatedProducts.map((product) => (
-              <div key={product.id} className="bg-card border rounded-xl p-4 flex items-center justify-between gap-4 shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex items-center gap-4 flex-1 min-w-0">
-                  <div className={`h-12 w-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-sm flex-shrink-0 ${getInitialsColor(product.name)}`}>
+              <div key={product.id} className="bg-card border-b py-4 px-2 flex items-start justify-between gap-4 hover:bg-muted/10 transition-colors">
+                <div className="flex items-start gap-3 flex-1 min-w-0">
+                  <div className={`h-10 w-10 mt-1 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-sm flex-shrink-0 ${getInitialsColor(product.name)}`}>
                     {product.name.substring(0, 2).toUpperCase()}
                   </div>
                   <div className="flex flex-col flex-1 min-w-0">
-                    <h3 className="font-bold text-foreground truncate">
-                      {product.name} {product.piecesPerBundle && product.piecesPerBundle > 1 ? `(${product.piecesPerBundle}pcs)` : ""}
+                    <h3 className="font-bold text-sm text-[#1a237e] truncate uppercase">
+                      {product.name}(<span className="text-[#1976d2] underline">{product.piecesPerBundle || 1}</span> Pcs)1X <span className="text-[#1976d2] underline">{product.sellingPrice}</span>
                     </h3>
-                    <p className="text-sm text-muted-foreground truncate mt-0.5">
-                      Qty: <span className={product.quantity <= 5 ? "text-red-500 font-bold" : "font-medium"}>{product.quantity}</span> {product.sku ? `| SKU: ${product.sku}` : ""}
+                    <p className="text-sm text-muted-foreground truncate mt-1 font-medium">
+                      Qty:{product.quantity} X {product.sellingPrice}={(product.quantity * product.sellingPrice).toLocaleString()}
                     </p>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                      <span>In: {product.buyingPrice ? `${product.currency} ${product.buyingPrice.toLocaleString()}` : "-"}</span>
-                      <span>•</span>
-                      <span>Out: {product.sellingPrice > 0 ? `${product.currency} ${product.sellingPrice.toLocaleString()}` : "Not Set"}</span>
-                    </div>
+                    <p className="text-sm text-muted-foreground truncate mt-1 font-medium">
+                      Name:<span className="underline uppercase">{product.name}</span>
+                    </p>
                   </div>
                 </div>
                 {userRole !== "CASHIER" && (
-                  <div className="flex flex-col items-end justify-center gap-2">
+                  <div className="flex flex-col items-end justify-start gap-4 h-full pt-1 pr-2">
+                    <button
+                      onClick={() => {
+                        setActiveTab("existing")
+                        setSelectedProductId(product.id)
+                        setIsModalOpen(true)
+                      }}
+                      className="text-[#1976d2] hover:text-[#1976d2]/80 transition-colors"
+                      title="Add Stock / Send"
+                    >
+                      <Send className="h-6 w-6" />
+                    </button>
                     <div className="flex gap-2">
+                      <button
+                        onClick={() => handleDelete(product.id)}
+                        disabled={isLoading}
+                        className="text-red-500 hover:text-red-600 transition-colors disabled:opacity-50"
+                        title="Delete Product"
+                      >
+                        <Trash2 className="h-6 w-6" />
+                      </button>
                       <button
                         onClick={() => {
                           setActiveTab("edit")
                           setEditingProduct(product)
                           setIsModalOpen(true)
                         }}
-                        className="p-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors inline-flex items-center justify-center"
-                        title="Edit Product"
+                        className="text-[#f57c00] hover:text-[#f57c00]/80 transition-colors"
+                        title="Edit Product / Save"
                       >
-                        <Edit className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => {
-                          setActiveTab("existing")
-                          setSelectedProductId(product.id)
-                          setIsModalOpen(true)
-                        }}
-                        className="p-2 text-primary hover:bg-primary/10 rounded-md transition-colors inline-flex items-center justify-center"
-                        title="Add Stock"
-                      >
-                        <ArrowUp className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(product.id)}
-                        disabled={isLoading}
-                        className="p-2 text-red-600 hover:bg-red-500/10 rounded-md transition-colors inline-flex items-center justify-center"
-                        title="Delete Product"
-                      >
-                        <Trash2 className="h-4 w-4" />
+                        <Save className="h-6 w-6" />
                       </button>
                     </div>
                   </div>

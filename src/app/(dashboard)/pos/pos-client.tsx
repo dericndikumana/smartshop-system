@@ -60,6 +60,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
   const [showHeldCarts, setShowHeldCarts] = useState(false)
   const [isHolding, setIsHolding] = useState(false)
   const [showDebtConfirm, setShowDebtConfirm] = useState(false)
+  const [hasAutoFilled, setHasAutoFilled] = useState(false)
 
   // Quantity Modal states
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
@@ -85,10 +86,11 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
   }, [])
 
   useEffect(() => {
-    if (cashierName && !customerSearch) {
+    if (cashierName && !hasAutoFilled) {
       setCustomerSearch(cashierName)
+      setHasAutoFilled(true)
     }
-  }, [cashierName, customerSearch])
+  }, [cashierName, hasAutoFilled])
 
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product)
