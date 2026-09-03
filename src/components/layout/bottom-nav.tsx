@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, CreditCard, User, Settings, FileText } from "lucide-react"
+import { Home, ShoppingCart, Users, FileText, Settings } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export function BottomNav() {
@@ -10,9 +10,9 @@ export function BottomNav() {
 
   const navItems = [
     { name: "Home", href: "/pos", icon: Home },
-    { name: "Payments", href: "/sales", icon: FileText },
-    { name: "Account", href: "/settings/account", icon: User },
-    { name: "Card", href: "/customers", icon: CreditCard },
+    { name: "Sales", href: "/sales", icon: ShoppingCart },
+    { name: "Cashier", href: "/staff", icon: Users },
+    { name: "Report", href: "/reports", icon: FileText },
     { name: "Settings", href: "/settings", icon: Settings },
   ]
 

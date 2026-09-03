@@ -15,6 +15,7 @@ const checkoutSchema = z.object({
   vatRate: z.number().min(0),
   primaryCurrency: z.string(),
   customerName: z.string().optional(),
+  customerPhone: z.string().optional(),
   amountReceived: z.number().optional()
 })
 
@@ -39,18 +40,35 @@ export async function checkoutAction(data: z.infer<typeof checkoutSchema>) {
     const saleResult = await prisma.$transaction(async (tx) => {
       // 0. Handle Customer
       let customerId: string | undefined = undefined
-      if (validated.customerName && validated.customerName.trim() !== "") {
-        const customerName = validated.customerName.trim()
+      let finalCustomerName = validated.customerName?.trim()
+      let finalCustomerPhone = validated.customerPhone?.trim()
+
+      if (!finalCustomerName) {
+        // Default to Shop Admin
+        const shopAdmin = await tx.user.findFirst({ where: { shopId: session.user.shopId!, role: "SHOP_ADMIN" } })
+        finalCustomerName = shopAdmin?.name || session.user.name || "Shop Admin"
+        finalCustomerPhone = shopAdmin?.email || "N/A"
+      }
+
+      if (finalCustomerName) {
         const existingCustomer = await tx.customer.findFirst({
-          where: { shopId: session.user.shopId!, fullName: customerName }
+          where: { shopId: session.user.shopId!, fullName: finalCustomerName }
         })
 
         if (existingCustomer) {
           customerId = existingCustomer.id
+          // Optionally update phone if not present
+          if (finalCustomerPhone && !existingCustomer.phone) {
+            await tx.customer.update({
+              where: { id: existingCustomer.id },
+              data: { phone: finalCustomerPhone }
+            })
+          }
         } else {
           const newCustomer = await tx.customer.create({
             data: {
-              fullName: customerName,
+              fullName: finalCustomerName,
+              phone: finalCustomerPhone || null,
               shopId: session.user.shopId!
             }
           })

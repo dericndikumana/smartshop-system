@@ -10,8 +10,6 @@ import {
   Package, 
   Users, 
   Wallet, 
-  CreditCard, 
-  Coins, 
   Receipt,
   User
 } from "lucide-react"
@@ -22,16 +20,6 @@ export default async function SettingsPage() {
   const session = await auth()
   if (!session) redirect("/login")
 
-  // Calculate shop balance/revenue for the display
-  let shopBalance = 0
-  if (session.user.shopId) {
-    const sales = await prisma.sale.findMany({
-      where: { shopId: session.user.shopId },
-      select: { totalAmount: true }
-    })
-    shopBalance = sales.reduce((sum, sale) => sum + sale.totalAmount, 0)
-  }
-
   const menuItems = [
     { name: "Account Details", href: "/settings/account", icon: User },
     { name: "Dispatch Orders:", href: "#", icon: Truck },
@@ -40,7 +28,6 @@ export default async function SettingsPage() {
     { name: "Stocks:", href: "/inventory", icon: Package },
     { name: "Contacts:", href: "/customers", icon: Users },
     { name: "Dettes:", href: "/dettes", icon: Wallet },
-    { name: "Edit Card:", href: "#", icon: CreditCard },
   ]
 
   return (
@@ -68,16 +55,6 @@ export default async function SettingsPage() {
             <span>→</span>
           </Link>
         ))}
-
-        <div className="flex items-center justify-between p-4 rounded-xl bg-teal-50/50 dark:bg-teal-950/20 text-teal-700 dark:text-teal-400 font-bold text-lg border border-teal-100 dark:border-teal-900">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full border-2 border-yellow-400 flex items-center justify-center text-yellow-400">
-              <Coins className="h-4 w-4" />
-            </div>
-            <span>Balance: {shopBalance.toFixed(2)}</span>
-          </div>
-          <span>→</span>
-        </div>
 
         <Link 
           href="#"

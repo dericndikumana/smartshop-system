@@ -20,6 +20,7 @@ interface Customer {
   id: string
   fullName: string
   balance?: number
+  phone?: string | null
 }
 
 interface CartItem extends Product {
@@ -49,6 +50,8 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
   
   // Customer states
   const [customerSearch, setCustomerSearch] = useState("")
+  const [customerPhone, setCustomerPhone] = useState("")
+  const [customerCountryCode, setCustomerCountryCode] = useState("+250")
   const [showCustomerDropdown, setShowCustomerDropdown] = useState(false)
   const customerDropdownRef = useRef<HTMLDivElement>(null)
 
@@ -248,6 +251,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
       vatRate,
       primaryCurrency: Object.keys(totalsByCurrency)[0] || "RWF", // Use first currency as primary for the sale record
       customerName: customerSearch.trim() || undefined,
+      customerPhone: customerPhone.trim() ? `${customerCountryCode}${customerPhone.trim()}` : undefined,
       amountReceived: amountReceived ? parseFloat(amountReceived) : undefined
     }
 
@@ -257,6 +261,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
     } else {
       setCart([])
       setCustomerSearch("")
+      setCustomerPhone("")
       setAmountReceived("")
       toast.success(t('pos_page.sale_completed'))
     }
@@ -310,7 +315,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
           </div>
         </div>
         
-        <div className="flex-1 overflow-y-auto p-4">
+        <div className={`flex-1 overflow-y-auto p-4 ${!searchTerm ? 'hidden lg:block' : 'block'}`}>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {filteredProducts.map(product => (
               <button
@@ -340,7 +345,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
       </div>
 
       {/* Cart Section */}
-      <div className="w-full lg:w-96 flex flex-col bg-card rounded-xl border shadow-sm overflow-hidden h-[500px] lg:h-auto shrink-0">
+      <div className={`w-full lg:w-96 flex flex-col bg-card rounded-xl border shadow-sm overflow-hidden shrink-0 ${!searchTerm ? 'flex-1 h-auto' : 'h-[500px] lg:h-auto'}`}>
         <div className="p-4 border-b bg-muted/10 flex items-center justify-between">
           <h2 className="font-semibold flex items-center gap-2">
             <ShoppingCart className="h-5 w-5 text-primary" />
@@ -379,23 +384,58 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
             />
           </div>
           {showCustomerDropdown && customerSearch.length > 0 && (
-            <div className="absolute z-10 w-[calc(100%-2rem)] mt-1 bg-card border rounded-md shadow-lg max-h-40 overflow-y-auto">
+            <div className="absolute z-10 w-[calc(100%-2rem)] mt-1 bg-card border rounded-md shadow-lg overflow-y-auto p-2">
               {filteredCustomers.length > 0 ? (
                 filteredCustomers.map(c => (
                   <button
                     key={c.id}
                     onClick={() => {
                       setCustomerSearch(c.fullName)
+                      if (c.phone) {
+                        // Attempt to strip common African country codes if they exist in the DB or just ignore parsing for simplicity
+                        setCustomerPhone("") 
+                      }
                       setShowCustomerDropdown(false)
                     }}
-                    className="w-full text-left px-3 py-2 text-sm hover:bg-muted transition-colors"
+                    className="w-full text-left px-3 py-2 text-sm hover:bg-muted transition-colors rounded-md"
                   >
-                    {c.fullName}
+                    <span className="font-medium">{c.fullName}</span>
+                    {c.phone && <span className="text-muted-foreground ml-2">({c.phone})</span>}
                   </button>
                 ))
               ) : (
-                <div className="px-3 py-2 text-sm text-muted-foreground italic">
-                  {t('pos_page.create_customer')} &quot;{customerSearch}&quot;
+                <div className="p-2">
+                  <div className="text-sm font-medium mb-2">New Customer: {customerSearch}</div>
+                  <div className="flex gap-2">
+                    <select 
+                      value={customerCountryCode}
+                      onChange={(e) => setCustomerCountryCode(e.target.value)}
+                      className="rounded-md border bg-background px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary w-24"
+                    >
+                      <option value="+250">+250 (RW)</option>
+                      <option value="+254">+254 (KE)</option>
+                      <option value="+255">+255 (TZ)</option>
+                      <option value="+256">+256 (UG)</option>
+                      <option value="+257">+257 (BI)</option>
+                      <option value="+243">+243 (CD)</option>
+                      <option value="+27">+27 (ZA)</option>
+                      <option value="+234">+234 (NG)</option>
+                      <option value="+233">+233 (GH)</option>
+                    </select>
+                    <input 
+                      type="tel"
+                      placeholder="Phone number"
+                      value={customerPhone}
+                      onChange={(e) => setCustomerPhone(e.target.value)}
+                      className="flex-1 rounded-md border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+                  <button 
+                    onClick={() => setShowCustomerDropdown(false)}
+                    className="mt-3 w-full bg-primary/10 text-primary py-1.5 rounded-md text-sm font-medium hover:bg-primary/20 transition-colors"
+                  >
+                    Confirm Info
+                  </button>
                 </div>
               )}
             </div>
