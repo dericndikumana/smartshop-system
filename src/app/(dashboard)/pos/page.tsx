@@ -32,7 +32,7 @@ export default async function POSPage() {
     const customers = await prisma.customer.findMany({
       where: { shopId: session.user.shopId },
       orderBy: { fullName: 'asc' },
-      select: { id: true, fullName: true, balance: true }
+      select: { id: true, fullName: true, balance: true, phone: true }
     })
 
     // Fetch held carts for this shop and cashier
@@ -58,6 +58,7 @@ export default async function POSPage() {
       currency: p.currency || "RWF",
       quantity: Number(p.quantity || 0),
       sku: p.sku || "",
+      piecesPerBundle: p.piecesPerBundle || 1,
     }))
 
     const serializedCustomers = customers.map(c => ({

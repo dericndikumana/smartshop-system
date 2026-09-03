@@ -28,6 +28,7 @@ export default async function InventoryPage() {
       currency: p.currency || "RWF",
       quantity: Number(p.quantity || 0),
       minStock: Number(p.minStock || 0),
+      piecesPerBundle: p.piecesPerBundle || 1,
     }))
 
     return <InventoryClient products={serializedProducts} userRole={session.user.role} />
