@@ -44,8 +44,7 @@ export async function checkoutAction(data: z.infer<typeof checkoutSchema>) {
       let finalCustomerPhone = validated.customerPhone?.trim()
 
       if (!finalCustomerName) {
-        // Default to Shop Admin
-        const shopAdmin = await tx.user.findFirst({ where: { shopId: session.user.shopId!, role: "SHOP_ADMIN" } })
+        const shopAdmin = await tx.user.findFirst({ where: { shopId: session.user.shopId!, role: { name: "SHOP_ADMIN" } } })
         finalCustomerName = shopAdmin?.name || session.user.name || "Shop Admin"
         finalCustomerPhone = shopAdmin?.email || "N/A"
       }
