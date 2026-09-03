@@ -59,6 +59,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
   // Held Cart states
   const [showHeldCarts, setShowHeldCarts] = useState(false)
   const [isHolding, setIsHolding] = useState(false)
+  const [showDebtConfirm, setShowDebtConfirm] = useState(false)
 
   // Quantity Modal states
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
@@ -82,6 +83,12 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
     document.addEventListener("mousedown", handleClickOutside)
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
+
+  useEffect(() => {
+    if (cashierName && !customerSearch) {
+      setCustomerSearch(cashierName)
+    }
+  }, [cashierName, customerSearch])
 
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product)
@@ -238,9 +245,9 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
     setIsCheckingOut(false)
   }
 
-  const handleCheckout = async () => {
-    if (cart.length === 0) return
+  const proceedCheckout = async () => {
     setIsCheckingOut(true)
+    setShowDebtConfirm(false)
 
     const payload = {
       items: cart.map(item => ({
@@ -261,13 +268,32 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
       toast.error(result.error)
     } else {
       setCart([])
-      setCustomerSearch("")
+      // Don't reset customer search since it's prefilled with cashier name
       setCustomerPhone("")
       setAmountReceived("")
       toast.success(t('pos_page.sale_completed'))
     }
     
     setIsCheckingOut(false)
+  }
+
+  const handleCheckout = async () => {
+    if (cart.length === 0) return
+    
+    const rawTotal = Object.values(totalsByCurrency).reduce((a, b) => a + b, 0)
+    const amt = amountReceived ? parseFloat(amountReceived) : rawTotal
+    const diff = rawTotal - amt
+
+    if (diff !== 0) {
+      if (!customerSearch.trim()) {
+        toast.error("Please enter a customer name for debt/loan tracking.")
+        return
+      }
+      setShowDebtConfirm(true)
+      return
+    }
+
+    proceedCheckout()
   }
 
   // Colors for product blocks
@@ -282,8 +308,12 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
     return colors[index % colors.length]
   }
 
-  const selectedCustomerObj = customers.find(c => c.fullName.toLowerCase() === customerSearch.toLowerCase())
+  const selectedCustomerObj = customers.find(c => c.fullName.toLowerCase() === customerSearch.trim().toLowerCase())
   const customerDebt = selectedCustomerObj?.balance || 0
+  
+  const rawTotal = Object.values(totalsByCurrency).reduce((a, b) => a + b, 0)
+  const amt = amountReceived ? parseFloat(amountReceived) : rawTotal
+  const newBalance = customerDebt + (rawTotal - amt)
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-8rem)] animate-in fade-in slide-in-from-bottom-4 duration-500 relative">
@@ -823,6 +853,50 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
           </div>
         </div>
       )}
+
+      {/* Debt/Loan Confirmation Modal */}
+      {showDebtConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in duration-200 p-4">
+          <div className="bg-card w-full max-w-sm rounded-xl shadow-lg border p-6 animate-in zoom-in-95 duration-200">
+            <h2 className="text-xl font-bold mb-4">Confirm Debt/Loan</h2>
+            <div className="mb-6 space-y-2 text-sm">
+              <p>Customer: <span className="font-bold">{customerSearch.trim()}</span></p>
+              <p>Total Due: <span className="font-bold text-foreground">{rawTotal.toLocaleString()} RWF</span></p>
+              <p>Amount Received: <span className="font-bold text-foreground">{amt.toLocaleString()} RWF</span></p>
+              {customerDebt !== 0 && (
+                <p>Previous Balance: <span className="font-bold text-muted-foreground">{customerDebt.toLocaleString()} RWF</span></p>
+              )}
+              <div className="p-3 mt-4 rounded-lg bg-muted/50 border">
+                {newBalance > 0 ? (
+                  <p className="text-red-500 font-bold">New Debt Balance: {newBalance.toLocaleString()} RWF</p>
+                ) : newBalance < 0 ? (
+                  <p className="text-emerald-500 font-bold">New Loan Balance: {Math.abs(newBalance).toLocaleString()} RWF (You owe them)</p>
+                ) : (
+                  <p className="text-emerald-500 font-bold">Debt is cleared! Balance: 0 RWF</p>
+                )}
+              </div>
+              <p className="text-muted-foreground pt-2">Do you want to proceed and save this transaction?</p>
+            </div>
+            <div className="flex gap-3 justify-end">
+              <button 
+                onClick={() => setShowDebtConfirm(false)}
+                className="px-4 py-2 border rounded-lg hover:bg-muted font-medium text-sm transition-colors"
+                disabled={isCheckingOut}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={proceedCheckout}
+                className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-bold hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-50"
+                disabled={isCheckingOut}
+              >
+                {isCheckingOut ? "Processing..." : "Proceed"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }

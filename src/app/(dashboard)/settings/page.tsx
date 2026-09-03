@@ -3,12 +3,13 @@ import { redirect } from "next/navigation"
 import Link from "next/link"
 import { LogOutButton } from "./logout-button"
 import { 
-  ListOrdered, 
   Package, 
   Users, 
   Receipt,
   User,
-  ShoppingCart
+  ShoppingCart,
+  Banknote,
+  HandCoins
 } from "lucide-react"
 
 export const dynamic = 'force-dynamic'
@@ -20,7 +21,8 @@ export default async function SettingsPage() {
   const menuItems = [
     { name: "Account Details", href: "/settings/account", icon: User },
     { name: "Order", href: "/pos", icon: ShoppingCart },
-    { name: "All Sales", href: "/sales", icon: ListOrdered },
+    { name: "Debt", href: "/dettes", icon: Banknote },
+    { name: "Loan", href: "/loans", icon: HandCoins },
     { name: "Manage Cashiers", href: "/staff", icon: Users },
     { name: "Stock", href: "/inventory", icon: Package },
     { name: "Report", href: "/reports", icon: Receipt },
