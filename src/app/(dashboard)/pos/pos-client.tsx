@@ -14,6 +14,7 @@ interface Product {
   currency: string
   quantity: number
   sku?: string
+  piecesPerBundle?: number
 }
 
 interface Customer {
@@ -323,7 +324,9 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
                 <div className={`w-full aspect-square rounded-lg flex items-center justify-center text-white font-bold text-3xl shadow-sm mb-3 group-hover:scale-105 transition-transform ${getInitialsColor(product.name)}`}>
                   {product.name.substring(0, 2).toUpperCase()}
                 </div>
-                <h3 className="font-medium leading-tight line-clamp-2">{product.name}</h3>
+                <h3 className="font-medium leading-tight line-clamp-2">
+                  {product.name} {product.piecesPerBundle && product.piecesPerBundle > 1 ? `(${product.piecesPerBundle}pcs)` : ""}
+                </h3>
                 <div className="mt-2 w-full flex items-center justify-between">
                   <p className="font-bold text-primary">{product.currency} {product.sellingPrice.toLocaleString()}</p>
                   <span className="text-[10px] text-muted-foreground font-medium bg-muted px-1.5 py-0.5 rounded-sm">
@@ -379,8 +382,8 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
               className="w-full pl-9 rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all" 
             />
           </div>
-          {showCustomerDropdown && customerSearch.length > 0 && (
-            <div className="absolute z-10 w-[calc(100%-2rem)] mt-1 bg-card border rounded-md shadow-lg overflow-y-auto p-2">
+          {showCustomerDropdown && (
+            <div className="absolute z-10 w-[calc(100%-2rem)] mt-1 bg-card border rounded-md shadow-lg overflow-y-auto p-2 max-h-60">
               {filteredCustomers.length > 0 ? (
                 filteredCustomers.map(c => (
                   <button
@@ -446,7 +449,9 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
               <div key={item.id} className="flex flex-col gap-2 p-3 border rounded-lg bg-muted/10">
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="font-medium text-[10px] leading-tight">{item.name}</p>
+                    <p className="font-medium text-[10px] leading-tight">
+                      {item.name} {item.piecesPerBundle && item.piecesPerBundle > 1 ? `(${item.piecesPerBundle}pcs)` : ""}
+                    </p>
                     <p className="text-[10px] text-muted-foreground mt-0.5">{item.currency} {item.sellingPrice.toLocaleString()} {t('pos_page.each')}</p>
                   </div>
                   <button onClick={() => removeFromCart(item.id)} className="text-muted-foreground hover:text-red-500 transition-colors">
@@ -583,7 +588,9 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
                   className="flex items-center justify-between p-3 border-b hover:bg-muted/30 cursor-pointer"
                 >
                   <div>
-                    <h4 className="font-bold text-sm">{product.name}</h4>
+                    <h4 className="font-bold text-sm">
+                      {product.name} {product.piecesPerBundle && product.piecesPerBundle > 1 ? `(${product.piecesPerBundle}pcs)` : ""}
+                    </h4>
                     <span className="text-xs text-muted-foreground">{product.quantity} in stock</span>
                   </div>
                   <span className="font-bold text-primary">{product.currency} {product.sellingPrice.toLocaleString()}</span>
@@ -597,21 +604,46 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
         </div>
 
         {/* Mobile Customer Selection */}
-        <div className="py-4 border-b flex flex-col items-center">
+        <div className="py-4 border-b flex flex-col items-center relative" ref={customerDropdownRef}>
           <div className="flex items-center gap-4 text-primary font-medium">
             <User className="h-5 w-5 text-orange-500" />
             <span>{customerSearch || "Customer"}</span>
             <span className="w-5 h-5 border-2 border-pink-500 text-pink-500 rounded-sm flex items-center justify-center text-[10px]">QR</span>
           </div>
           
-          {/* Very basic customer input for mobile if needed */}
           <input 
             type="text" 
-            placeholder="Search/Add Customer" 
+            placeholder={t("pos_page.customer_optional") || "Search Customer"}
             value={customerSearch}
-            onChange={e => setCustomerSearch(e.target.value)}
-            className="mt-2 text-center text-sm bg-transparent border-b border-dashed focus:outline-none px-2 py-1"
+            onChange={e => {
+              setCustomerSearch(e.target.value)
+              setShowCustomerDropdown(true)
+            }}
+            onFocus={() => setShowCustomerDropdown(true)}
+            className="mt-2 text-center text-sm bg-transparent border-b border-dashed focus:outline-none px-2 py-1 w-48"
           />
+          {showCustomerDropdown && (
+            <div className="absolute top-full z-30 w-64 bg-card border rounded-md shadow-lg overflow-y-auto p-2 max-h-60 mt-1 left-1/2 -translate-x-1/2">
+              {filteredCustomers.length > 0 ? (
+                filteredCustomers.map(c => (
+                  <button
+                    key={c.id}
+                    onClick={() => {
+                      setCustomerSearch(c.fullName)
+                      if (c.phone) setCustomerPhone("") 
+                      setShowCustomerDropdown(false)
+                    }}
+                    className="w-full text-left px-3 py-2 text-sm hover:bg-muted transition-colors rounded-md border-b last:border-0"
+                  >
+                    <span className="font-medium">{c.fullName}</span>
+                    {c.phone && <span className="text-muted-foreground ml-2 text-xs">({c.phone})</span>}
+                  </button>
+                ))
+              ) : (
+                <div className="p-2 text-sm text-center text-muted-foreground">New Customer</div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Mobile Cart Items (Compact) */}
@@ -621,7 +653,9 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
               <div key={item.id} className="flex justify-between items-center text-xs">
                 <div className="flex items-center gap-2">
                   <span className="font-bold">{item.cartQuantity}x</span>
-                  <span className="truncate w-32">{item.name}</span>
+                  <span className="truncate w-32">
+                    {item.name} {item.piecesPerBundle && item.piecesPerBundle > 1 ? `(${item.piecesPerBundle}pcs)` : ""}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="font-bold">{item.currency} {(item.sellingPrice * item.cartQuantity).toLocaleString()}</span>

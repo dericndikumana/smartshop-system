@@ -23,6 +23,7 @@ interface Product {
   currency: string
   quantity: number
   minStock: number
+  piecesPerBundle?: number | null
 }
 
 const getInitialsColor = (name: string) => {
@@ -212,7 +213,9 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                           {product.name.substring(0, 2).toUpperCase()}
                         </div>
                         <div className="flex flex-col">
-                          <p className="font-medium text-xs text-foreground truncate max-w-[150px]" title={product.name}>{product.name}</p>
+                          <p className="font-medium text-xs text-foreground truncate max-w-[150px]" title={product.name}>
+                            {product.name} {product.piecesPerBundle && product.piecesPerBundle > 1 ? `(${product.piecesPerBundle}pcs)` : ""}
+                          </p>
                           {product.sku && <p className="text-[10px] text-muted-foreground truncate">{product.sku}</p>}
                         </div>
                       </div>
@@ -340,10 +343,15 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                     <input name="sku" type="text" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="SKU" />
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">{t("inventory_page.items_number")}</label>
-                    <input required name="quantity" type="number" min="0" defaultValue="0" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
-                    <input type="hidden" name="piecesPerBundle" value="1" />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">{t("inventory_page.items_number")}</label>
+                      <input required name="quantity" type="number" min="0" defaultValue="0" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">PCS (Pieces)</label>
+                      <input required name="piecesPerBundle" type="number" min="1" defaultValue="1" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -394,10 +402,15 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                     <input name="sku" type="text" defaultValue={editingProduct.sku || ""} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="SKU" />
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">{t("inventory_page.items_number")}</label>
-                    <input required name="quantity" type="number" min="0" defaultValue={editingProduct.quantity} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
-                    <input type="hidden" name="piecesPerBundle" value="1" />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">{t("inventory_page.items_number")}</label>
+                      <input required name="quantity" type="number" min="0" defaultValue={editingProduct.quantity} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">PCS (Pieces)</label>
+                      <input required name="piecesPerBundle" type="number" min="1" defaultValue={editingProduct.piecesPerBundle || 1} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -449,7 +462,7 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                       <option value="" disabled>Select an existing product...</option>
                       {initialProducts.map(p => (
                         <option key={p.id} value={p.id}>
-                          {p.name} ({p.quantity} in stock)
+                          {p.name} {p.piecesPerBundle && p.piecesPerBundle > 1 ? `(${p.piecesPerBundle}pcs)` : ""} ({p.quantity} in stock)
                         </option>
                       ))}
                     </select>

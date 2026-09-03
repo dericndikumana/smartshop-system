@@ -10,6 +10,8 @@ import { Toaster } from "sonner";
 
 import { AuthProvider } from "@/components/providers/auth-provider";
 import { LanguageProvider } from "@/components/providers/language-provider";
+import { SessionTimeout } from "@/components/providers/session-timeout";
+import NextTopLoader from "nextjs-toploader";
 
 export const metadata: Metadata = {
   title: "SmartShop System",
@@ -24,7 +26,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn("font-sans", inter.variable)} suppressHydrationWarning>
       <body className="antialiased bg-background text-foreground">
+        <NextTopLoader color="#0ea5e9" showSpinner={true} />
         <AuthProvider>
+          <SessionTimeout />
           <LanguageProvider>
             <ThemeProvider
               attribute="class"

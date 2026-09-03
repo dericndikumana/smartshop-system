@@ -32,12 +32,12 @@ export default async function DashboardPage() {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
-  if (session.user.role === "CASHIER") {
-    // 1. CASHIER DASHBOARD DATA
+  if (session.user.role === "CASHIER" || session.user.role === "SHOP_ADMIN") {
+    // 1. DASHBOARD DATA
     const cashierSales = await prisma.sale.findMany({
       where: {
         shopId: session.user.shopId,
-        cashierId: session.user.id,
+        ...(session.user.role === "CASHIER" ? { cashierId: session.user.id } : {}),
         createdAt: { gte: today }
       },
       orderBy: { createdAt: 'desc' },
@@ -65,10 +65,6 @@ export default async function DashboardPage() {
         revenueByCurrency={revenueByCurrency}
       />
     )
-  }
-
-  if (session.user.role === "SHOP_ADMIN") {
-    redirect("/pos")
   }
 
   return (

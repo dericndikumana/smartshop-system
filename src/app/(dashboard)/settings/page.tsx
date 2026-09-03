@@ -3,12 +3,9 @@ import { redirect } from "next/navigation"
 import Link from "next/link"
 import { LogOutButton } from "./logout-button"
 import { 
-  Truck, 
-  ShoppingCart, 
   ListOrdered, 
   Package, 
   Users, 
-  Wallet, 
   Receipt,
   User
 } from "lucide-react"
@@ -21,12 +18,10 @@ export default async function SettingsPage() {
 
   const menuItems = [
     { name: "Account Details", href: "/settings/account", icon: User },
-    { name: "Dispatch Orders:", href: "#", icon: Truck },
-    { name: "Sales:", href: "/pos", icon: ShoppingCart },
-    { name: "All Sales:", href: "/sales", icon: ListOrdered },
-    { name: "Stocks:", href: "/inventory", icon: Package },
-    { name: "Contacts:", href: "/customers", icon: Users },
-    { name: "Dettes:", href: "/dettes", icon: Wallet },
+    { name: "All Sales", href: "/sales", icon: ListOrdered },
+    { name: "Manage Cashiers", href: "/staff", icon: Users },
+    { name: "Stock", href: "/inventory", icon: Package },
+    { name: "Report", href: "/reports", icon: Receipt },
   ]
 
   return (
@@ -55,19 +50,6 @@ export default async function SettingsPage() {
           </Link>
         ))}
 
-        <Link 
-          href="#"
-          className="flex items-center justify-between p-4 rounded-xl bg-teal-50/50 dark:bg-teal-950/20 text-teal-700 dark:text-teal-400 font-bold text-lg border border-teal-100 dark:border-teal-900 hover:bg-teal-100 dark:hover:bg-teal-900/40 transition-colors"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full border-2 border-yellow-400 flex items-center justify-center text-yellow-400">
-              <Receipt className="h-4 w-4" />
-            </div>
-            <span>Spendings:</span>
-          </div>
-          <span>→</span>
-        </Link>
-        
         <LogOutButton />
       </div>
     </div>

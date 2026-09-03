@@ -2,17 +2,18 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, ShoppingCart, Users, FileText, Settings } from "lucide-react"
+import { Home, ShoppingCart, ListOrdered, Package, Users, Settings } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export function BottomNav() {
   const pathname = usePathname()
 
   const navItems = [
-    { name: "Home", href: "/pos", icon: Home },
-    { name: "Sales", href: "/sales", icon: ShoppingCart },
-    { name: "Cashier", href: "/staff", icon: Users },
-    { name: "Report", href: "/reports", icon: FileText },
+    { name: "Home", href: "/", icon: Home },
+    { name: "POS", href: "/pos", icon: ShoppingCart },
+    { name: "All Sales", href: "/sales", icon: ListOrdered },
+    { name: "Product", href: "/inventory", icon: Package },
+    { name: "Custome info", href: "/customers", icon: Users },
     { name: "Settings", href: "/settings", icon: Settings },
   ]
 
