@@ -481,10 +481,15 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
               <div key={item.id} className="flex flex-col gap-2 p-3 border rounded-lg bg-muted/10">
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="font-medium text-[10px] leading-tight">
-                      {item.name} {item.piecesPerBundle && item.piecesPerBundle > 1 ? `(${item.piecesPerBundle}pcs)` : ""}
+                    <p className="font-bold text-sm text-[#1a237e] uppercase leading-tight">
+                      {item.sku || item.name}(<span className="text-[#1976d2] underline">{item.piecesPerBundle || 1}</span> Pcs)1X <span className="text-[#1976d2] underline">{item.sellingPrice}</span>
                     </p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">{item.currency} {item.sellingPrice.toLocaleString()} {t('pos_page.each')}</p>
+                    <p className="text-xs text-muted-foreground font-medium mt-1">
+                      Qty:{item.cartQuantity} X {item.sellingPrice}={(item.cartQuantity * item.sellingPrice).toLocaleString()}
+                    </p>
+                    <p className="text-xs text-muted-foreground font-medium">
+                      Name:<span className="underline uppercase">{item.sku || item.name}</span>
+                    </p>
                   </div>
                   <button onClick={() => removeFromCart(item.id)} className="text-muted-foreground hover:text-red-500 transition-colors">
                     <Trash2 className="h-4 w-4" />
@@ -620,10 +625,10 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
                   className="flex items-center justify-between p-3 border-b hover:bg-muted/30 cursor-pointer"
                 >
                   <div>
-                    <h4 className="font-bold text-sm">
-                      {product.name} {product.piecesPerBundle && product.piecesPerBundle > 1 ? `(${product.piecesPerBundle}pcs)` : ""}
+                    <h4 className="font-bold text-sm text-[#1a237e] uppercase">
+                      {product.sku || product.name}(<span className="text-[#1976d2] underline">{product.piecesPerBundle || 1}</span> Pcs)1X <span className="text-[#1976d2] underline">{product.sellingPrice}</span>
                     </h4>
-                    <span className="text-xs text-muted-foreground">{product.quantity} in stock</span>
+                    <span className="text-xs text-muted-foreground font-medium">{product.quantity} in stock</span>
                   </div>
                   <span className="font-bold text-primary">{product.currency} {product.sellingPrice.toLocaleString()}</span>
                 </div>
@@ -685,8 +690,8 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
               <div key={item.id} className="flex justify-between items-center text-xs">
                 <div className="flex items-center gap-2">
                   <span className="font-bold">{item.cartQuantity}x</span>
-                  <span className="truncate w-32">
-                    {item.name} {item.piecesPerBundle && item.piecesPerBundle > 1 ? `(${item.piecesPerBundle}pcs)` : ""}
+                  <span className="truncate w-32 uppercase text-[#1a237e]">
+                    {item.sku || item.name}(<span className="text-[#1976d2] underline">{item.piecesPerBundle || 1}</span> Pcs)1X <span className="text-[#1976d2] underline">{item.sellingPrice}</span>
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
