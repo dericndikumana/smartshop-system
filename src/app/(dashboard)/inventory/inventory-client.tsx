@@ -218,7 +218,16 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                       </div>
                     </td>
                     <td className="px-3 py-2 text-xs font-medium">
-                      {product.quantity}
+                      <div className="flex flex-col">
+                        <span className={product.quantity <= 5 ? "text-red-500 font-bold" : ""}>
+                          {product.quantity}
+                        </span>
+                        {product.quantity <= 5 && (
+                          <span className="text-[10px] text-red-500 font-semibold mt-0.5">
+                            {product.quantity === 0 ? t("inventory_page.ended") : t("inventory_page.low_stock")}
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-3 py-2 text-xs">
                       {product.buyingPrice ? `${product.currency} ${product.buyingPrice.toLocaleString()}` : "-"}

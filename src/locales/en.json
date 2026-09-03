@@ -99,7 +99,9 @@
     "currency": "Currency",
     "cancel": "Cancel",
     "save": "Save",
-    "select_product": "Select Product"
+    "select_product": "Select Product",
+    "low_stock": "Low stock",
+    "ended": "Ended"
   },
   "settings_page": {
     "edit_profile": "Edit Profile",

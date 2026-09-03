@@ -28,7 +28,7 @@
     "system_overview": "Incamake y Imikorere",
     "manage_shops": "Cunga Amaduka",
     "shop_dashboard": "Incamake",
-    "pos_terminal": "Point of Sale(POS)",
+    "pos_terminal": "Aho Kugurishiriza (POS)",
     "inventory": "Ibicuruzwa & Ububiko",
     "sales_receipts": "Ibyagurishijwe & Inyemezabuguzi",
     "manage_cashiers": "Cunga Abagurisha",
@@ -99,7 +99,9 @@
     "currency": "Ifaranga",
     "cancel": "Kureka",
     "save": "Bika",
-    "select_product": "Hitamo Igicuruzwa"
+    "select_product": "Hitamo Igicuruzwa",
+    "low_stock": "Biri Hasi",
+    "ended": "Byashize"
   },
   "settings_page": {
     "edit_profile": "Hindura Umwirondoro",
