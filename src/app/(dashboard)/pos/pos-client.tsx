@@ -285,20 +285,17 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
   const customerDebt = selectedCustomerObj?.balance || 0
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-8rem)] animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-8rem)] animate-in fade-in slide-in-from-bottom-4 duration-500 relative">
       
-      {/* Products Section */}
-      <div className="flex-1 flex flex-col bg-card rounded-xl border shadow-sm overflow-hidden min-h-[50vh]">
-        
-        {/* Mobile-style Header (Matches Design) */}
+      {/* ==================================================== */}
+      {/* DESKTOP VIEW (Hidden on Mobile)                      */}
+      {/* ==================================================== */}
+      <div className="hidden lg:flex flex-1 flex-col bg-card rounded-xl border shadow-sm overflow-hidden min-h-[50vh]">
         <div className="flex flex-col items-center py-3 border-b bg-background/50">
           <h1 className="text-red-500 font-bold tracking-widest text-lg uppercase">{cashierName || "CASHIER"}</h1>
           <div className="flex items-center gap-1 text-sm font-bold mt-1">
             <span className="uppercase">{shopName || "SHOP"}</span>
             <span className="text-xs">▼</span>
-          </div>
-          <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground cursor-pointer hover:text-foreground">
-            <span className="text-yellow-400 text-lg">★</span> Pick Default Account
           </div>
         </div>
 
@@ -315,7 +312,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
           </div>
         </div>
         
-        <div className={`flex-1 overflow-y-auto p-4 ${!searchTerm ? 'hidden lg:block' : 'block'}`}>
+        <div className="flex-1 overflow-y-auto p-4 block">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {filteredProducts.map(product => (
               <button
@@ -344,8 +341,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
         </div>
       </div>
 
-      {/* Cart Section */}
-      <div className={`w-full lg:w-96 flex flex-col bg-card rounded-xl border shadow-sm overflow-hidden shrink-0 ${!searchTerm ? 'flex-1 h-auto' : 'h-[500px] lg:h-auto'}`}>
+      <div className="hidden lg:flex w-96 flex-col bg-card rounded-xl border shadow-sm overflow-hidden h-[500px] shrink-0">
         <div className="p-4 border-b bg-muted/10 flex items-center justify-between">
           <h2 className="font-semibold flex items-center gap-2">
             <ShoppingCart className="h-5 w-5 text-primary" />
@@ -367,7 +363,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
           </div>
         </div>
 
-        {/* Customer Selection */}
+        {/* Customer Selection Desktop */}
         <div className="p-4 border-b relative" ref={customerDropdownRef}>
           <div className="relative">
             <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -391,10 +387,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
                     key={c.id}
                     onClick={() => {
                       setCustomerSearch(c.fullName)
-                      if (c.phone) {
-                        // Attempt to strip common African country codes if they exist in the DB or just ignore parsing for simplicity
-                        setCustomerPhone("") 
-                      }
+                      if (c.phone) setCustomerPhone("") 
                       setShowCustomerDropdown(false)
                     }}
                     className="w-full text-left px-3 py-2 text-sm hover:bg-muted transition-colors rounded-md"
@@ -488,17 +481,6 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
               </div>
             </div>
             
-            {vatRate > 0 && Object.entries(totalsByCurrency).length > 0 && (
-              <div className="flex justify-between text-sm text-muted-foreground border-t border-border/50 pt-2">
-                <span>{t('pos_page.vat_included').replace('{0}', vatRate.toString())}</span>
-                <div className="text-right flex flex-col">
-                  {Object.entries(totalsByCurrency).map(([currency, total]) => (
-                    <span key={currency}>{currency} {(total - (total / (1 + vatRate / 100))).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
-                  ))}
-                </div>
-              </div>
-            )}
-
             <div className="flex justify-between font-bold text-lg pt-2 border-t mt-2">
               <span>{t('pos_page.total')}</span>
               <div className="text-right flex flex-col">
@@ -526,16 +508,6 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
                   {!amountReceived && <span className="absolute right-3 text-orange-400/80 pointer-events-none">⚠️</span>}
                 </div>
               </div>
-              {amountReceived && Object.keys(totalsByCurrency).length > 0 && (
-                <div className="text-right text-xs font-medium">
-                  {(() => {
-                    const diff = parseFloat(amountReceived) - Object.values(totalsByCurrency)[0]
-                    if (diff > 0) return <span className="text-emerald-500">Change / Credit: {diff.toLocaleString()}</span>
-                    if (diff < 0) return <span className="text-red-500">Remaining Debt: {Math.abs(diff).toLocaleString()}</span>
-                    return <span className="text-muted-foreground">Exact Amount</span>
-                  })()}
-                </div>
-              )}
             </div>
           </div>
 
@@ -557,6 +529,155 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
               {isCheckingOut ? t('pos_page.processing') : t('pos_page.complete_sale')}
             </button>
           </div>
+        </div>
+      </div>
+
+      {/* ==================================================== */}
+      {/* MOBILE VIEW (Hidden on Desktop)                      */}
+      {/* ==================================================== */}
+      <div className="flex flex-col lg:hidden w-full h-full bg-background rounded-xl overflow-y-auto pb-24 shadow-sm border relative">
+        
+        {/* Mobile Header */}
+        <div className="flex flex-col items-center py-2 border-b bg-background/50">
+          <h1 className="text-red-500 font-bold tracking-widest text-lg uppercase">{cashierName || "GASORE"}</h1>
+          <div className="flex items-center gap-1 text-sm font-bold mt-1">
+            <span className="uppercase">{shopName || "GASORELTD"}</span>
+            <span className="text-xs">▼</span>
+          </div>
+          <div className="flex items-center gap-2 mt-2 text-sm font-medium text-muted-foreground hover:text-foreground">
+            <span className="text-yellow-400 text-lg">★</span> Pick Default Account
+          </div>
+        </div>
+
+        {/* Mobile Search Bar */}
+        <div className="px-4 py-3 border-b flex flex-col relative z-20 bg-background">
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-bold whitespace-nowrap text-muted-foreground uppercase">Search By</span>
+            <div className="flex-1 flex items-center border border-gray-300 rounded-full px-3 py-1 bg-white shadow-sm">
+              <select className="bg-transparent text-sm font-bold focus:outline-none py-1 mr-2 appearance-none">
+                <option>Code</option>
+              </select>
+              <span className="text-xs text-muted-foreground">▼</span>
+              <input 
+                type="text" 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="flex-1 bg-transparent px-3 text-sm focus:outline-none" 
+              />
+              <div className="w-5 h-5 rounded-full bg-gray-700 text-white flex items-center justify-center">
+                <Search className="h-3 w-3" />
+              </div>
+            </div>
+          </div>
+          
+          {/* Mobile Search Popup (Absolute) */}
+          {searchTerm && (
+            <div className="absolute top-full left-0 right-0 bg-white border shadow-xl max-h-[50vh] overflow-y-auto z-30">
+              {filteredProducts.map(product => (
+                <div 
+                  key={product.id}
+                  onClick={() => {
+                    handleProductClick(product)
+                    setSearchTerm("")
+                  }}
+                  className="flex items-center justify-between p-3 border-b hover:bg-muted/30 cursor-pointer"
+                >
+                  <div>
+                    <h4 className="font-bold text-sm">{product.name}</h4>
+                    <span className="text-xs text-muted-foreground">{product.quantity} in stock</span>
+                  </div>
+                  <span className="font-bold text-primary">{product.currency} {product.sellingPrice.toLocaleString()}</span>
+                </div>
+              ))}
+              {filteredProducts.length === 0 && (
+                <div className="p-4 text-center text-sm text-muted-foreground">No products found</div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Mobile Customer Selection */}
+        <div className="py-4 border-b flex flex-col items-center">
+          <div className="flex items-center gap-4 text-primary font-medium">
+            <User className="h-5 w-5 text-orange-500" />
+            <span>{customerSearch || "Customer"}</span>
+            <span className="w-5 h-5 border-2 border-pink-500 text-pink-500 rounded-sm flex items-center justify-center text-[10px]">QR</span>
+          </div>
+          
+          {/* Very basic customer input for mobile if needed */}
+          <input 
+            type="text" 
+            placeholder="Search/Add Customer" 
+            value={customerSearch}
+            onChange={e => setCustomerSearch(e.target.value)}
+            className="mt-2 text-center text-sm bg-transparent border-b border-dashed focus:outline-none px-2 py-1"
+          />
+        </div>
+
+        {/* Mobile Cart Items (Compact) */}
+        {cart.length > 0 && (
+          <div className="p-2 border-b bg-muted/5 flex flex-col gap-1 max-h-40 overflow-y-auto">
+            {cart.map(item => (
+              <div key={item.id} className="flex justify-between items-center text-xs">
+                <div className="flex items-center gap-2">
+                  <span className="font-bold">{item.cartQuantity}x</span>
+                  <span className="truncate w-32">{item.name}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold">{item.currency} {(item.sellingPrice * item.cartQuantity).toLocaleString()}</span>
+                  <button onClick={() => removeFromCart(item.id)} className="text-red-500"><Trash2 className="h-3 w-3"/></button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Mobile Total */}
+        <div className="py-2 flex items-center justify-center gap-2 font-bold text-lg">
+          <span>Total:</span>
+          {Object.entries(totalsByCurrency).length === 0 ? <span>0</span> : (
+            Object.entries(totalsByCurrency).map(([currency, total]) => (
+              <span key={currency}>{total.toLocaleString()}</span>
+            ))
+          )}
+          <span className="text-blue-500 ml-2">{"<"}</span>
+        </div>
+
+        {/* Mobile Payment Input */}
+        <div className="px-4 py-2">
+          <div className="flex items-center justify-between gap-2 p-1 border rounded-lg bg-white shadow-sm border-gray-300">
+            <span className="bg-red-500 text-white px-3 py-2 rounded-md text-sm font-bold flex-shrink-0">
+              dettes {customerDebt.toLocaleString()}
+            </span>
+            <div className="flex-1 flex items-center justify-end relative">
+              <input
+                type="number"
+                placeholder="Ayo Yishyuye..."
+                value={amountReceived}
+                onChange={(e) => setAmountReceived(e.target.value)}
+                className="w-full text-left rounded-md border-none bg-transparent px-2 py-2 text-sm font-medium focus:outline-none"
+              />
+              {!amountReceived && <span className="absolute right-2 text-orange-400 text-lg pointer-events-none">⚠️</span>}
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Action Buttons */}
+        <div className="px-4 pt-4 pb-2 flex gap-3 mt-auto">
+          <button
+            onClick={handleHoldCart}
+            disabled={cart.length === 0 || isHolding || isCheckingOut}
+            className="flex-1 bg-muted py-2 rounded-lg font-bold text-sm disabled:opacity-50"
+          >
+            Hold
+          </button>
+          <button
+            onClick={handleCheckout}
+            disabled={cart.length === 0 || isCheckingOut || isHolding}
+            className="flex-1 bg-primary text-primary-foreground py-2 rounded-lg font-bold text-sm shadow-sm disabled:opacity-50"
+          >
+            Complete
+          </button>
         </div>
       </div>
 
