@@ -17,5 +17,5 @@ export default async function CustomersPage() {
     orderBy: { fullName: 'asc' }
   })
 
-  return <CustomersClient initialCustomers={customers} currentUserName={session.user.name} userRole={session.user.role} />
+  return <CustomersClient initialCustomers={customers} currentUserName={session.user.name || undefined} userRole={session.user.role} />
 }
