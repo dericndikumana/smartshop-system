@@ -436,10 +436,21 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
                         setShowCustomerDropdown(false)
                         setCustomerSearchText("")
                       }}
-                      className="w-full text-left px-3 py-2 text-sm hover:bg-muted transition-colors rounded-md border-b last:border-0"
+                      className="w-full bg-card border rounded-xl p-3 flex items-center justify-between gap-4 shadow-sm hover:shadow-md hover:bg-muted/50 transition-all text-left mt-2 first:mt-0"
                     >
-                      <span className="font-medium">{c.fullName}</span>
-                      {c.phone && <span className="text-muted-foreground ml-2">({c.phone})</span>}
+                      <div className="flex items-center gap-3 w-full">
+                        <div className={`h-10 w-10 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm flex-shrink-0 ${getInitialsColor(c.fullName)}`}>
+                          {c.fullName.substring(0, 2).toUpperCase()}
+                        </div>
+                        <div className="flex flex-col min-w-0">
+                          <h3 className="font-bold text-foreground text-sm truncate">{c.fullName}</h3>
+                          <p className="text-xs text-muted-foreground truncate">{c.phone || "No phone"}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 opacity-80 shrink-0">
+                        <Save className="h-4 w-4 text-orange-500" />
+                        <Trash2 className="h-4 w-4 text-red-500" />
+                      </div>
                     </button>
                   ))
                 ) : (
@@ -746,10 +757,21 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
                         setShowCustomerDropdown(false)
                         setCustomerSearchText("")
                       }}
-                      className="w-full text-left px-3 py-2 text-sm hover:bg-muted transition-colors rounded-md border-b last:border-0"
+                      className="w-full bg-card border rounded-xl p-3 flex items-center justify-between gap-4 shadow-sm hover:shadow-md hover:bg-muted/50 transition-all text-left mt-2 first:mt-0"
                     >
-                      <span className="font-medium">{c.fullName}</span>
-                      {c.phone && <span className="text-muted-foreground ml-2 text-xs">({c.phone})</span>}
+                      <div className="flex items-center gap-3 w-full">
+                        <div className={`h-10 w-10 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm flex-shrink-0 ${getInitialsColor(c.fullName)}`}>
+                          {c.fullName.substring(0, 2).toUpperCase()}
+                        </div>
+                        <div className="flex flex-col min-w-0">
+                          <h3 className="font-bold text-foreground text-sm truncate">{c.fullName}</h3>
+                          <p className="text-xs text-muted-foreground truncate">{c.phone || "No phone"}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 opacity-80 shrink-0">
+                        <Save className="h-4 w-4 text-orange-500" />
+                        <Trash2 className="h-4 w-4 text-red-500" />
+                      </div>
                     </button>
                   ))
                 ) : (
