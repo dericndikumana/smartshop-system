@@ -5,10 +5,11 @@ import Link from "next/link"
 import { 
   Users, 
   Receipt,
-  User,
   ShoppingCart,
   Banknote,
-  HandCoins
+  HandCoins,
+  Contact,
+  User
 } from "lucide-react"
 import { useTranslation } from "@/components/providers/language-provider"
 
@@ -28,6 +29,7 @@ export function SettingsMenuClient({ userRole, userName }: SettingsMenuClientPro
     { name: t('sidebar.loan') || "Loan", href: "/loans", icon: HandCoins },
     { name: t('sidebar.manage_cashiers') || "Manage Cashiers", href: "/staff", icon: Users },
     { name: t('sidebar.reports') || "Report", href: "/reports", icon: Receipt },
+    { name: t('nav.customer_info') || "Customer info", href: "/customers", icon: Contact, mobileOnly: true },
   ]
 
   // Filter based on role
@@ -36,6 +38,13 @@ export function SettingsMenuClient({ userRole, userName }: SettingsMenuClientPro
     menuItems = [
       { name: t('sidebar.account_details') || "Account Details", href: "/settings/account", icon: User },
       { name: t('sidebar.reports') || "Report", href: "/reports", icon: Receipt },
+      { name: t('nav.customer_info') || "Customer info", href: "/customers", icon: Contact, mobileOnly: true },
+    ]
+  } else if (userRole === "STOCK_CASHIER") {
+    menuItems = [
+      { name: t('sidebar.account_details') || "Account Details", href: "/settings/account", icon: User },
+      { name: t('sidebar.reports') || "Report", href: "/reports", icon: Receipt },
+      { name: t('nav.customer_info') || "Customer info", href: "/customers", icon: Contact, mobileOnly: true },
     ]
   }
 
@@ -53,7 +62,7 @@ export function SettingsMenuClient({ userRole, userName }: SettingsMenuClientPro
           <Link 
             key={i} 
             href={item.href}
-            className="flex items-center justify-between p-4 rounded-xl bg-teal-50/50 dark:bg-teal-950/20 text-teal-700 dark:text-teal-400 font-bold text-lg border border-teal-100 dark:border-teal-900 hover:bg-teal-100 dark:hover:bg-teal-900/40 transition-colors"
+            className={`flex items-center justify-between p-4 rounded-xl bg-teal-50/50 dark:bg-teal-950/20 text-teal-700 dark:text-teal-400 font-bold text-lg border border-teal-100 dark:border-teal-900 hover:bg-teal-100 dark:hover:bg-teal-900/40 transition-colors ${item.mobileOnly ? 'md:hidden' : ''}`}
           >
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full border-2 border-yellow-400 flex items-center justify-center text-yellow-400">

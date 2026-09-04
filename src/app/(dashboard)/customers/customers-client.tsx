@@ -30,7 +30,7 @@ export function CustomersClient({ initialCustomers, userRole, currentUserName }:
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [countryCode, setCountryCode] = useState("+250")
-  const [customers, setCustomers] = useState(initialCustomers)
+  const customers = initialCustomers
 
   const filteredCustomers = customers.filter(c => 
     c.fullName.toLowerCase().includes(searchTerm.toLowerCase()) || 
