@@ -83,6 +83,7 @@ export function Sidebar({ role, onNavClick, isCollapsed, onToggleCollapse }: Sid
               {!isCollapsed && <span className="truncate">{item.name}</span>}
             </Link>
           )
+        })}
       </nav>
     </div>
   )

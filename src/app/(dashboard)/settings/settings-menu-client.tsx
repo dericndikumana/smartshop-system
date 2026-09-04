@@ -57,6 +57,7 @@ export function SettingsMenuClient({ userRole, userName }: SettingsMenuClientPro
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full border-2 border-yellow-400 flex items-center justify-center text-yellow-400">
                 <item.icon className="h-4 w-4" />
+              </div>
               <span>{item.name}</span>
             </div>
             <span>→</span>
