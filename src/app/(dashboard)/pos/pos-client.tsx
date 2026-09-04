@@ -6,6 +6,7 @@ import { checkoutAction } from "@/app/actions/pos"
 import { holdCartAction, deleteHeldCartAction } from "@/app/actions/held-cart"
 import { toast } from "sonner"
 import { useTranslation } from "@/components/providers/language-provider"
+import { useLoader } from "@/components/providers/loader-provider"
 
 interface Product {
   id: string
@@ -44,6 +45,7 @@ interface HeldCart {
 
 export function POSClient({ products, customers, vatRate, heldCarts = [], cashierName, shopName }: { products: Product[], customers: Customer[], vatRate: number, heldCarts?: HeldCart[], cashierName?: string, shopName?: string }) {
   const { t } = useTranslation()
+  const { showLoader } = useLoader()
   const [searchTerm, setSearchTerm] = useState("")
   const [cart, setCart] = useState<CartItem[]>([])
   const [isCheckingOut, setIsCheckingOut] = useState(false)
@@ -255,6 +257,9 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
     setIsCheckingOut(true)
     setShowDebtConfirm(false)
 
+    showLoader(5000)
+    await new Promise(resolve => setTimeout(resolve, 5000))
+
     const payload = {
       items: cart.map(item => ({
         productId: item.id,
@@ -419,7 +424,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
           >
             <User className="h-5 w-5 text-orange-500" />
             <span className="text-blue-600 dark:text-blue-400">{customerSearch || cashierName || "Walk-in"}</span>
-            <span className="text-[10px] bg-pink-500/10 text-pink-500 border border-pink-500 rounded-sm px-1 py-0.5">QR</span>
+            <span className="text-[10px] bg-emerald-500/10 text-emerald-500 border border-emerald-500 rounded-sm px-1 py-0.5">NEW</span>
           </button>
           
           <div className="w-full max-w-[150px] border-b border-dashed border-muted-foreground/30 mt-1"></div>
@@ -744,7 +749,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
           >
             <User className="h-5 w-5 text-orange-500" />
             <span className="text-blue-600 dark:text-blue-400">{customerSearch || cashierName || "Walk-in"}</span>
-            <span className="w-5 h-5 border border-pink-500 bg-pink-500/10 text-pink-500 rounded-sm flex items-center justify-center text-[10px]">QR</span>
+            <span className="w-5 h-5 border border-emerald-500 bg-emerald-500/10 text-emerald-500 rounded-sm flex items-center justify-center text-[10px]">NEW</span>
           </button>
           
           <div className="w-32 border-b border-dashed border-muted-foreground/30 mt-2 text-center text-sm font-medium text-foreground pb-1">

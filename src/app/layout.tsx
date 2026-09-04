@@ -11,6 +11,7 @@ import { Toaster } from "sonner";
 import { AuthProvider } from "@/components/providers/auth-provider";
 import { LanguageProvider } from "@/components/providers/language-provider";
 import { SessionTimeout } from "@/components/providers/session-timeout";
+import { LoaderProvider } from "@/components/providers/loader-provider";
 import NextTopLoader from "nextjs-toploader";
 
 export const metadata: Metadata = {
@@ -30,12 +31,13 @@ export default function RootLayout({
         <AuthProvider>
           <SessionTimeout />
           <LanguageProvider>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="light"
-              disableTransitionOnChange
-            >
-              {children}
+            <LoaderProvider>
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="light"
+                disableTransitionOnChange
+              >
+                {children}
           <Toaster 
             position="top-center" 
             toastOptions={{
@@ -49,6 +51,7 @@ export default function RootLayout({
             }}
           />
             </ThemeProvider>
+            </LoaderProvider>
           </LanguageProvider>
         </AuthProvider>
       </body>

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Receipt, Search, Printer, Calendar, User, Eye, X } from "lucide-react"
+import { Receipt, Search, Printer, Calendar, User, Eye, X, MessageCircle } from "lucide-react"
 import { useTranslation } from "@/components/providers/language-provider"
 
 interface SaleItem {
@@ -109,13 +109,24 @@ export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
                 </div>
                 <div className="flex flex-col items-end justify-center gap-2">
                   <span className="font-bold text-primary">{sale.primaryCurrency} {(sale.totalsByCurrency[sale.primaryCurrency] || 0).toLocaleString()}</span>
-                  <button
-                    onClick={() => setSelectedSale(sale)}
-                    className="p-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors"
-                    title="View Receipt"
-                  >
-                    <Eye className="h-5 w-5" />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <a
+                      href={`https://wa.me/?text=${encodeURIComponent(`Receipt: ${sale.receiptNumber}\nTotal: ${sale.primaryCurrency} ${(sale.totalsByCurrency[sale.primaryCurrency] || 0).toLocaleString()}\nItems:\n${sale.items.map(i => `- ${i.quantity}x ${i.name}`).join('\n')}`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 text-green-600 bg-green-50 hover:bg-green-100 rounded-md transition-colors"
+                      title="Send via WhatsApp"
+                    >
+                      <MessageCircle className="h-5 w-5" />
+                    </a>
+                    <button
+                      onClick={() => setSelectedSale(sale)}
+                      className="p-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors"
+                      title="View Receipt"
+                    >
+                      <Eye className="h-5 w-5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             ))
