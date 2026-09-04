@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, ShoppingCart, ListOrdered, Package, Users, Settings, Store } from "lucide-react"
+import { LayoutDashboard, ShoppingCart, ListOrdered, Package, Settings, Store } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useTranslation } from "@/components/providers/language-provider"
 
