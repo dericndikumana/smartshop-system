@@ -35,8 +35,13 @@ export default middleware((req) => {
       return NextResponse.redirect(new URL('/', req.nextUrl))
     }
 
-    // Role-based protection: Shop Admin (prevent Cashier from accessing settings)
-    if ((req.nextUrl.pathname.startsWith('/settings') || req.nextUrl.pathname.startsWith('/staff')) && user.role === 'CASHIER') {
+    // Role-based protection: Shop Admin (prevent Cashier from accessing settings, staff, inventory, and reports)
+    if ((
+      req.nextUrl.pathname.startsWith('/settings') || 
+      req.nextUrl.pathname.startsWith('/staff') ||
+      req.nextUrl.pathname.startsWith('/inventory') ||
+      req.nextUrl.pathname.startsWith('/reports')
+    ) && user.role === 'CASHIER') {
       return NextResponse.redirect(new URL('/', req.nextUrl))
     }
   }

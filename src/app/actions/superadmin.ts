@@ -83,6 +83,15 @@ export async function createShopAction(formData: FormData) {
           status: "ACTIVE"
         }
       })
+
+      await tx.customer.create({
+        data: {
+          shopId: shop.id,
+          fullName: validated.adminName,
+          phone: validated.adminPhone || "",
+          balance: 0
+        }
+      })
     })
 
     revalidatePath("/superadmin")

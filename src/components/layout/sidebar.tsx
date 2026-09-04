@@ -26,8 +26,15 @@ export function Sidebar({ role, onNavClick, isCollapsed, onToggleCollapse }: Sid
       { name: t("sidebar.manage_shops"), href: "/superadmin/shops", icon: Store },
       { name: t("sidebar.settings"), href: "/settings", icon: Settings },
     ]
+  } else if (role === "CASHIER") {
+    navItems = [
+      { name: t("nav.home"), href: "/", icon: LayoutDashboard },
+      { name: t("nav.pos"), href: "/pos", icon: ShoppingCart },
+      { name: t("nav.all_sales"), href: "/sales", icon: Receipt },
+      { name: t("nav.customer_info"), href: "/customers", icon: Users },
+    ]
   } else {
-    // Both SHOP_ADMIN and CASHIER share the exact same 6 navigation items
+    // SHOP_ADMIN
     navItems = [
       { name: t("nav.home"), href: "/", icon: LayoutDashboard },
       { name: t("nav.pos"), href: "/pos", icon: ShoppingCart },

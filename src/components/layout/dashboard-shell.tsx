@@ -50,7 +50,7 @@ export function DashboardShell({
           <Footer />
         </div>
       </div>
-      <BottomNav />
+      <BottomNav role={user.role || ""} />
     </div>
   )
 }
