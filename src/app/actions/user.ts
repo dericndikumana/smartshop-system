@@ -8,6 +8,7 @@ import { z } from "zod"
 const updateProfileSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
+  phone: z.string().optional(),
 })
 
 const updatePasswordSchema = z.object({
@@ -80,6 +81,7 @@ export async function updateProfileInfoAction(formData: FormData) {
     const data = {
       name: formData.get("name") as string,
       email: formData.get("email") as string,
+      phone: formData.get("phone") as string || undefined,
     }
 
     const validated = updateProfileSchema.parse(data)
@@ -93,6 +95,28 @@ export async function updateProfileInfoAction(formData: FormData) {
       where: { id: session.user.id },
       data: { name: validated.name, email: validated.email }
     })
+
+    if (session.user.shopId) {
+      const existingCustomer = await prisma.customer.findFirst({
+        where: { shopId: session.user.shopId, fullName: validated.name }
+      })
+
+      if (existingCustomer) {
+        await prisma.customer.update({
+          where: { id: existingCustomer.id },
+          data: { phone: validated.phone || "" }
+        })
+      } else {
+        await prisma.customer.create({
+          data: {
+            shopId: session.user.shopId,
+            fullName: validated.name,
+            phone: validated.phone || "",
+            balance: 0
+          }
+        })
+      }
+    }
 
     return { success: true, message: "Profile updated successfully. Please log in again to sync session." }
   } catch (error) {

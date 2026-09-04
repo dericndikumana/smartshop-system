@@ -64,7 +64,8 @@ export default async function POSPage() {
     const serializedCustomers = customers.map(c => ({
       id: c.id,
       fullName: c.fullName,
-      balance: c.balance || 0
+      balance: c.balance || 0,
+      phone: c.phone || undefined
     }))
 
     const heldCarts = rawHeldCarts.map(hc => ({

@@ -11,9 +11,10 @@ interface SettingsClientProps {
   userRole: string
   initialName: string
   initialEmail: string
+  initialPhone?: string
 }
 
-export function SettingsClient({ userRole, initialName, initialEmail }: SettingsClientProps) {
+export function SettingsClient({ userRole, initialName, initialEmail, initialPhone }: SettingsClientProps) {
   const { t } = useTranslation()
   const { update } = useSession()
   const [isPwdLoading, setIsPwdLoading] = useState(false)
@@ -82,6 +83,16 @@ export function SettingsClient({ userRole, initialName, initialEmail }: Settings
               name="email"
               type="email" 
               defaultValue={initialEmail}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" 
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Phone Number</label>
+            <input 
+              name="phone"
+              type="tel" 
+              defaultValue={initialPhone || ""}
+              placeholder="e.g. +250781234567"
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" 
             />
           </div>

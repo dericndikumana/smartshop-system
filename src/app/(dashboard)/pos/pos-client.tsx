@@ -393,6 +393,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
           <div className="flex items-center gap-3">
             {heldCarts.length > 0 && (
               <button 
+                type="button"
                 onClick={() => setShowHeldCarts(true)}
                 className="text-xs font-bold text-primary flex items-center gap-1 hover:underline"
               >
@@ -409,7 +410,8 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
         {/* Customer Selection Desktop */}
         <div className="p-4 border-b relative flex flex-col items-center" ref={customerDropdownRef}>
           <button
-            onClick={() => setShowCustomerDropdown(!showCustomerDropdown)}
+            type="button"
+            onClick={(e) => { e.preventDefault(); setShowCustomerDropdown(!showCustomerDropdown); }}
             className="flex items-center justify-center gap-2 text-primary font-bold w-full hover:bg-muted/30 py-2 rounded-md transition-colors"
           >
             <User className="h-5 w-5 text-orange-500" />
@@ -433,10 +435,12 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
                 {customers.filter(c => c.fullName.toLowerCase().includes(customerSearchText.toLowerCase()) || (c.phone && c.phone.includes(customerSearchText))).length > 0 ? (
                   customers.filter(c => c.fullName.toLowerCase().includes(customerSearchText.toLowerCase()) || (c.phone && c.phone.includes(customerSearchText))).map(c => (
                     <button
+                      type="button"
                       key={c.id}
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.preventDefault()
                         setCustomerSearch(c.fullName)
-                        if (c.phone) setCustomerPhone("") 
+                        if (c.phone) setCustomerPhone(c.phone) 
                         setShowCustomerDropdown(false)
                         setCustomerSearchText("")
                       }}
@@ -729,7 +733,8 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
         {/* Mobile Customer Selection */}
         <div className="py-4 border-b flex flex-col items-center relative" ref={customerDropdownRef}>
           <button 
-            onClick={() => setShowCustomerDropdown(!showCustomerDropdown)}
+            type="button"
+            onClick={(e) => { e.preventDefault(); setShowCustomerDropdown(!showCustomerDropdown); }}
             className="flex items-center gap-4 text-primary font-bold hover:opacity-80 transition-opacity"
           >
             <User className="h-5 w-5 text-orange-500" />
@@ -896,15 +901,26 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
           </div>
         )}
 
-        {/* Mobile Total */}
-        <div className="py-2 flex items-center justify-center gap-2 font-bold text-lg">
-          <span>Total:</span>
-          {Object.entries(totalsByCurrency).length === 0 ? <span>0</span> : (
-            Object.entries(totalsByCurrency).map(([currency, total]) => (
-              <span key={currency}>{total.toLocaleString()}</span>
-            ))
+        {/* Mobile Total and Waiting */}
+        <div className="py-2 flex items-center justify-between px-4 font-bold text-lg border-b">
+          <div className="flex items-center gap-2">
+            <span>Total:</span>
+            {Object.entries(totalsByCurrency).length === 0 ? <span>0</span> : (
+              Object.entries(totalsByCurrency).map(([currency, total]) => (
+                <span key={currency}>{total.toLocaleString()}</span>
+              ))
+            )}
+          </div>
+          {heldCarts.length > 0 && (
+            <button 
+              type="button"
+              onClick={() => setShowHeldCarts(true)}
+              className="text-xs font-bold text-primary flex items-center gap-1 bg-primary/10 px-2 py-1.5 rounded-md"
+            >
+              <Clock className="h-4 w-4" />
+              {heldCarts.length} Waiting
+            </button>
           )}
-          <span className="text-blue-500 ml-2">{"<"}</span>
         </div>
 
         {/* Mobile Payment Input */}

@@ -1,12 +1,23 @@
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { SettingsClient } from "../settings-client"
+import prisma from "@/lib/prisma"
 
 export const dynamic = 'force-dynamic'
 
 export default async function AccountSettingsPage() {
   const session = await auth()
   if (!session) redirect("/login")
+
+  let userPhone = ""
+  if (session.user.shopId && session.user.name) {
+    const customer = await prisma.customer.findFirst({
+      where: { shopId: session.user.shopId, fullName: session.user.name }
+    })
+    if (customer && customer.phone) {
+      userPhone = customer.phone
+    }
+  }
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-2xl mx-auto w-full pt-8 px-4">
@@ -35,7 +46,8 @@ export default async function AccountSettingsPage() {
         <SettingsClient 
           userRole={session.user.role || ""} 
           initialName={session.user.name || ""} 
-          initialEmail={session.user.email || ""} 
+          initialEmail={session.user.email || ""}
+          initialPhone={userPhone} 
         />
       </div>
     </div>
