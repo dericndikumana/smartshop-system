@@ -72,9 +72,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
     return p.name.toLowerCase().includes(term) || (p.sku && p.sku.toLowerCase().includes(term))
   })
 
-  const filteredCustomers = customers.filter(c => 
-    c.fullName.toLowerCase().includes(customerSearch.toLowerCase())
-  )
+
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
