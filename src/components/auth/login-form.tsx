@@ -11,7 +11,7 @@ import { useLoader } from "@/components/providers/loader-provider"
 export default function LoginForm({ initialSuspended }: { initialSuspended?: boolean }) {
   const router = useRouter()
   const { t } = useTranslation()
-  const { showLoader } = useLoader()
+  const { showLoader, hideLoader } = useLoader()
   const [identifier, setIdentifier] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -24,6 +24,7 @@ export default function LoginForm({ initialSuspended }: { initialSuspended?: boo
     e.preventDefault()
     setLoading(true)
     setErrorMessage(null)
+    showLoader(10000) // Show full screen loader immediately
 
     try {
       const res = await signIn("credentials", {
@@ -33,21 +34,23 @@ export default function LoginForm({ initialSuspended }: { initialSuspended?: boo
       })
 
       if (res?.error) {
+        hideLoader() // Hide loader if error
         if (res.error === "suspended") {
            setErrorMessage("Your account has been suspended. Please contact the System Administrator.")
         } else {
            setErrorMessage("Invalid credentials.")
         }
+        setLoading(false)
       } else {
-        showLoader(1000)
+        // Success: redirect
         setTimeout(() => {
           router.push("/")
           router.refresh()
         }, 1000)
       }
     } catch {
+      hideLoader()
       setErrorMessage("An unexpected error occurred.")
-    } finally {
       setLoading(false)
     }
   }
@@ -119,7 +122,7 @@ export default function LoginForm({ initialSuspended }: { initialSuspended?: boo
       
       <div className="flex gap-2 mt-6">
         <Button className="flex-1 font-medium" type="submit" disabled={loading}>
-          {loading ? "..." : t('login_page.signin')}
+          {t('login_page.signin')}
         </Button>
         {errorMessage && (
           <Button 

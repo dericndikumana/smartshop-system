@@ -10,6 +10,7 @@ interface Cashier {
   id: string
   name: string
   email: string
+  phone?: string | null
   status: string
   role: string
 }
@@ -222,6 +223,10 @@ export function StaffClient({ cashiers: initialCashiers }: { cashiers: Cashier[]
                 <input required name="name" type="text" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g. Jane Doe" />
               </div>
               <div className="space-y-2">
+                <label className="text-sm font-medium">Phone Number</label>
+                <input name="phone" type="tel" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g. +250788000000" />
+              </div>
+              <div className="space-y-2">
                 <label className="text-sm font-medium">{t('staff_page.email')}</label>
                 <input required name="email" type="email" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g. jane@shop.com" />
               </div>
@@ -266,6 +271,10 @@ export function StaffClient({ cashiers: initialCashiers }: { cashiers: Cashier[]
               <div className="space-y-2">
                 <label className="text-sm font-medium">{t('staff_page.full_name')}</label>
                 <input required name="name" type="text" defaultValue={editCashier.name} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Phone Number</label>
+                <input name="phone" type="tel" defaultValue={editCashier.phone || ""} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g. +250788000000" />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium">{t('staff_page.email')}</label>

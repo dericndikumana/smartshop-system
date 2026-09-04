@@ -10,6 +10,7 @@ import bcrypt from "bcryptjs"
 const createCashierSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
+  phone: z.string().optional().or(z.literal("")),
   password: z.string().min(6, "Password must be at least 6 characters"),
 })
 
@@ -70,6 +71,7 @@ export async function createCashierAction(formData: FormData) {
     const data = {
       name: formData.get("name") as string,
       email: formData.get("email") as string,
+      phone: formData.get("phone") as string,
       password: formData.get("password") as string,
     }
 
@@ -98,6 +100,7 @@ export async function createCashierAction(formData: FormData) {
       data: {
         name: validated.name,
         email: validated.email,
+        phone: validated.phone || null,
         password: hashedPassword,
         roleId: cashierRole.id,
         shopId: session.user.shopId,
@@ -121,6 +124,7 @@ const editCashierSchema = z.object({
   userId: z.string(),
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
+  phone: z.string().optional().or(z.literal("")),
   password: z.string().min(6, "Password must be at least 6 characters").optional().or(z.literal("")),
 })
 
@@ -135,6 +139,7 @@ export async function editCashierAction(formData: FormData) {
       userId: formData.get("userId") as string,
       name: formData.get("name") as string,
       email: formData.get("email") as string,
+      phone: formData.get("phone") as string,
       password: formData.get("password") as string,
     }
 
@@ -148,7 +153,7 @@ export async function editCashierAction(formData: FormData) {
       return { success: false, error: "Email is already taken by another user." }
     }
 
-    const updateData: Prisma.UserUpdateInput = { name: validated.name, email: validated.email }
+    const updateData: Prisma.UserUpdateInput = { name: validated.name, email: validated.email, phone: validated.phone || null }
     if (validated.password) {
       updateData.password = await bcrypt.hash(validated.password, 10)
     }

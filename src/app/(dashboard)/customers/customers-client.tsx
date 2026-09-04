@@ -24,12 +24,13 @@ const getInitialsColor = (name: string) => {
   return colors[index % colors.length]
 }
 
-export function CustomersClient({ customers, userRole }: { customers: Customer[], userRole: string }) {
+export function CustomersClient({ initialCustomers, userRole, currentUserName }: { initialCustomers: Customer[], userRole: string, currentUserName?: string }) {
   const { t } = useTranslation()
   const [searchTerm, setSearchTerm] = useState("")
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [countryCode, setCountryCode] = useState("+250")
+  const [customers, setCustomers] = useState(initialCustomers)
 
   const filteredCustomers = customers.filter(c => 
     c.fullName.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -149,7 +150,7 @@ export function CustomersClient({ customers, userRole }: { customers: Customer[]
                     <p className="text-sm text-muted-foreground truncate">{customer.phone || "No phone"}</p>
                   </div>
                 </div>
-                {userRole !== "CASHIER" && (
+                {userRole !== "CASHIER" && customer.fullName !== currentUserName && (
                   <div className="flex items-center justify-end gap-2 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 mt-2 sm:mt-0">
                     <button
                       onClick={() => {
@@ -212,7 +213,7 @@ export function CustomersClient({ customers, userRole }: { customers: Customer[]
                     </td>
                     <td className="px-4 py-2 font-medium">{customer.fullName}</td>
                     <td className="px-4 py-2 text-muted-foreground">{customer.phone || "No phone"}</td>
-                    {userRole !== "CASHIER" && (
+                    {userRole !== "CASHIER" && customer.fullName !== currentUserName && (
                       <td className="px-4 py-2 text-right">
                         <div className="flex items-center justify-end gap-2">
                           <button
@@ -242,6 +243,11 @@ export function CustomersClient({ customers, userRole }: { customers: Customer[]
                             Delete
                           </button>
                         </div>
+                      </td>
+                    )}
+                    {userRole !== "CASHIER" && customer.fullName === currentUserName && (
+                      <td className="px-4 py-2 text-right">
+                        <span className="text-xs text-muted-foreground italic px-2 py-1">Owner</span>
                       </td>
                     )}
                   </tr>

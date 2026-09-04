@@ -21,6 +21,7 @@ export default async function StaffPage() {
       id: true,
       name: true,
       email: true,
+      phone: true,
       status: true,
       role: { select: { name: true } }
     },
@@ -31,6 +32,7 @@ export default async function StaffPage() {
     id: c.id,
     name: c.name,
     email: c.email,
+    phone: c.phone,
     status: c.status,
     role: c.role.name
   }))

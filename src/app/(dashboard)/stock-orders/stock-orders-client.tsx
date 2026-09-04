@@ -25,12 +25,13 @@ interface Order {
 }
 
 export function StockOrdersClient({ orders, userRole }: { orders: Order[], userRole: string }) {
+  const [localOrders, setLocalOrders] = useState(orders)
   const [searchTerm, setSearchTerm] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
 
-  const filteredOrders = orders.filter(o => 
+  const filteredOrders = localOrders.filter(o => 
     o.requesterName.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
@@ -44,6 +45,7 @@ export function StockOrdersClient({ orders, userRole }: { orders: Order[], userR
     const result = await processInternalOrder(orderId, action)
     if (result.success) {
       toast.success(`Order ${action.toLowerCase()}ed successfully`)
+      setLocalOrders(prev => prev.filter(o => o.id !== orderId))
     } else {
       toast.error(result.error || "Failed to process order")
     }

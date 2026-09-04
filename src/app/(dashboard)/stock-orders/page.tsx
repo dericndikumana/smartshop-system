@@ -20,7 +20,8 @@ export default async function StockOrdersPage() {
   const orders = await prisma.internalOrder.findMany({
     take: 100,
     where: { 
-      shopId: session.user.shopId
+      shopId: session.user.shopId,
+      status: "PENDING"
     },
     include: {
       requester: { select: { name: true } },

@@ -6,6 +6,7 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 
 interface LoaderContextType {
   showLoader: (durationMs: number) => void
+  hideLoader: () => void
   isLoading: boolean
 }
 
@@ -79,8 +80,12 @@ export function LoaderProvider({ children }: { children: React.ReactNode }) {
     }, durationMs)
   }
 
+  const hideLoader = () => {
+    setIsLoading(false)
+  }
+
   return (
-    <LoaderContext.Provider value={{ showLoader, isLoading }}>
+    <LoaderContext.Provider value={{ showLoader, hideLoader, isLoading }}>
       <Suspense fallback={null}>
         <LoaderEffect setIsLoading={setIsLoading} />
       </Suspense>
