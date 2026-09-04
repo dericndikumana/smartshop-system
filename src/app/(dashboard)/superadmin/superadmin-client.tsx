@@ -1,7 +1,7 @@
 "use client"
 
-import { Store, ShieldAlert, CheckCircle } from "lucide-react"
-import { toggleUserStatusAction } from "@/app/actions/superadmin"
+import { Store, ShieldAlert, CheckCircle, KeyRound } from "lucide-react"
+import { toggleUserStatusAction, resetShopAdminPasswordAction } from "@/app/actions/superadmin"
 import { toast } from "sonner"
 import { useTranslation } from "@/components/providers/language-provider"
 
@@ -27,6 +27,23 @@ export function SuperAdminClient({ stats, admins, currentUserId }: SuperAdminCli
       toast.success(`Admin ${currentStatus === "ACTIVE" ? "suspended" : "activated"} successfully.`)
     } catch (e) {
       console.error(e)
+    }
+  }
+
+  async function handleResetPassword(userId: string) {
+    if (userId === currentUserId) return
+    if (!window.confirm("Are you sure you want to reset this admin's password to Admin@123?")) return
+    
+    try {
+      const result = await resetShopAdminPasswordAction(userId)
+      if (result.error) {
+        toast.error(result.error)
+      } else {
+        toast.success("Password reset to Admin@123 successfully.")
+      }
+    } catch (e) {
+      console.error(e)
+      toast.error("Failed to reset password")
     }
   }
 
@@ -97,16 +114,26 @@ export function SuperAdminClient({ stats, admins, currentUserId }: SuperAdminCli
                     </td>
                     <td className="px-6 py-4 text-right">
                       {admin.id !== currentUserId && (
-                        <button
-                          onClick={() => handleToggleStatus(admin.id, admin.status)}
-                          className={`text-xs font-medium px-3 py-1.5 rounded-md transition-colors ${
-                            admin.status === "ACTIVE" 
-                              ? "text-red-600 hover:bg-red-500/10" 
-                              : "text-emerald-600 hover:bg-emerald-500/10"
-                          }`}
-                        >
-                          {admin.status === "ACTIVE" ? t("superadmin.suspend") : t("superadmin.activate")}
-                        </button>
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => handleResetPassword(admin.id)}
+                            className="text-xs font-medium px-3 py-1.5 rounded-md transition-colors text-blue-600 hover:bg-blue-500/10 flex items-center gap-1"
+                            title="Reset Password"
+                          >
+                            <KeyRound className="h-3.5 w-3.5" />
+                            Reset
+                          </button>
+                          <button
+                            onClick={() => handleToggleStatus(admin.id, admin.status)}
+                            className={`text-xs font-medium px-3 py-1.5 rounded-md transition-colors ${
+                              admin.status === "ACTIVE" 
+                                ? "text-red-600 hover:bg-red-500/10" 
+                                : "text-emerald-600 hover:bg-emerald-500/10"
+                            }`}
+                          >
+                            {admin.status === "ACTIVE" ? t("superadmin.suspend") : t("superadmin.activate")}
+                          </button>
+                        </div>
                       )}
                     </td>
                   </tr>

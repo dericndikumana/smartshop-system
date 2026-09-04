@@ -349,7 +349,7 @@ export async function resetShopAdminPasswordAction(userId: string) {
       return { success: false, error: "Unauthorized" }
     }
 
-    const hashedPassword = await bcrypt.hash("shop@123", 10)
+    const hashedPassword = await bcrypt.hash("Admin@123", 10)
 
     await prisma.user.update({
       where: { id: userId },
