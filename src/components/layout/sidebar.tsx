@@ -1,9 +1,9 @@
 "use client"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, ShoppingCart, Package, Users, Settings, LogOut, Receipt, Store, ChevronLeft, ChevronRight } from "lucide-react"
+import { LayoutDashboard, ShoppingCart, Package, Users, Settings, Receipt, Store, ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { signOut } from "next-auth/react"
+
 import { useTranslation } from "@/components/providers/language-provider"
 
 interface SidebarProps {

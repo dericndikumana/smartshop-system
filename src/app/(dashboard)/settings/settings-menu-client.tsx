@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { LogOutButton } from "./logout-button"
+
 import { 
   Users, 
   Receipt,
