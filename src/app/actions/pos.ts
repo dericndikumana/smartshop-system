@@ -43,12 +43,48 @@ export async function checkoutAction(data: z.infer<typeof checkoutSchema>) {
       let finalCustomerName = validated.customerName?.trim()
       let finalCustomerPhone = validated.customerPhone?.trim()
 
-      if (!finalCustomerName) {
-        const currentUser = await tx.user.findUnique({ where: { id: session.user.id } })
+      // Determine if this is a self-purchase (Internal Order)
+      const currentUser = await tx.user.findUnique({ where: { id: session.user.id } })
+      
+      let isSelfPurchase = false
+      if (finalCustomerName) {
+        if (currentUser && (finalCustomerName.toLowerCase() === currentUser.name.toLowerCase() || (finalCustomerPhone && currentUser.phone && finalCustomerPhone === currentUser.phone))) {
+          isSelfPurchase = true
+        }
+      } else {
+        // Default customer is self
         finalCustomerName = currentUser?.name || "Shop Admin"
         finalCustomerPhone = currentUser?.phone || undefined
+        isSelfPurchase = true
       }
 
+      const rawTotal = validated.items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0)
+
+      if (isSelfPurchase) {
+        // Create Internal Order
+        const internalOrder = await tx.internalOrder.create({
+          data: {
+            status: "PENDING",
+            totalAmount: rawTotal,
+            currency: validated.primaryCurrency,
+            requesterId: session.user.id,
+            shopId: session.user.shopId!,
+            items: {
+              create: validated.items.map(item => ({
+                productId: item.productId,
+                quantity: item.quantity,
+                unitPrice: item.unitPrice,
+                subtotal: item.quantity * item.unitPrice,
+                currency: item.currency
+              }))
+            }
+          }
+        })
+        return { type: "INTERNAL_ORDER", id: internalOrder.id }
+      }
+
+      // --- REGULAR SALE FLOW ---
+      
       if (finalCustomerName) {
         const existingCustomer = await tx.customer.findFirst({
           where: { shopId: session.user.shopId!, fullName: finalCustomerName }
@@ -56,7 +92,6 @@ export async function checkoutAction(data: z.infer<typeof checkoutSchema>) {
 
         if (existingCustomer) {
           customerId = existingCustomer.id
-          // Optionally update phone if not present
           if (finalCustomerPhone && !existingCustomer.phone) {
             await tx.customer.update({
               where: { id: existingCustomer.id },
@@ -87,9 +122,6 @@ export async function checkoutAction(data: z.infer<typeof checkoutSchema>) {
         data: { nextReceiptSeq: seq + 1 }
       })
 
-      // Calculate total amount (We'll just sum raw values for the Sale object, but receipts will group by currency via items)
-      const rawTotal = validated.items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0)
-      
       const vatRate = validated.vatRate
       let vatAmount = 0
       
@@ -161,13 +193,13 @@ export async function checkoutAction(data: z.infer<typeof checkoutSchema>) {
         })
       }
 
-      return sale
+      return { type: "SALE", id: sale.id }
     })
 
     revalidatePath("/pos")
     revalidatePath("/inventory")
     revalidatePath("/sales")
-    return { success: true, receiptId: saleResult.id }
+    return { success: true, receiptId: saleResult.id, type: saleResult.type }
 
   } catch (error) {
     if (error instanceof z.ZodError) {

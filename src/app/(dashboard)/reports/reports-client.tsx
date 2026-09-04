@@ -191,7 +191,7 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
             
             {/* Desktop Table */}
             <table className="hidden md:table w-full text-sm text-left">
-              <thead className="bg-muted/50 text-muted-foreground uppercase text-[10px] print:bg-gray-100">
+              <thead className="bg-muted/50 text-muted-foreground uppercase text-[17px] print:bg-gray-100">
                 <tr>
                   <th className="px-6 py-4 font-medium w-12">#</th>
                   <th className="px-6 py-4 font-medium">{t('reports_page.receipt_no')}</th>
@@ -212,7 +212,7 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
                   </tr>
                 ) : (
                   paginatedTransactions.map((tx, index) => (
-                    <tr key={tx.id} className="hover:bg-muted/20 transition-colors text-[10px]">
+                    <tr key={tx.id} className="hover:bg-muted/20 transition-colors text-[17px]">
                       <td className="px-6 py-4 text-muted-foreground font-medium">
                         {(currentPage - 1) * itemsPerPage + index + 1}
                       </td>

@@ -63,7 +63,7 @@ export default function LoginForm({ initialSuspended }: { initialSuspended?: boo
 
       <div className="space-y-2">
         <label className="text-sm font-medium leading-none" htmlFor="identifier">
-          {t('login_page.email') || 'Email, Username, or Phone'}
+          {t('login_page.email') || 'Email, Username, or Phone Number'}
         </label>
         <input 
           id="identifier" 

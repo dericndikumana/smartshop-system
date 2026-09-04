@@ -11,6 +11,7 @@ interface Cashier {
   name: string
   email: string
   status: string
+  role: string
 }
 
 export function StaffClient({ cashiers: initialCashiers }: { cashiers: Cashier[] }) {
@@ -110,11 +111,12 @@ export function StaffClient({ cashiers: initialCashiers }: { cashiers: Cashier[]
       <div className="rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
-            <thead className="bg-muted/50 border-b text-[10px] uppercase text-muted-foreground">
+            <thead className="bg-muted/50 border-b text-[17px] uppercase text-muted-foreground">
               <tr>
                 <th className="px-4 py-3 font-medium w-12">#</th>
                 <th className="px-4 py-3 font-medium">{t('staff_page.col_name')}</th>
                 <th className="px-4 py-3 font-medium">{t('staff_page.col_email')}</th>
+                <th className="px-4 py-3 font-medium">Role</th>
                 <th className="px-4 py-3 font-medium">{t('staff_page.col_status')}</th>
                 <th className="px-4 py-3 font-medium text-right">{t('staff_page.col_actions')}</th>
               </tr>
@@ -128,12 +130,17 @@ export function StaffClient({ cashiers: initialCashiers }: { cashiers: Cashier[]
                 </tr>
               ) : (
                 paginatedCashiers.map((cashier, index) => (
-                  <tr key={cashier.id} className="border-b hover:bg-muted/20 text-[10px]">
+                  <tr key={cashier.id} className="border-b hover:bg-muted/20 text-[17px]">
                     <td className="px-4 py-3 text-muted-foreground font-medium">
                       {(currentPage - 1) * itemsPerPage + index + 1}
                     </td>
                     <td className="px-4 py-3 font-medium">{cashier.name}</td>
                     <td className="px-4 py-3">{cashier.email}</td>
+                    <td className="px-4 py-3">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border bg-blue-500/10 text-blue-600 border-blue-500/20">
+                        {cashier.role === "CASHIER" ? "Shop Cashier" : "Stock Cashier"}
+                      </span>
+                    </td>
                     <td className="px-4 py-3">
                       <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border ${
                         cashier.status === "ACTIVE" 
@@ -222,6 +229,13 @@ export function StaffClient({ cashiers: initialCashiers }: { cashiers: Cashier[]
                 <label className="text-sm font-medium">{t('staff_page.password')}</label>
                 <input required name="password" type="password" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Minimum 6 characters" />
               </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Role</label>
+                <select name="roleName" required className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+                  <option value="CASHIER">Shop Cashier</option>
+                  <option value="STOCK_CASHIER">Stock Cashier</option>
+                </select>
+              </div>
               
               <div className="flex justify-end gap-3 mt-6">
                 <button 
@@ -260,6 +274,13 @@ export function StaffClient({ cashiers: initialCashiers }: { cashiers: Cashier[]
               <div className="space-y-2">
                 <label className="text-sm font-medium">{t('staff_page.password')}</label>
                 <input name="password" type="password" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Leave blank to keep current" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Role</label>
+                <select name="roleName" required defaultValue={editCashier.role} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+                  <option value="CASHIER">Shop Cashier</option>
+                  <option value="STOCK_CASHIER">Stock Cashier</option>
+                </select>
               </div>
               
               <div className="flex justify-end gap-3 mt-6">

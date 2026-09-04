@@ -246,7 +246,11 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
       toast.error(result.error)
     } else {
       await deleteHeldCartAction(heldCart.id)
-      toast.success(t('pos_page.sale_completed'))
+      if (result.type === "INTERNAL_ORDER") {
+        toast.success("Internal Order sent to Stock Cashier")
+      } else {
+        toast.success(t('pos_page.sale_completed'))
+      }
       if (heldCarts.length <= 1) setShowHeldCarts(false)
     }
     
@@ -283,7 +287,11 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
       // Don't reset customer search since it's prefilled with cashier name
       setCustomerPhone("")
       setAmountReceived("")
-      toast.success(t('pos_page.sale_completed'))
+      if (result.type === "INTERNAL_ORDER") {
+        toast.success("Internal Order sent to Stock Cashier")
+      } else {
+        toast.success(t('pos_page.sale_completed'))
+      }
     }
     
     setIsCheckingOut(false)

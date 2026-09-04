@@ -30,6 +30,7 @@ model Shop {
   activityLogs       ActivityLog[]
   returns            Return[]
   receipts           Receipt[]
+  internalOrders     InternalOrder[]
 }
 
 model Role {
@@ -81,6 +82,7 @@ model User {
   stockTransactions StockTransaction[]
   activityLogs      ActivityLog[]
   returns           Return[]
+  internalOrders    InternalOrder[] @relation("OrderRequester")
 }
 
 model Category {
@@ -123,6 +125,7 @@ model Product {
   heldCartItems     HeldCartItem[]
   stockTransactions StockTransaction[]
   returnItems       ReturnItem[]
+  internalOrderItems InternalOrderItem[]
 }
 
 model Customer {
@@ -328,4 +331,35 @@ model Receipt {
 
   shopId      String
   shop        Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+}
+
+model InternalOrder {
+  id          String   @id @default(cuid())
+  status      String   @default("PENDING") // PENDING, ACCEPTED, REJECTED
+  totalAmount Float
+  currency    String   @default("RWF")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  requesterId String
+  requester   User     @relation("OrderRequester", fields: [requesterId], references: [id])
+
+  shopId      String
+  shop        Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  items       InternalOrderItem[]
+}
+
+model InternalOrderItem {
+  id           String  @id @default(cuid())
+  quantity     Int
+  unitPrice    Float
+  subtotal     Float
+  currency     String
+  
+  orderId      String
+  order        InternalOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId    String
+  product      Product @relation(fields: [productId], references: [id])
 }

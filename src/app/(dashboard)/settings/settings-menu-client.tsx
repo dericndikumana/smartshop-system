@@ -32,9 +32,10 @@ export function SettingsMenuClient({ userRole, userName }: SettingsMenuClientPro
 
   // Filter based on role
   if (userRole === "CASHIER") {
-    // Only Account Details for cashier
+    // Account Details and Report for cashier
     menuItems = [
       { name: t('sidebar.account_details') || "Account Details", href: "/settings/account", icon: User },
+      { name: t('sidebar.reports') || "Report", href: "/reports", icon: Receipt },
     ]
   }
 

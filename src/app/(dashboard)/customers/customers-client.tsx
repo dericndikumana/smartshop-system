@@ -168,17 +168,15 @@ export function CustomersClient({ customers, userRole }: { customers: Customer[]
                         setCountryCode(cCode)
                         setIsModalOpen(true)
                       }}
-                      className="text-orange-500 hover:opacity-80 transition-opacity p-2"
-                      title="Edit Customer"
+                      className="px-3 py-1.5 text-sm font-medium bg-teal-50 text-teal-600 rounded-md hover:bg-teal-100 transition-colors flex items-center gap-1"
                     >
-                      <Save className="h-5 w-5" />
+                      Edit
                     </button>
                     <button
                       onClick={() => handleDeleteCustomer(customer.id)}
-                      className="text-red-500 hover:opacity-80 transition-opacity p-2"
-                      title="Delete Customer"
+                      className="px-3 py-1.5 text-sm font-medium bg-red-50 text-red-600 rounded-md hover:bg-red-100 transition-colors flex items-center gap-1"
                     >
-                      <Trash2 className="h-5 w-5" />
+                      Delete
                     </button>
                   </div>
                 )}
@@ -190,7 +188,7 @@ export function CustomersClient({ customers, userRole }: { customers: Customer[]
         {/* Desktop Table View */}
         <div className="hidden md:block overflow-x-auto bg-card border rounded-xl shadow-sm">
           <table className="w-full text-left">
-            <thead className="bg-muted/50 border-b text-[10px] uppercase text-muted-foreground">
+            <thead className="bg-muted/50 border-b text-[17px] uppercase text-muted-foreground">
               <tr>
                 <th className="px-4 py-3 font-medium w-12">#</th>
                 <th className="px-4 py-3 font-medium">Customer Name</th>
@@ -209,7 +207,7 @@ export function CustomersClient({ customers, userRole }: { customers: Customer[]
                 </tr>
               ) : (
                 filteredCustomers.map((customer, index) => (
-                  <tr key={customer.id} className="border-b hover:bg-muted/20 text-[10px]">
+                  <tr key={customer.id} className="border-b hover:bg-muted/20 text-[17px]">
                     <td className="px-4 py-2 text-muted-foreground font-medium">
                       {index + 1}
                     </td>
@@ -234,17 +232,15 @@ export function CustomersClient({ customers, userRole }: { customers: Customer[]
                               setCountryCode(cCode)
                               setIsModalOpen(true)
                             }}
-                            className="p-1.5 text-orange-500 hover:bg-orange-100 rounded-md transition-colors"
-                            title="Edit Customer"
+                            className="px-2 py-1 text-xs font-bold bg-teal-50 text-teal-600 rounded hover:bg-teal-100 transition-colors"
                           >
-                            <Save className="h-4 w-4" />
+                            Edit
                           </button>
-                          <button
+                          <button 
+                            className="p-1 text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded text-xs font-bold px-2 flex items-center gap-1 transition-colors"
                             onClick={() => handleDeleteCustomer(customer.id)}
-                            className="p-1.5 text-red-500 hover:bg-red-100 rounded-md transition-colors"
-                            title="Delete Customer"
                           >
-                            <Trash2 className="h-4 w-4" />
+                            Delete
                           </button>
                         </div>
                       </td>

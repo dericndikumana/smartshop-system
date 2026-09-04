@@ -33,6 +33,14 @@ export function Sidebar({ role, onNavClick, isCollapsed, onToggleCollapse }: Sid
       { name: t("nav.all_sales"), href: "/sales", icon: Receipt },
       { name: t("nav.customer_info"), href: "/customers", icon: Users },
     ]
+  } else if (role === "STOCK_CASHIER") {
+    navItems = [
+      { name: t("nav.home"), href: "/", icon: LayoutDashboard },
+      { name: t("nav.pos"), href: "/pos", icon: ShoppingCart },
+      { name: t("nav.all_sales"), href: "/sales", icon: Receipt },
+      { name: "Stock Orders", href: "/stock-orders", icon: Package },
+      { name: t("nav.customer_info"), href: "/customers", icon: Users },
+    ]
   } else {
     // SHOP_ADMIN
     navItems = [
@@ -40,6 +48,7 @@ export function Sidebar({ role, onNavClick, isCollapsed, onToggleCollapse }: Sid
       { name: t("nav.pos"), href: "/pos", icon: ShoppingCart },
       { name: t("nav.all_sales"), href: "/sales", icon: Receipt },
       { name: t("nav.product"), href: "/inventory", icon: Package },
+      { name: "Stock Orders", href: "/stock-orders", icon: Package },
       { name: t("nav.customer_info"), href: "/customers", icon: Users },
       { name: t("nav.settings"), href: "/settings", icon: Settings },
     ]

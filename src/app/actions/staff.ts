@@ -82,12 +82,14 @@ export async function createCashierAction(formData: FormData) {
       return { success: false, error: "Email is already in use." }
     }
 
+    const roleName = formData.get("roleName") as string || "CASHIER"
+
     const cashierRole = await prisma.role.findUnique({
-      where: { name: "CASHIER" }
+      where: { name: roleName }
     })
 
     if (!cashierRole) {
-      return { success: false, error: "System error: CASHIER role not found." }
+      return { success: false, error: `System error: ${roleName} role not found.` }
     }
 
     const hashedPassword = await bcrypt.hash(validated.password, 10)
@@ -149,6 +151,14 @@ export async function editCashierAction(formData: FormData) {
     const updateData: Prisma.UserUpdateInput = { name: validated.name, email: validated.email }
     if (validated.password) {
       updateData.password = await bcrypt.hash(validated.password, 10)
+    }
+
+    const roleName = formData.get("roleName") as string
+    if (roleName) {
+      const roleRecord = await prisma.role.findUnique({ where: { name: roleName } })
+      if (roleRecord) {
+        updateData.role = { connect: { id: roleRecord.id } }
+      }
     }
 
     await prisma.user.update({

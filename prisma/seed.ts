@@ -11,6 +11,7 @@ async function main() {
     { name: "SUPER_ADMIN", description: "System Administrator" },
     { name: "SHOP_ADMIN", description: "Shop Owner / Manager" },
     { name: "CASHIER", description: "Point of Sale Cashier" },
+    { name: "STOCK_CASHIER", description: "Stock Order Cashier" },
   ]
 
   for (const r of roles) {

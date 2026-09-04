@@ -252,7 +252,7 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
         {/* Desktop Table View */}
         <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left">
-            <thead className="bg-muted/50 border-b text-[10px] uppercase text-muted-foreground">
+            <thead className="bg-muted/50 border-b text-[17px] uppercase text-muted-foreground">
               <tr>
                 <th className="px-4 py-3 font-medium w-12">#</th>
                 <th className="px-4 py-3 font-medium">Product</th>
@@ -273,7 +273,7 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                 </tr>
               ) : (
                 paginatedProducts.map((product, index) => (
-                  <tr key={product.id} className="border-b hover:bg-muted/20 text-[10px]">
+                  <tr key={product.id} className="border-b hover:bg-muted/20 text-[17px]">
                     <td className="px-4 py-2 text-muted-foreground font-medium">
                       {(currentPage - 1) * itemsPerPage + index + 1}
                     </td>

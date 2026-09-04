@@ -109,7 +109,7 @@ export function DettesClient({ initialCustomers }: { initialCustomers: CustomerD
         {/* Desktop Table View */}
         <div className="hidden md:block overflow-x-auto bg-card border rounded-xl shadow-sm">
           <table className="w-full text-left">
-            <thead className="bg-muted/50 border-b text-[10px] uppercase text-muted-foreground">
+            <thead className="bg-muted/50 border-b text-[17px] uppercase text-muted-foreground">
               <tr>
                 <th className="px-4 py-3 font-medium w-12">#</th>
                 <th className="px-4 py-3 font-medium">Customer</th>
@@ -127,7 +127,7 @@ export function DettesClient({ initialCustomers }: { initialCustomers: CustomerD
                 </tr>
               ) : (
                 filteredCustomers.map((customer, index) => (
-                  <tr key={customer.id} className="border-b hover:bg-muted/20 text-[10px]">
+                  <tr key={customer.id} className="border-b hover:bg-muted/20 text-[17px]">
                     <td className="px-4 py-2 text-muted-foreground font-medium">
                       {index + 1}
                     </td>

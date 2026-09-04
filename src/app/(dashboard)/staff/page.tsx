@@ -12,19 +12,28 @@ export default async function StaffPage() {
     redirect("/")
   }
 
-  const cashiers = await prisma.user.findMany({
+  const cashiersRaw = await prisma.user.findMany({
     where: { 
       shopId: session.user.shopId,
-      role: { name: "CASHIER" }
+      role: { name: { in: ["CASHIER", "STOCK_CASHIER"] } }
     },
     select: {
       id: true,
       name: true,
       email: true,
-      status: true
+      status: true,
+      role: { select: { name: true } }
     },
     orderBy: { createdAt: 'desc' }
   })
+
+  const cashiers = cashiersRaw.map(c => ({
+    id: c.id,
+    name: c.name,
+    email: c.email,
+    status: c.status,
+    role: c.role.name
+  }))
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
