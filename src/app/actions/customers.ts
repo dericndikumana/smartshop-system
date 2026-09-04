@@ -45,7 +45,7 @@ export async function createCustomerAction(formData: FormData) {
   }
 }
 
-export async function editCustomerAction(customerId: string, formData: FormData) {
+export async function editCustomerAction(id: string, formData: FormData) {
   try {
     const session = await auth()
     if (!session || !session.user.shopId) {
@@ -61,7 +61,7 @@ export async function editCustomerAction(customerId: string, formData: FormData)
 
     await prisma.customer.update({
       where: { 
-        id: customerId,
+        id,
         shopId: session.user.shopId
       },
       data: {
@@ -83,16 +83,16 @@ export async function editCustomerAction(customerId: string, formData: FormData)
   }
 }
 
-export async function deleteCustomerAction(customerId: string) {
+export async function deleteCustomerAction(id: string) {
   try {
     const session = await auth()
-    if (!session || !session.user.shopId || session.user.role === "CASHIER") {
+    if (!session || !session.user.shopId) {
       return { success: false, error: "Unauthorized" }
     }
 
     await prisma.customer.delete({
       where: { 
-        id: customerId,
+        id,
         shopId: session.user.shopId
       }
     })
@@ -102,6 +102,6 @@ export async function deleteCustomerAction(customerId: string) {
     return { success: true }
   } catch (error) {
     console.error("Delete Customer Error:", error)
-    return { success: false, error: "Failed to delete customer" }
+    return { success: false, error: "An unexpected error occurred" }
   }
 }

@@ -196,7 +196,7 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                     {product.name.substring(0, 2).toUpperCase()}
                   </div>
                   <div className="flex flex-col flex-1 min-w-0">
-                    <h3 className="font-bold text-sm text-primary truncate uppercase">
+                    <h3 className="font-bold text-sm text-blue-800 dark:text-blue-300 truncate uppercase">
                       {product.name}(<span className="text-blue-600 dark:text-blue-400 underline">{product.piecesPerBundle || 1}</span> Pcs)1X <span className="text-blue-600 dark:text-blue-400 underline">{product.sellingPrice}</span>
                     </h3>
                     <p className="text-sm text-muted-foreground truncate mt-1 font-medium">
@@ -215,7 +215,7 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                         setSelectedProductId(product.id)
                         setIsModalOpen(true)
                       }}
-                      className="text-[#1976d2] hover:text-[#1976d2]/80 transition-colors"
+                      className="text-blue-600 dark:text-blue-400 hover:opacity-80 transition-opacity"
                       title="Add Stock / Send"
                     >
                       <Send className="h-6 w-6" />
@@ -235,7 +235,7 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                           setEditingProduct(product)
                           setIsModalOpen(true)
                         }}
-                        className="text-[#f57c00] hover:text-[#f57c00]/80 transition-colors"
+                        className="text-orange-500 hover:opacity-80 transition-opacity"
                         title="Edit Product / Save"
                       >
                         <Save className="h-6 w-6" />

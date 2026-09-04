@@ -1,10 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { Users, Plus, Search, Trash2, Save } from "lucide-react"
-import { createCustomerAction, deleteCustomerAction, editCustomerAction } from "@/app/actions/customers"
+import { Users, Plus, Search } from "lucide-react"
+import { createCustomerAction, editCustomerAction, deleteCustomerAction } from "@/app/actions/customers"
 import { toast } from "sonner"
 import { useTranslation } from "@/components/providers/language-provider"
+import { Trash2, Save } from "lucide-react"
 
 interface Customer {
   id: string
@@ -30,12 +31,14 @@ export function CustomersClient({ customers }: { customers: Customer[] }) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [countryCode, setCountryCode] = useState("+250")
-  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null)
 
   const filteredCustomers = customers.filter(c => 
     c.fullName.toLowerCase().includes(searchTerm.toLowerCase()) || 
     (c.phone && c.phone.includes(searchTerm))
   )
+
+  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null)
+  const [activeTab, setActiveTab] = useState<"new" | "edit">("new")
 
   const handleCreateCustomer = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -85,11 +88,12 @@ export function CustomersClient({ customers }: { customers: Customer[] }) {
     setIsLoading(false)
   }
 
-  const handleDelete = async (id: string) => {
+  const handleDeleteCustomer = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this customer?")) return
     setIsLoading(true)
     const result = await deleteCustomerAction(id)
     if (result.success) {
-      toast.success("Customer deleted successfully")
+      toast.success("Customer deleted")
     } else {
       toast.error(result.error || "Failed to delete customer")
     }
@@ -104,7 +108,11 @@ export function CustomersClient({ customers }: { customers: Customer[] }) {
           <p className="text-muted-foreground mt-2">Manage your customers and contact information.</p>
         </div>
         <button 
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            setActiveTab("new")
+            setEditingCustomer(null)
+            setIsModalOpen(true)
+          }}
           className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors shadow-sm self-start sm:self-auto"
         >
           <Plus className="h-5 w-5" />
@@ -123,56 +131,66 @@ export function CustomersClient({ customers }: { customers: Customer[] }) {
         />
       </div>
 
-      <div className="rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden mt-4">
-        <div className="flex flex-col gap-0">
-          {filteredCustomers.length === 0 ? (
-            <div className="py-12 text-center text-muted-foreground bg-card rounded-xl border-dashed">
-              <Users className="h-12 w-12 mx-auto mb-4 opacity-20" />
-              No customers found.
-            </div>
-          ) : (
-            filteredCustomers.map(customer => (
-              <div key={customer.id} className="bg-card border-b last:border-b-0 py-4 px-4 flex items-center justify-between gap-4 hover:bg-muted/10 transition-colors">
-                <div className="flex items-center gap-4 flex-1 min-w-0">
-                  <div className={`h-12 w-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-sm flex-shrink-0 ${getInitialsColor(customer.fullName)}`}>
-                    {customer.fullName.substring(0, 2).toUpperCase()}
-                  </div>
-                  <div className="flex flex-col flex-1 min-w-0">
-                    <h3 className="font-bold text-foreground truncate">{customer.fullName}</h3>
-                    <p className="text-sm text-muted-foreground truncate">{customer.phone || "No phone"}</p>
-                  </div>
+      <div className="flex flex-col gap-4">
+        {filteredCustomers.length === 0 ? (
+          <div className="col-span-full py-12 text-center text-muted-foreground bg-card rounded-xl border border-dashed">
+            <Users className="h-12 w-12 mx-auto mb-4 opacity-20" />
+            No customers found.
+          </div>
+        ) : (
+          filteredCustomers.map(customer => (
+            <div key={customer.id} className="bg-card border rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex items-center gap-4 w-full">
+                <div className={`h-12 w-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-sm flex-shrink-0 ${getInitialsColor(customer.fullName)}`}>
+                  {customer.fullName.substring(0, 2).toUpperCase()}
                 </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleDelete(customer.id)}
-                    disabled={isLoading}
-                    className="text-red-500 hover:text-red-600 transition-colors disabled:opacity-50"
-                    title="Delete Customer"
-                  >
-                    <Trash2 className="h-5 w-5" />
-                  </button>
-                  <button
-                    onClick={() => {
-                      setEditingCustomer(customer)
-                      setIsModalOpen(true)
-                    }}
-                    className="text-[#f57c00] hover:text-[#f57c00]/80 transition-colors"
-                    title="Edit Customer"
-                  >
-                    <Save className="h-5 w-5" />
-                  </button>
+                <div className="flex flex-col flex-1 min-w-0">
+                  <h3 className="font-bold text-foreground truncate">{customer.fullName}</h3>
+                  <p className="text-sm text-muted-foreground truncate">{customer.phone || "No phone"}</p>
                 </div>
               </div>
-            ))
-          )}
-        </div>
+              <div className="flex items-center justify-end gap-2 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 mt-2 sm:mt-0">
+                <button
+                  onClick={() => {
+                    setEditingCustomer(customer)
+                    setActiveTab("edit")
+                    // Pre-fill country code if possible, default +250
+                    let cCode = "+250"
+                    let phoneNum = customer.phone || ""
+                    if (phoneNum.startsWith("+")) {
+                      const match = phoneNum.match(/^(\+\d{1,4})(.*)$/)
+                      if (match) {
+                        cCode = match[1]
+                        phoneNum = match[2]
+                      }
+                    }
+                    setCountryCode(cCode)
+                    setIsModalOpen(true)
+                    // The phone input is uncontrolled with defaultValue in the modal
+                  }}
+                  className="text-orange-500 hover:opacity-80 transition-opacity p-2"
+                  title="Edit Customer"
+                >
+                  <Save className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={() => handleDeleteCustomer(customer.id)}
+                  className="text-red-500 hover:opacity-80 transition-opacity p-2"
+                  title="Delete Customer"
+                >
+                  <Trash2 className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in duration-200 p-4">
           <div className="bg-card w-full max-w-md rounded-xl shadow-xl border overflow-hidden animate-in zoom-in-95 duration-200 p-6">
-            <h2 className="text-xl font-bold mb-4">{editingCustomer ? "Edit Customer" : "Add Customer"}</h2>
-            <form onSubmit={editingCustomer ? handleEditCustomer : handleCreateCustomer} className="space-y-4">
+            <h2 className="text-xl font-bold mb-4">{activeTab === "new" ? "Add Customer" : "Edit Customer"}</h2>
+            <form onSubmit={activeTab === "new" ? handleCreateCustomer : handleEditCustomer} className="space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Full Name</label>
                 <input required name="fullName" type="text" defaultValue={editingCustomer?.fullName} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="John Doe" />
@@ -185,71 +203,68 @@ export function CustomersClient({ customers }: { customers: Customer[] }) {
                     onChange={(e) => setCountryCode(e.target.value)}
                     className="rounded-md border bg-background px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary w-32"
                   >
-                    <option value="+213">+213 (DZ)</option>
-                    <option value="+244">+244 (AO)</option>
-                    <option value="+229">+229 (BJ)</option>
-                    <option value="+267">+267 (BW)</option>
-                    <option value="+226">+226 (BF)</option>
-                    <option value="+257">+257 (BI)</option>
-                    <option value="+237">+237 (CM)</option>
-                    <option value="+238">+238 (CV)</option>
-                    <option value="+236">+236 (CF)</option>
-                    <option value="+235">+235 (TD)</option>
-                    <option value="+269">+269 (KM)</option>
-                    <option value="+242">+242 (CG)</option>
-                    <option value="+243">+243 (CD)</option>
-                    <option value="+253">+253 (DJ)</option>
-                    <option value="+20">+20 (EG)</option>
-                    <option value="+240">+240 (GQ)</option>
-                    <option value="+291">+291 (ER)</option>
-                    <option value="+268">+268 (SZ)</option>
-                    <option value="+251">+251 (ET)</option>
-                    <option value="+241">+241 (GA)</option>
-                    <option value="+220">+220 (GM)</option>
-                    <option value="+233">+233 (GH)</option>
-                    <option value="+224">+224 (GN)</option>
-                    <option value="+245">+245 (GW)</option>
-                    <option value="+225">+225 (CI)</option>
-                    <option value="+254">+254 (KE)</option>
-                    <option value="+266">+266 (LS)</option>
-                    <option value="+231">+231 (LR)</option>
-                    <option value="+218">+218 (LY)</option>
-                    <option value="+261">+261 (MG)</option>
-                    <option value="+265">+265 (MW)</option>
-                    <option value="+223">+223 (ML)</option>
-                    <option value="+222">+222 (MR)</option>
-                    <option value="+230">+230 (MU)</option>
-                    <option value="+212">+212 (MA)</option>
-                    <option value="+258">+258 (MZ)</option>
-                    <option value="+264">+264 (NA)</option>
-                    <option value="+227">+227 (NE)</option>
-                    <option value="+234">+234 (NG)</option>
-                    <option value="+250">+250 (RW)</option>
-                    <option value="+239">+239 (ST)</option>
-                    <option value="+221">+221 (SN)</option>
-                    <option value="+248">+248 (SC)</option>
-                    <option value="+232">+232 (SL)</option>
-                    <option value="+252">+252 (SO)</option>
-                    <option value="+27">+27 (ZA)</option>
-                    <option value="+211">+211 (SS)</option>
-                    <option value="+249">+249 (SD)</option>
-                    <option value="+255">+255 (TZ)</option>
-                    <option value="+228">+228 (TG)</option>
-                    <option value="+216">+216 (TN)</option>
-                    <option value="+256">+256 (UG)</option>
-                    <option value="+260">+260 (ZM)</option>
-                    <option value="+263">+263 (ZW)</option>
+                    <option value="+213">+213 (Algeria)</option>
+                    <option value="+244">+244 (Angola)</option>
+                    <option value="+229">+229 (Benin)</option>
+                    <option value="+267">+267 (Botswana)</option>
+                    <option value="+226">+226 (Burkina Faso)</option>
+                    <option value="+257">+257 (Burundi)</option>
+                    <option value="+237">+237 (Cameroon)</option>
+                    <option value="+238">+238 (Cape Verde)</option>
+                    <option value="+236">+236 (Central African Republic)</option>
+                    <option value="+235">+235 (Chad)</option>
+                    <option value="+269">+269 (Comoros)</option>
+                    <option value="+242">+242 (Congo)</option>
+                    <option value="+243">+243 (DR Congo)</option>
+                    <option value="+253">+253 (Djibouti)</option>
+                    <option value="+20">+20 (Egypt)</option>
+                    <option value="+240">+240 (Equatorial Guinea)</option>
+                    <option value="+291">+291 (Eritrea)</option>
+                    <option value="+268">+268 (Eswatini)</option>
+                    <option value="+251">+251 (Ethiopia)</option>
+                    <option value="+241">+241 (Gabon)</option>
+                    <option value="+220">+220 (Gambia)</option>
+                    <option value="+233">+233 (Ghana)</option>
+                    <option value="+224">+224 (Guinea)</option>
+                    <option value="+245">+245 (Guinea-Bissau)</option>
+                    <option value="+225">+225 (Ivory Coast)</option>
+                    <option value="+254">+254 (Kenya)</option>
+                    <option value="+266">+266 (Lesotho)</option>
+                    <option value="+231">+231 (Liberia)</option>
+                    <option value="+218">+218 (Libya)</option>
+                    <option value="+261">+261 (Madagascar)</option>
+                    <option value="+265">+265 (Malawi)</option>
+                    <option value="+223">+223 (Mali)</option>
+                    <option value="+222">+222 (Mauritania)</option>
+                    <option value="+230">+230 (Mauritius)</option>
+                    <option value="+212">+212 (Morocco)</option>
+                    <option value="+258">+258 (Mozambique)</option>
+                    <option value="+264">+264 (Namibia)</option>
+                    <option value="+227">+227 (Niger)</option>
+                    <option value="+234">+234 (Nigeria)</option>
+                    <option value="+250">+250 (Rwanda)</option>
+                    <option value="+239">+239 (Sao Tome)</option>
+                    <option value="+221">+221 (Senegal)</option>
+                    <option value="+248">+248 (Seychelles)</option>
+                    <option value="+232">+232 (Sierra Leone)</option>
+                    <option value="+252">+252 (Somalia)</option>
+                    <option value="+27">+27 (South Africa)</option>
+                    <option value="+211">+211 (South Sudan)</option>
+                    <option value="+249">+249 (Sudan)</option>
+                    <option value="+255">+255 (Tanzania)</option>
+                    <option value="+228">+228 (Togo)</option>
+                    <option value="+216">+216 (Tunisia)</option>
+                    <option value="+256">+256 (Uganda)</option>
+                    <option value="+260">+260 (Zambia)</option>
+                    <option value="+263">+263 (Zimbabwe)</option>
                   </select>
-                  <input name="phoneInput" type="tel" defaultValue={editingCustomer?.phone?.replace(countryCode, "")} className="flex-1 rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="788 123 456" />
+                  <input name="phoneInput" type="tel" defaultValue={editingCustomer?.phone ? editingCustomer.phone.replace(/^\+\d{1,4}/, '') : ''} className="flex-1 rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="788 123 456" />
                 </div>
               </div>
               <div className="flex justify-end gap-3 mt-8">
                 <button 
                   type="button" 
-                  onClick={() => {
-                    setIsModalOpen(false)
-                    setEditingCustomer(null)
-                  }}
+                  onClick={() => setIsModalOpen(false)}
                   className="px-4 py-2 text-sm font-medium rounded-md border hover:bg-muted transition-colors"
                 >
                   Cancel
