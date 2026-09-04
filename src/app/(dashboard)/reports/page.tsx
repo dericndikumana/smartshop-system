@@ -15,7 +15,7 @@ export default async function ReportsPage() {
   const shopId = session.user.shopId
   const userRole = session.user.role
 
-  if (userRole !== "SHOP_ADMIN" && userRole !== "CASHIER") {
+  if (userRole !== "SHOP_ADMIN" && userRole !== "CASHIER" && userRole !== "STOCK_CASHIER") {
     redirect("/login")
   }
 
@@ -23,7 +23,7 @@ export default async function ReportsPage() {
   const sales = await prisma.sale.findMany({
     where: { 
       shopId,
-      ...(userRole === "CASHIER" ? { cashierId: session.user.id } : {}) 
+      ...(userRole !== "SHOP_ADMIN" ? { cashierId: session.user.id } : {}) 
     },
     include: {
       items: {
