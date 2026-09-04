@@ -5,7 +5,6 @@ import Link from "next/link"
 import { 
   Users, 
   Receipt,
-  ShoppingCart,
   Banknote,
   HandCoins,
   Contact,
