@@ -6,10 +6,12 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { AlertCircle, RefreshCw, Eye, EyeOff } from "lucide-react"
 import { useTranslation } from "@/components/providers/language-provider"
+import { useLoader } from "@/components/providers/loader-provider"
 
 export default function LoginForm({ initialSuspended }: { initialSuspended?: boolean }) {
   const router = useRouter()
   const { t } = useTranslation()
+  const { showLoader } = useLoader()
   const [identifier, setIdentifier] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -37,8 +39,11 @@ export default function LoginForm({ initialSuspended }: { initialSuspended?: boo
            setErrorMessage("Invalid credentials.")
         }
       } else {
-        router.push("/")
-        router.refresh()
+        showLoader(2000)
+        setTimeout(() => {
+          router.push("/")
+          router.refresh()
+        }, 2000)
       }
     } catch {
       setErrorMessage("An unexpected error occurred.")

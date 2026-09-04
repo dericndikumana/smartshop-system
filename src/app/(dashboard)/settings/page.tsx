@@ -3,7 +3,6 @@ import { redirect } from "next/navigation"
 import Link from "next/link"
 import { LogOutButton } from "./logout-button"
 import { 
-  Package, 
   Users, 
   Receipt,
   User,
@@ -24,7 +23,6 @@ export default async function SettingsPage() {
     { name: "Debt", href: "/dettes", icon: Banknote },
     { name: "Loan", href: "/loans", icon: HandCoins },
     { name: "Manage Cashiers", href: "/staff", icon: Users },
-    { name: "Stock", href: "/inventory", icon: Package },
     { name: "Report", href: "/reports", icon: Receipt },
   ]
 
