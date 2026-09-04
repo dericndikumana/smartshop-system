@@ -178,7 +178,7 @@ export function SettingsClient({ userRole, initialName, initialEmail, initialPho
         </form>
       </div>
 
-      {userRole !== "CASHIER" && (
+      {!["CASHIER", "STOCK_CASHIER"].includes(userRole) && (
         <div className="border-t pt-6">
           <h3 className="text-lg font-medium text-destructive flex items-center gap-2">
             <Lock className="h-4 w-4" />

@@ -23,12 +23,14 @@ export function BottomNav({ role }: { role: string }) {
       { name: t("nav.home") || "Home", href: "/", icon: LayoutDashboard },
       { name: t("nav.pos") || "POS", href: "/pos", icon: ShoppingCart },
       { name: t("nav.all_sales") || "Sales", href: "/sales", icon: ListOrdered },
+      { name: t("nav.settings") || "Settings", href: "/settings", icon: Settings },
     ]
   } else if (role === "STOCK_CASHIER") {
     navItems = [
       { name: t("nav.home") || "Home", href: "/", icon: LayoutDashboard },
       { name: t("nav.pos") || "POS", href: "/pos", icon: ShoppingCart },
       { name: "Orders", href: "/stock-orders", icon: Package },
+      { name: t("nav.settings") || "Settings", href: "/settings", icon: Settings },
     ]
   } else {
     // SHOP_ADMIN

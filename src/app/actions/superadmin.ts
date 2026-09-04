@@ -226,6 +226,10 @@ export async function permanentDeleteShopAction(shopId: string) {
       await tx.payment.deleteMany({ where: { sale: { shopId } } })
       await tx.receipt.deleteMany({ where: { shopId } })
       
+      // Delete internal orders
+      await tx.internalOrderItem.deleteMany({ where: { order: { shopId } } })
+      await tx.internalOrder.deleteMany({ where: { shopId } })
+
       await tx.return.deleteMany({ where: { shopId } })
       await tx.heldCart.deleteMany({ where: { shopId } })
       await tx.sale.deleteMany({ where: { shopId } })

@@ -1,7 +1,7 @@
 "use client"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, ShoppingCart, Package, Users, Settings, Receipt, Store, ChevronLeft, ChevronRight } from "lucide-react"
+import { LayoutDashboard, ShoppingCart, Package, Users, Settings, Receipt, Store, ChevronLeft, ChevronRight, BarChart3 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 import { useTranslation } from "@/components/providers/language-provider"
@@ -32,6 +32,8 @@ export function Sidebar({ role, onNavClick, isCollapsed, onToggleCollapse }: Sid
       { name: t("nav.pos"), href: "/pos", icon: ShoppingCart },
       { name: t("nav.all_sales"), href: "/sales", icon: Receipt },
       { name: t("nav.customer_info"), href: "/customers", icon: Users },
+      { name: t("sidebar.reports") || "Reports", href: "/reports", icon: BarChart3 },
+      { name: t("nav.settings"), href: "/settings", icon: Settings },
     ]
   } else if (role === "STOCK_CASHIER") {
     navItems = [
@@ -40,6 +42,8 @@ export function Sidebar({ role, onNavClick, isCollapsed, onToggleCollapse }: Sid
       { name: t("nav.all_sales"), href: "/sales", icon: Receipt },
       { name: "Stock Orders", href: "/stock-orders", icon: Package },
       { name: t("nav.customer_info"), href: "/customers", icon: Users },
+      { name: t("sidebar.reports") || "Reports", href: "/reports", icon: BarChart3 },
+      { name: t("nav.settings"), href: "/settings", icon: Settings },
     ]
   } else {
     // SHOP_ADMIN
