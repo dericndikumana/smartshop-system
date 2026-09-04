@@ -9,7 +9,8 @@ import {
   Banknote,
   HandCoins,
   Contact,
-  User
+  User,
+  Package
 } from "lucide-react"
 import { useTranslation } from "@/components/providers/language-provider"
 
@@ -37,12 +38,14 @@ export function SettingsMenuClient({ userRole, userName }: SettingsMenuClientPro
     // Account Details and Report for cashier
     menuItems = [
       { name: t('sidebar.account_details') || "Account Details", href: "/settings/account", icon: User },
+      { name: t('nav.product') || "Products", href: "/inventory", icon: Package },
       { name: t('sidebar.reports') || "Report", href: "/reports", icon: Receipt },
       { name: t('nav.customer_info') || "Customer info", href: "/customers", icon: Contact, mobileOnly: true },
     ]
   } else if (userRole === "STOCK_CASHIER") {
     menuItems = [
       { name: t('sidebar.account_details') || "Account Details", href: "/settings/account", icon: User },
+      { name: t('nav.product') || "Products", href: "/inventory", icon: Package },
       { name: t('sidebar.reports') || "Report", href: "/reports", icon: Receipt },
       { name: t('nav.customer_info') || "Customer info", href: "/customers", icon: Contact, mobileOnly: true },
     ]

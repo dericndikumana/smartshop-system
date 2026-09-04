@@ -147,7 +147,7 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
             {t("inventory_page.subtitle")}
           </p>
         </div>
-        {userRole !== "CASHIER" && (
+        {userRole === "SHOP_ADMIN" && (
           <button 
             onClick={() => {
               setActiveTab("new")
@@ -206,9 +206,12 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                     <p className="text-sm text-muted-foreground truncate mt-1 font-medium">
                       Name:<span className="underline uppercase">{product.sku || product.name}</span>
                     </p>
+                    {product.quantity === 0 && (
+                      <p className="text-sm font-bold text-red-500 mt-1">product finished in stock</p>
+                    )}
                   </div>
                 </div>
-                {userRole !== "CASHIER" && (
+                {userRole === "SHOP_ADMIN" && (
                   <div className="flex flex-col items-end justify-start gap-4 h-full pt-1 pr-2">
                     <button
                       onClick={() => {
@@ -259,7 +262,7 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                 <th className="px-4 py-3 font-medium">Details</th>
                 <th className="px-4 py-3 font-medium">Quantity</th>
                 <th className="px-4 py-3 font-medium text-right">Value</th>
-                {userRole !== "CASHIER" && (
+                {userRole === "SHOP_ADMIN" && (
                   <th className="px-4 py-3 font-medium text-right w-32">Actions</th>
                 )}
               </tr>
@@ -267,7 +270,7 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
             <tbody>
               {paginatedProducts.length === 0 ? (
                 <tr>
-                  <td colSpan={userRole !== "CASHIER" ? 6 : 5} className="px-4 py-8 text-center text-muted-foreground border-b">
+                  <td colSpan={userRole === "SHOP_ADMIN" ? 6 : 5} className="px-4 py-8 text-center text-muted-foreground border-b">
                     {t("inventory_page.no_products")}
                   </td>
                 </tr>
@@ -281,6 +284,7 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                       <div className="flex flex-col gap-0.5">
                         <span className="font-bold uppercase text-blue-800 dark:text-blue-300">{product.name}</span>
                         <span className="text-muted-foreground uppercase">{product.sku || product.name}</span>
+                        {product.quantity === 0 && <span className="text-xs font-bold text-red-500">product finished in stock</span>}
                       </div>
                     </td>
                     <td className="px-4 py-2">
@@ -295,7 +299,7 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
                     <td className="px-4 py-2 text-right font-medium text-muted-foreground">
                       {(product.quantity * product.sellingPrice).toLocaleString()} {product.currency}
                     </td>
-                    {userRole !== "CASHIER" && (
+                    {userRole === "SHOP_ADMIN" && (
                       <td className="px-4 py-2 text-right">
                         <div className="flex items-center justify-end gap-2">
                           <button
@@ -364,7 +368,7 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
         )}
       </div>
 
-      {isModalOpen && userRole !== "CASHIER" && (
+      {isModalOpen && userRole === "SHOP_ADMIN" && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in duration-200 p-4">
           <div className="bg-card w-full max-w-md rounded-xl shadow-xl border overflow-hidden animate-in zoom-in-95 duration-200">
             <div className="flex border-b">

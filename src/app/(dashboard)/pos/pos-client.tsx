@@ -373,8 +373,10 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
             {filteredProducts.map(product => (
               <button
                 key={product.id}
-                onClick={() => handleProductClick(product)}
-                className="bg-card border rounded-xl p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm hover:shadow-md transition-all text-left w-full hover:border-primary/50"
+                onClick={() => {
+                  if (product.quantity > 0) handleProductClick(product)
+                }}
+                className={`bg-card border rounded-xl p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm transition-all text-left w-full ${product.quantity === 0 ? 'opacity-70 border-red-500 bg-red-50/50 dark:bg-red-950/20 cursor-not-allowed' : 'hover:shadow-md hover:border-primary/50'}`}
               >
                 <div className="flex items-center gap-4 w-full">
                   <div className={`h-12 w-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-sm flex-shrink-0 ${getInitialsColor(product.name)}`}>
@@ -390,6 +392,9 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
                     <p className="text-sm text-muted-foreground truncate mt-1 font-medium">
                       Name:<span className="underline uppercase">{product.sku || product.name}</span>
                     </p>
+                    {product.quantity === 0 && (
+                      <p className="text-sm font-bold text-red-500 mt-1">Ended in stock</p>
+                    )}
                   </div>
                 </div>
               </button>
@@ -729,18 +734,24 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
                 <div 
                   key={product.id}
                   onClick={() => {
-                    handleProductClick(product)
-                    setSearchTerm("")
+                    if (product.quantity > 0) {
+                      handleProductClick(product)
+                      setSearchTerm("")
+                    }
                   }}
-                  className="flex items-center justify-between p-3 border-b hover:bg-muted/30 cursor-pointer"
+                  className={`flex items-center justify-between p-3 border-b ${product.quantity === 0 ? 'opacity-70 bg-red-50/50 dark:bg-red-950/20 cursor-not-allowed border-red-500/50' : 'hover:bg-muted/30 cursor-pointer'}`}
                 >
                   <div>
                     <h4 className="font-bold text-sm text-blue-800 dark:text-blue-300 uppercase">
                       {product.sku || product.name}(<span className="text-blue-600 dark:text-blue-400 underline">{product.piecesPerBundle || 1}</span> Pcs)1X <span className="text-blue-600 dark:text-blue-400 underline">{product.sellingPrice}</span>
                     </h4>
-                    <span className="text-xs text-muted-foreground font-medium">{product.quantity} in stock</span>
+                    {product.quantity === 0 ? (
+                      <span className="text-xs font-bold text-red-500">Ended in stock</span>
+                    ) : (
+                      <span className="text-xs text-muted-foreground font-medium">{product.quantity} in stock</span>
+                    )}
                   </div>
-                  <span className="font-bold text-primary">{product.currency} {product.sellingPrice.toLocaleString()}</span>
+                  <span className={`font-bold ${product.quantity === 0 ? 'text-red-500' : 'text-primary'}`}>{product.currency} {product.sellingPrice.toLocaleString()}</span>
                 </div>
               ))}
               {filteredProducts.length === 0 && (
