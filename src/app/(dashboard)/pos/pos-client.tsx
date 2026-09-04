@@ -51,6 +51,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
   
   // Customer states
   const [customerSearch, setCustomerSearch] = useState("")
+  const [customerSearchText, setCustomerSearchText] = useState("")
   const [customerPhone, setCustomerPhone] = useState("")
   const [customerCountryCode, setCustomerCountryCode] = useState("+250")
   const [showCustomerDropdown, setShowCustomerDropdown] = useState(false)
@@ -403,73 +404,139 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
         </div>
 
         {/* Customer Selection Desktop */}
-        <div className="p-4 border-b relative" ref={customerDropdownRef}>
-          <div className="relative">
-            <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-            <input 
-              type="text" 
-              placeholder={t('pos_page.customer_optional')}
-              value={customerSearch}
-              onChange={(e) => {
-                setCustomerSearch(e.target.value)
-                setShowCustomerDropdown(true)
-              }}
-              onFocus={() => setShowCustomerDropdown(true)}
-              className="w-full pl-9 rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all" 
-            />
-          </div>
+        <div className="p-4 border-b relative flex flex-col items-center" ref={customerDropdownRef}>
+          <button
+            onClick={() => setShowCustomerDropdown(!showCustomerDropdown)}
+            className="flex items-center justify-center gap-2 text-primary font-bold w-full hover:bg-muted/30 py-2 rounded-md transition-colors"
+          >
+            <User className="h-5 w-5 text-orange-500" />
+            <span className="text-blue-600 dark:text-blue-400">{customerSearch || cashierName || "Walk-in"}</span>
+            <span className="text-[10px] bg-pink-500/10 text-pink-500 border border-pink-500 rounded-sm px-1 py-0.5">QR</span>
+          </button>
+          
+          <div className="w-full max-w-[150px] border-b border-dashed border-muted-foreground/30 mt-1"></div>
+
           {showCustomerDropdown && (
-            <div className="absolute z-10 w-[calc(100%-2rem)] mt-1 bg-card border rounded-md shadow-lg overflow-y-auto p-2 max-h-60">
-              {filteredCustomers.length > 0 ? (
-                filteredCustomers.map(c => (
-                  <button
-                    key={c.id}
-                    onClick={() => {
-                      setCustomerSearch(c.fullName)
-                      if (c.phone) setCustomerPhone("") 
-                      setShowCustomerDropdown(false)
-                    }}
-                    className="w-full text-left px-3 py-2 text-sm hover:bg-muted transition-colors rounded-md"
-                  >
-                    <span className="font-medium">{c.fullName}</span>
-                    {c.phone && <span className="text-muted-foreground ml-2">({c.phone})</span>}
-                  </button>
-                ))
-              ) : (
-                <div className="p-2">
-                  <div className="text-sm font-medium mb-2">New Customer: {customerSearch}</div>
-                  <div className="flex gap-2">
-                    <select 
-                      value={customerCountryCode}
-                      onChange={(e) => setCustomerCountryCode(e.target.value)}
-                      className="rounded-md border bg-background px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary w-24"
+            <div className="absolute top-full z-10 w-[calc(100%-2rem)] mt-1 bg-card border rounded-md shadow-lg p-2">
+              <input 
+                type="text" 
+                autoFocus
+                placeholder={t('pos_page.search_products')} // reusing translation or "Search customers..."
+                value={customerSearchText}
+                onChange={(e) => setCustomerSearchText(e.target.value)}
+                className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary mb-2" 
+              />
+              
+              <div className="overflow-y-auto max-h-48 flex flex-col gap-1">
+                {customers.filter(c => c.fullName.toLowerCase().includes(customerSearchText.toLowerCase()) || (c.phone && c.phone.includes(customerSearchText))).length > 0 ? (
+                  customers.filter(c => c.fullName.toLowerCase().includes(customerSearchText.toLowerCase()) || (c.phone && c.phone.includes(customerSearchText))).map(c => (
+                    <button
+                      key={c.id}
+                      onClick={() => {
+                        setCustomerSearch(c.fullName)
+                        if (c.phone) setCustomerPhone("") 
+                        setShowCustomerDropdown(false)
+                        setCustomerSearchText("")
+                      }}
+                      className="w-full text-left px-3 py-2 text-sm hover:bg-muted transition-colors rounded-md border-b last:border-0"
                     >
-                      <option value="+250">+250 (Rwanda)</option>
-                      <option value="+254">+254 (Kenya)</option>
-                      <option value="+255">+255 (Tanzania)</option>
-                      <option value="+256">+256 (Uganda)</option>
-                      <option value="+257">+257 (Burundi)</option>
-                      <option value="+243">+243 (DR Congo)</option>
-                      <option value="+27">+27 (South Africa)</option>
-                      <option value="+234">+234 (Nigeria)</option>
-                      <option value="+233">+233 (Ghana)</option>
-                    </select>
-                    <input 
-                      type="tel"
-                      placeholder="Phone number"
-                      value={customerPhone}
-                      onChange={(e) => setCustomerPhone(e.target.value)}
-                      className="flex-1 rounded-md border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                    />
+                      <span className="font-medium">{c.fullName}</span>
+                      {c.phone && <span className="text-muted-foreground ml-2">({c.phone})</span>}
+                    </button>
+                  ))
+                ) : (
+                  <div className="p-2 border rounded-md bg-muted/10 mt-1">
+                    <div className="text-sm font-medium mb-2 text-primary">New Customer</div>
+                    <div className="flex flex-col gap-2">
+                      <input 
+                        type="text"
+                        placeholder="Full Name"
+                        value={customerSearchText}
+                        onChange={(e) => setCustomerSearchText(e.target.value)}
+                        className="w-full rounded-md border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                      />
+                      <div className="flex gap-2">
+                        <select 
+                          value={customerCountryCode}
+                          onChange={(e) => setCustomerCountryCode(e.target.value)}
+                          className="rounded-md border bg-background px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary w-24"
+                        >
+                          <option value="+213">+213 (Algeria)</option>
+                          <option value="+244">+244 (Angola)</option>
+                          <option value="+229">+229 (Benin)</option>
+                          <option value="+267">+267 (Botswana)</option>
+                          <option value="+226">+226 (Burkina Faso)</option>
+                          <option value="+257">+257 (Burundi)</option>
+                          <option value="+237">+237 (Cameroon)</option>
+                          <option value="+238">+238 (Cape Verde)</option>
+                          <option value="+236">+236 (Central African Republic)</option>
+                          <option value="+235">+235 (Chad)</option>
+                          <option value="+269">+269 (Comoros)</option>
+                          <option value="+242">+242 (Congo)</option>
+                          <option value="+243">+243 (DR Congo)</option>
+                          <option value="+253">+253 (Djibouti)</option>
+                          <option value="+20">+20 (Egypt)</option>
+                          <option value="+240">+240 (Equatorial Guinea)</option>
+                          <option value="+291">+291 (Eritrea)</option>
+                          <option value="+268">+268 (Eswatini)</option>
+                          <option value="+251">+251 (Ethiopia)</option>
+                          <option value="+241">+241 (Gabon)</option>
+                          <option value="+220">+220 (Gambia)</option>
+                          <option value="+233">+233 (Ghana)</option>
+                          <option value="+224">+224 (Guinea)</option>
+                          <option value="+245">+245 (Guinea-Bissau)</option>
+                          <option value="+225">+225 (Ivory Coast)</option>
+                          <option value="+254">+254 (Kenya)</option>
+                          <option value="+266">+266 (Lesotho)</option>
+                          <option value="+231">+231 (Liberia)</option>
+                          <option value="+218">+218 (Libya)</option>
+                          <option value="+261">+261 (Madagascar)</option>
+                          <option value="+265">+265 (Malawi)</option>
+                          <option value="+223">+223 (Mali)</option>
+                          <option value="+222">+222 (Mauritania)</option>
+                          <option value="+230">+230 (Mauritius)</option>
+                          <option value="+212">+212 (Morocco)</option>
+                          <option value="+258">+258 (Mozambique)</option>
+                          <option value="+264">+264 (Namibia)</option>
+                          <option value="+227">+227 (Niger)</option>
+                          <option value="+234">+234 (Nigeria)</option>
+                          <option value="+250">+250 (Rwanda)</option>
+                          <option value="+239">+239 (Sao Tome)</option>
+                          <option value="+221">+221 (Senegal)</option>
+                          <option value="+248">+248 (Seychelles)</option>
+                          <option value="+232">+232 (Sierra Leone)</option>
+                          <option value="+252">+252 (Somalia)</option>
+                          <option value="+27">+27 (South Africa)</option>
+                          <option value="+211">+211 (South Sudan)</option>
+                          <option value="+249">+249 (Sudan)</option>
+                          <option value="+255">+255 (Tanzania)</option>
+                          <option value="+228">+228 (Togo)</option>
+                          <option value="+216">+216 (Tunisia)</option>
+                          <option value="+256">+256 (Uganda)</option>
+                          <option value="+260">+260 (Zambia)</option>
+                          <option value="+263">+263 (Zimbabwe)</option>
+                        </select>
+                        <input 
+                          type="tel"
+                          placeholder="Phone number"
+                          value={customerPhone}
+                          onChange={(e) => setCustomerPhone(e.target.value)}
+                          className="flex-1 rounded-md border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                        />
+                      </div>
+                      <button 
+                        onClick={() => {
+                          setCustomerSearch(customerSearchText)
+                          setShowCustomerDropdown(false)
+                        }}
+                        className="mt-2 w-full bg-primary/10 text-primary py-1.5 rounded-md text-sm font-bold hover:bg-primary/20 transition-colors"
+                      >
+                        Confirm Info
+                      </button>
+                    </div>
                   </div>
-                  <button 
-                    onClick={() => setShowCustomerDropdown(false)}
-                    className="mt-3 w-full bg-primary/10 text-primary py-1.5 rounded-md text-sm font-medium hover:bg-primary/20 transition-colors"
-                  >
-                    Confirm Info
-                  </button>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           )}
         </div>
@@ -646,43 +713,140 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
 
         {/* Mobile Customer Selection */}
         <div className="py-4 border-b flex flex-col items-center relative" ref={customerDropdownRef}>
-          <div className="flex items-center gap-4 text-primary font-medium">
+          <button 
+            onClick={() => setShowCustomerDropdown(!showCustomerDropdown)}
+            className="flex items-center gap-4 text-primary font-bold hover:opacity-80 transition-opacity"
+          >
             <User className="h-5 w-5 text-orange-500" />
-            <span>{customerSearch || "Customer"}</span>
-            <span className="w-5 h-5 border-2 border-pink-500 text-pink-500 rounded-sm flex items-center justify-center text-[10px]">QR</span>
-          </div>
+            <span className="text-blue-600 dark:text-blue-400">{customerSearch || cashierName || "Walk-in"}</span>
+            <span className="w-5 h-5 border border-pink-500 bg-pink-500/10 text-pink-500 rounded-sm flex items-center justify-center text-[10px]">QR</span>
+          </button>
           
-          <input 
-            type="text" 
-            placeholder={t("pos_page.customer_optional") || "Search Customer"}
-            value={customerSearch}
-            onChange={e => {
-              setCustomerSearch(e.target.value)
-              setShowCustomerDropdown(true)
-            }}
-            onFocus={() => setShowCustomerDropdown(true)}
-            className="mt-2 text-center text-sm bg-transparent border-b border-dashed focus:outline-none px-2 py-1 w-48"
-          />
+          <div className="w-32 border-b border-dashed border-muted-foreground/30 mt-2 text-center text-sm font-medium text-foreground pb-1">
+            {customerSearch || cashierName || "Walk-in"}
+          </div>
+
           {showCustomerDropdown && (
-            <div className="absolute top-full z-30 w-64 bg-card border rounded-md shadow-lg overflow-y-auto p-2 max-h-60 mt-1 left-1/2 -translate-x-1/2">
-              {filteredCustomers.length > 0 ? (
-                filteredCustomers.map(c => (
-                  <button
-                    key={c.id}
-                    onClick={() => {
-                      setCustomerSearch(c.fullName)
-                      if (c.phone) setCustomerPhone("") 
-                      setShowCustomerDropdown(false)
-                    }}
-                    className="w-full text-left px-3 py-2 text-sm hover:bg-muted transition-colors rounded-md border-b last:border-0"
-                  >
-                    <span className="font-medium">{c.fullName}</span>
-                    {c.phone && <span className="text-muted-foreground ml-2 text-xs">({c.phone})</span>}
-                  </button>
-                ))
-              ) : (
-                <div className="p-2 text-sm text-center text-muted-foreground">New Customer</div>
-              )}
+            <div className="absolute top-full z-30 w-72 bg-card border rounded-md shadow-xl p-2 mt-1 left-1/2 -translate-x-1/2">
+              <input 
+                type="text" 
+                autoFocus
+                placeholder="Search Customer..."
+                value={customerSearchText}
+                onChange={e => setCustomerSearchText(e.target.value)}
+                className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary mb-2"
+              />
+              
+              <div className="overflow-y-auto max-h-48 flex flex-col gap-1">
+                {customers.filter(c => c.fullName.toLowerCase().includes(customerSearchText.toLowerCase()) || (c.phone && c.phone.includes(customerSearchText))).length > 0 ? (
+                  customers.filter(c => c.fullName.toLowerCase().includes(customerSearchText.toLowerCase()) || (c.phone && c.phone.includes(customerSearchText))).map(c => (
+                    <button
+                      key={c.id}
+                      onClick={() => {
+                        setCustomerSearch(c.fullName)
+                        if (c.phone) setCustomerPhone("") 
+                        setShowCustomerDropdown(false)
+                        setCustomerSearchText("")
+                      }}
+                      className="w-full text-left px-3 py-2 text-sm hover:bg-muted transition-colors rounded-md border-b last:border-0"
+                    >
+                      <span className="font-medium">{c.fullName}</span>
+                      {c.phone && <span className="text-muted-foreground ml-2 text-xs">({c.phone})</span>}
+                    </button>
+                  ))
+                ) : (
+                  <div className="p-2 border rounded-md bg-muted/10 mt-1">
+                    <div className="text-sm font-medium mb-2 text-primary">New Customer</div>
+                    <div className="flex flex-col gap-2">
+                      <input 
+                        type="text"
+                        placeholder="Full Name"
+                        value={customerSearchText}
+                        onChange={(e) => setCustomerSearchText(e.target.value)}
+                        className="w-full rounded-md border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                      />
+                      <div className="flex gap-2">
+                        <select 
+                          value={customerCountryCode}
+                          onChange={(e) => setCustomerCountryCode(e.target.value)}
+                          className="rounded-md border bg-background px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary w-24"
+                        >
+                          <option value="+213">+213 (Algeria)</option>
+                          <option value="+244">+244 (Angola)</option>
+                          <option value="+229">+229 (Benin)</option>
+                          <option value="+267">+267 (Botswana)</option>
+                          <option value="+226">+226 (Burkina Faso)</option>
+                          <option value="+257">+257 (Burundi)</option>
+                          <option value="+237">+237 (Cameroon)</option>
+                          <option value="+238">+238 (Cape Verde)</option>
+                          <option value="+236">+236 (Central African Republic)</option>
+                          <option value="+235">+235 (Chad)</option>
+                          <option value="+269">+269 (Comoros)</option>
+                          <option value="+242">+242 (Congo)</option>
+                          <option value="+243">+243 (DR Congo)</option>
+                          <option value="+253">+253 (Djibouti)</option>
+                          <option value="+20">+20 (Egypt)</option>
+                          <option value="+240">+240 (Equatorial Guinea)</option>
+                          <option value="+291">+291 (Eritrea)</option>
+                          <option value="+268">+268 (Eswatini)</option>
+                          <option value="+251">+251 (Ethiopia)</option>
+                          <option value="+241">+241 (Gabon)</option>
+                          <option value="+220">+220 (Gambia)</option>
+                          <option value="+233">+233 (Ghana)</option>
+                          <option value="+224">+224 (Guinea)</option>
+                          <option value="+245">+245 (Guinea-Bissau)</option>
+                          <option value="+225">+225 (Ivory Coast)</option>
+                          <option value="+254">+254 (Kenya)</option>
+                          <option value="+266">+266 (Lesotho)</option>
+                          <option value="+231">+231 (Liberia)</option>
+                          <option value="+218">+218 (Libya)</option>
+                          <option value="+261">+261 (Madagascar)</option>
+                          <option value="+265">+265 (Malawi)</option>
+                          <option value="+223">+223 (Mali)</option>
+                          <option value="+222">+222 (Mauritania)</option>
+                          <option value="+230">+230 (Mauritius)</option>
+                          <option value="+212">+212 (Morocco)</option>
+                          <option value="+258">+258 (Mozambique)</option>
+                          <option value="+264">+264 (Namibia)</option>
+                          <option value="+227">+227 (Niger)</option>
+                          <option value="+234">+234 (Nigeria)</option>
+                          <option value="+250">+250 (Rwanda)</option>
+                          <option value="+239">+239 (Sao Tome)</option>
+                          <option value="+221">+221 (Senegal)</option>
+                          <option value="+248">+248 (Seychelles)</option>
+                          <option value="+232">+232 (Sierra Leone)</option>
+                          <option value="+252">+252 (Somalia)</option>
+                          <option value="+27">+27 (South Africa)</option>
+                          <option value="+211">+211 (South Sudan)</option>
+                          <option value="+249">+249 (Sudan)</option>
+                          <option value="+255">+255 (Tanzania)</option>
+                          <option value="+228">+228 (Togo)</option>
+                          <option value="+216">+216 (Tunisia)</option>
+                          <option value="+256">+256 (Uganda)</option>
+                          <option value="+260">+260 (Zambia)</option>
+                          <option value="+263">+263 (Zimbabwe)</option>
+                        </select>
+                        <input 
+                          type="tel"
+                          placeholder="Phone number"
+                          value={customerPhone}
+                          onChange={(e) => setCustomerPhone(e.target.value)}
+                          className="flex-1 rounded-md border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                        />
+                      </div>
+                      <button 
+                        onClick={() => {
+                          setCustomerSearch(customerSearchText)
+                          setShowCustomerDropdown(false)
+                        }}
+                        className="mt-2 w-full bg-primary/10 text-primary py-1.5 rounded-md text-sm font-bold hover:bg-primary/20 transition-colors"
+                      >
+                        Confirm Info
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
