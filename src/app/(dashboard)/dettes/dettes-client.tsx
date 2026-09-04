@@ -71,37 +71,87 @@ export function DettesClient({ initialCustomers }: { initialCustomers: CustomerD
       </div>
 
       <div className="grid gap-4 mt-2">
-        {filteredCustomers.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground bg-card rounded-xl border border-dashed">
-            {t("dettes_page.no_debts")}
-          </div>
-        ) : (
-          filteredCustomers.map(customer => (
-            <div key={customer.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl bg-card border shadow-sm gap-4 hover:shadow-md transition-shadow">
-              <div>
-                <h3 className="font-bold text-lg">{customer.fullName}</h3>
-                <p className="text-sm text-muted-foreground">{customer.phone || "No phone number"}</p>
-              </div>
-              <div className="flex items-center gap-4 justify-between sm:justify-end w-full sm:w-auto">
-                <div className="text-right">
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    {t("dettes_page.debt_owes")}
-                  </p>
-                  <p className="font-bold text-xl text-red-500">
-                    {customer.balance.toLocaleString()} RWF
-                  </p>
-                </div>
-                <button 
-                  onClick={() => setSelectedCustomer(customer)}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-lg transition-colors shadow-sm font-medium flex items-center gap-2"
-                >
-                  <CreditCard className="h-5 w-5" />
-                  {t("dettes_page.pay")}
-                </button>
-              </div>
+        {/* Mobile View */}
+        <div className="flex md:hidden flex-col gap-4">
+          {filteredCustomers.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground bg-card rounded-xl border border-dashed">
+              {t("dettes_page.no_debts")}
             </div>
-          ))
-        )}
+          ) : (
+            filteredCustomers.map(customer => (
+              <div key={customer.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl bg-card border shadow-sm gap-4 hover:shadow-md transition-shadow">
+                <div>
+                  <h3 className="font-bold text-lg">{customer.fullName}</h3>
+                  <p className="text-sm text-muted-foreground">{customer.phone || "No phone number"}</p>
+                </div>
+                <div className="flex items-center gap-4 justify-between sm:justify-end w-full sm:w-auto">
+                  <div className="text-right">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      {t("dettes_page.debt_owes")}
+                    </p>
+                    <p className="font-bold text-xl text-red-500">
+                      {customer.balance.toLocaleString()} RWF
+                    </p>
+                  </div>
+                  <button 
+                    onClick={() => setSelectedCustomer(customer)}
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-lg transition-colors shadow-sm font-medium flex items-center gap-2"
+                  >
+                    <CreditCard className="h-5 w-5" />
+                    {t("dettes_page.pay")}
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto bg-card border rounded-xl shadow-sm">
+          <table className="w-full text-left">
+            <thead className="bg-muted/50 border-b text-[10px] uppercase text-muted-foreground">
+              <tr>
+                <th className="px-4 py-3 font-medium w-12">#</th>
+                <th className="px-4 py-3 font-medium">Customer</th>
+                <th className="px-4 py-3 font-medium">Phone</th>
+                <th className="px-4 py-3 font-medium text-right">Debt Owed</th>
+                <th className="px-4 py-3 font-medium text-right w-32">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredCustomers.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
+                    {t("dettes_page.no_debts")}
+                  </td>
+                </tr>
+              ) : (
+                filteredCustomers.map((customer, index) => (
+                  <tr key={customer.id} className="border-b hover:bg-muted/20 text-[10px]">
+                    <td className="px-4 py-2 text-muted-foreground font-medium">
+                      {index + 1}
+                    </td>
+                    <td className="px-4 py-2 font-medium">{customer.fullName}</td>
+                    <td className="px-4 py-2 text-muted-foreground">{customer.phone || "No phone number"}</td>
+                    <td className="px-4 py-2 text-right font-bold text-red-500">
+                      {customer.balance.toLocaleString()} RWF
+                    </td>
+                    <td className="px-4 py-2 text-right">
+                      <button 
+                        onClick={() => setSelectedCustomer(customer)}
+                        className="p-1.5 bg-primary/10 text-primary hover:bg-primary/20 rounded-md transition-colors flex items-center justify-center gap-1 ml-auto"
+                        title={t("dettes_page.pay")}
+                      >
+                        <CreditCard className="h-4 w-4" />
+                        <span className="font-medium px-1 text-[10px] uppercase tracking-wide">Pay</span>
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {selectedCustomer && (

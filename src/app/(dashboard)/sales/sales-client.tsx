@@ -81,7 +81,8 @@ export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
           </div>
         </div>
         
-        <div className="flex flex-col gap-3 p-4">
+        {/* Mobile View */}
+        <div className="flex md:hidden flex-col gap-3 p-4">
           {paginatedSales.length === 0 ? (
             <div className="py-12 text-center text-muted-foreground bg-card rounded-xl border border-dashed">
               <Receipt className="h-12 w-12 mx-auto mb-4 opacity-20" />
@@ -141,6 +142,80 @@ export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
               </div>
             ))
           )}
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
+          <table className="w-full text-left">
+            <thead className="bg-muted/50 border-b text-[10px] uppercase text-muted-foreground">
+              <tr>
+                <th className="px-4 py-3 font-medium w-12">#</th>
+                <th className="px-4 py-3 font-medium">Receipt</th>
+                <th className="px-4 py-3 font-medium">Customer</th>
+                <th className="px-4 py-3 font-medium">Date & Cashier</th>
+                <th className="px-4 py-3 font-medium text-right">Total</th>
+                <th className="px-4 py-3 font-medium text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedSales.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground border-b">
+                    {t('sales_page.no_sales')}
+                  </td>
+                </tr>
+              ) : (
+                paginatedSales.map((sale, index) => (
+                  <tr key={sale.id} className="border-b hover:bg-muted/20 text-[10px]">
+                    <td className="px-4 py-2 text-muted-foreground font-medium">
+                      {(currentPage - 1) * itemsPerPage + index + 1}
+                    </td>
+                    <td className="px-4 py-2 font-medium">{sale.receiptNumber}</td>
+                    <td className="px-4 py-2">{sale.customerName || t('sales_page.walk_in')}</td>
+                    <td className="px-4 py-2">
+                      <div className="flex items-center gap-2">
+                        <span>{new Date(sale.createdAt).toLocaleDateString()}</span>
+                        <span className="text-muted-foreground border-l pl-2">{sale.cashierName}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-2 text-right font-bold text-primary">
+                      {sale.primaryCurrency} {(sale.totalsByCurrency[sale.primaryCurrency] || 0).toLocaleString()}
+                    </td>
+                    <td className="px-4 py-2 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <a
+                          href={`https://wa.me/?text=${encodeURIComponent(
+                            `*Receipt: ${sale.receiptNumber}*\n` +
+                            `Shop: ${sale.shopName}\n` +
+                            (sale.shopPhone ? `Phone: ${sale.shopPhone}\n` : '') +
+                            `Date: ${new Date(sale.createdAt).toLocaleString()}\n` +
+                            `Cashier: ${sale.cashierName}\n` +
+                            `Customer: ${sale.customerName || 'Walk-in'}\n\n` +
+                            `*Items:*\n${sale.items.map(i => `- ${i.name} (x${i.quantity}): ${i.currency} ${(i.subtotal + i.subtotal * sale.vatRate / 100).toLocaleString()}`).join('\n')}\n\n` +
+                            `*Totals:*\n` +
+                            Object.entries(sale.totalsByCurrency).map(([curr, total]) => `${curr} ${total.toLocaleString()}`).join('\n')
+                          )}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-1.5 text-green-600 hover:bg-green-100 rounded-md transition-colors"
+                          title="Send via WhatsApp"
+                        >
+                          <MessageCircle className="h-4 w-4" />
+                        </a>
+                        <button
+                          onClick={() => setSelectedSale(sale)}
+                          className="p-1.5 text-blue-600 hover:bg-blue-100 rounded-md transition-colors"
+                          title="View Receipt"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
 
         {/* Pagination Controls */}

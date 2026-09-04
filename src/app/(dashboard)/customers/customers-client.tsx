@@ -131,62 +131,130 @@ export function CustomersClient({ customers, userRole }: { customers: Customer[]
         />
       </div>
 
-      <div className="flex flex-col gap-4">
-        {filteredCustomers.length === 0 ? (
-          <div className="col-span-full py-12 text-center text-muted-foreground bg-card rounded-xl border border-dashed">
-            <Users className="h-12 w-12 mx-auto mb-4 opacity-20" />
-            No customers found.
-          </div>
-        ) : (
-          filteredCustomers.map(customer => (
-            <div key={customer.id} className="bg-card border rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex items-center gap-4 w-full">
-                <div className={`h-12 w-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-sm flex-shrink-0 ${getInitialsColor(customer.fullName)}`}>
-                  {customer.fullName.substring(0, 2).toUpperCase()}
-                </div>
-                <div className="flex flex-col flex-1 min-w-0">
-                  <h3 className="font-bold text-foreground truncate">{customer.fullName}</h3>
-                  <p className="text-sm text-muted-foreground truncate">{customer.phone || "No phone"}</p>
-                </div>
-              </div>
-              {userRole !== "CASHIER" && (
-                <div className="flex items-center justify-end gap-2 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 mt-2 sm:mt-0">
-                  <button
-                    onClick={() => {
-                      setEditingCustomer(customer)
-                      setActiveTab("edit")
-                      // Pre-fill country code if possible, default +250
-                      let cCode = "+250"
-                      let phoneNum = customer.phone || ""
-                      if (phoneNum.startsWith("+")) {
-                        const match = phoneNum.match(/^(\+\d{1,4})(.*)$/)
-                        if (match) {
-                          cCode = match[1]
-                          phoneNum = match[2]
-                        }
-                      }
-                      setCountryCode(cCode)
-                      setIsModalOpen(true)
-                      // The phone input is uncontrolled with defaultValue in the modal
-                    }}
-                    className="text-orange-500 hover:opacity-80 transition-opacity p-2"
-                    title="Edit Customer"
-                  >
-                    <Save className="h-5 w-5" />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteCustomer(customer.id)}
-                    className="text-red-500 hover:opacity-80 transition-opacity p-2"
-                    title="Delete Customer"
-                  >
-                    <Trash2 className="h-5 w-5" />
-                  </button>
-                </div>
-              )}
+        {/* Mobile View */}
+        <div className="flex md:hidden flex-col gap-4">
+          {filteredCustomers.length === 0 ? (
+            <div className="col-span-full py-12 text-center text-muted-foreground bg-card rounded-xl border border-dashed">
+              <Users className="h-12 w-12 mx-auto mb-4 opacity-20" />
+              No customers found.
             </div>
-          ))
-        )}
-      </div>
+          ) : (
+            filteredCustomers.map(customer => (
+              <div key={customer.id} className="bg-card border rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-center gap-4 w-full">
+                  <div className={`h-12 w-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-sm flex-shrink-0 ${getInitialsColor(customer.fullName)}`}>
+                    {customer.fullName.substring(0, 2).toUpperCase()}
+                  </div>
+                  <div className="flex flex-col flex-1 min-w-0">
+                    <h3 className="font-bold text-foreground truncate">{customer.fullName}</h3>
+                    <p className="text-sm text-muted-foreground truncate">{customer.phone || "No phone"}</p>
+                  </div>
+                </div>
+                {userRole !== "CASHIER" && (
+                  <div className="flex items-center justify-end gap-2 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 mt-2 sm:mt-0">
+                    <button
+                      onClick={() => {
+                        setEditingCustomer(customer)
+                        setActiveTab("edit")
+                        let cCode = "+250"
+                        let phoneNum = customer.phone || ""
+                        if (phoneNum.startsWith("+")) {
+                          const match = phoneNum.match(/^(\+\d{1,4})(.*)$/)
+                          if (match) {
+                            cCode = match[1]
+                            phoneNum = match[2]
+                          }
+                        }
+                        setCountryCode(cCode)
+                        setIsModalOpen(true)
+                      }}
+                      className="text-orange-500 hover:opacity-80 transition-opacity p-2"
+                      title="Edit Customer"
+                    >
+                      <Save className="h-5 w-5" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteCustomer(customer.id)}
+                      className="text-red-500 hover:opacity-80 transition-opacity p-2"
+                      title="Delete Customer"
+                    >
+                      <Trash2 className="h-5 w-5" />
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto bg-card border rounded-xl shadow-sm">
+          <table className="w-full text-left">
+            <thead className="bg-muted/50 border-b text-[10px] uppercase text-muted-foreground">
+              <tr>
+                <th className="px-4 py-3 font-medium w-12">#</th>
+                <th className="px-4 py-3 font-medium">Customer Name</th>
+                <th className="px-4 py-3 font-medium">Phone Number</th>
+                {userRole !== "CASHIER" && (
+                  <th className="px-4 py-3 font-medium text-right w-32">Actions</th>
+                )}
+              </tr>
+            </thead>
+            <tbody>
+              {filteredCustomers.length === 0 ? (
+                <tr>
+                  <td colSpan={userRole !== "CASHIER" ? 4 : 3} className="px-4 py-8 text-center text-muted-foreground">
+                    No customers found.
+                  </td>
+                </tr>
+              ) : (
+                filteredCustomers.map((customer, index) => (
+                  <tr key={customer.id} className="border-b hover:bg-muted/20 text-[10px]">
+                    <td className="px-4 py-2 text-muted-foreground font-medium">
+                      {index + 1}
+                    </td>
+                    <td className="px-4 py-2 font-medium">{customer.fullName}</td>
+                    <td className="px-4 py-2 text-muted-foreground">{customer.phone || "No phone"}</td>
+                    {userRole !== "CASHIER" && (
+                      <td className="px-4 py-2 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => {
+                              setEditingCustomer(customer)
+                              setActiveTab("edit")
+                              let cCode = "+250"
+                              let phoneNum = customer.phone || ""
+                              if (phoneNum.startsWith("+")) {
+                                const match = phoneNum.match(/^(\+\d{1,4})(.*)$/)
+                                if (match) {
+                                  cCode = match[1]
+                                  phoneNum = match[2]
+                                }
+                              }
+                              setCountryCode(cCode)
+                              setIsModalOpen(true)
+                            }}
+                            className="p-1.5 text-orange-500 hover:bg-orange-100 rounded-md transition-colors"
+                            title="Edit Customer"
+                          >
+                            <Save className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteCustomer(customer.id)}
+                            className="p-1.5 text-red-500 hover:bg-red-100 rounded-md transition-colors"
+                            title="Delete Customer"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
+                    )}
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in duration-200 p-4">

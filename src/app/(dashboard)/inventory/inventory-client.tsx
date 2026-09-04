@@ -182,7 +182,8 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 p-4">
+        {/* Mobile View */}
+        <div className="flex flex-col md:hidden gap-3 p-4">
           {paginatedProducts.length === 0 ? (
             <div className="py-12 text-center text-muted-foreground bg-card rounded-xl border border-dashed">
               <Package className="h-12 w-12 mx-auto mb-4 opacity-20" />
@@ -246,6 +247,95 @@ export function InventoryClient({ products: initialProducts, userRole }: { produ
               </div>
             ))
           )}
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
+          <table className="w-full text-left">
+            <thead className="bg-muted/50 border-b text-[10px] uppercase text-muted-foreground">
+              <tr>
+                <th className="px-4 py-3 font-medium w-12">#</th>
+                <th className="px-4 py-3 font-medium">Product</th>
+                <th className="px-4 py-3 font-medium">Details</th>
+                <th className="px-4 py-3 font-medium">Quantity</th>
+                <th className="px-4 py-3 font-medium text-right">Value</th>
+                {userRole !== "CASHIER" && (
+                  <th className="px-4 py-3 font-medium text-right w-32">Actions</th>
+                )}
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedProducts.length === 0 ? (
+                <tr>
+                  <td colSpan={userRole !== "CASHIER" ? 6 : 5} className="px-4 py-8 text-center text-muted-foreground border-b">
+                    {t("inventory_page.no_products")}
+                  </td>
+                </tr>
+              ) : (
+                paginatedProducts.map((product, index) => (
+                  <tr key={product.id} className="border-b hover:bg-muted/20 text-[10px]">
+                    <td className="px-4 py-2 text-muted-foreground font-medium">
+                      {(currentPage - 1) * itemsPerPage + index + 1}
+                    </td>
+                    <td className="px-4 py-2">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="font-bold uppercase text-blue-800 dark:text-blue-300">{product.name}</span>
+                        <span className="text-muted-foreground uppercase">{product.sku || product.name}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-2">
+                      <div className="flex flex-col gap-0.5 font-medium text-muted-foreground">
+                        <span>Pack: <span className="text-blue-600 dark:text-blue-400 underline">{product.piecesPerBundle || 1}</span> Pcs</span>
+                        <span>Price: <span className="text-blue-600 dark:text-blue-400 underline">{product.sellingPrice} {product.currency}</span></span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-2 font-medium">
+                      {product.quantity}
+                    </td>
+                    <td className="px-4 py-2 text-right font-medium text-muted-foreground">
+                      {(product.quantity * product.sellingPrice).toLocaleString()} {product.currency}
+                    </td>
+                    {userRole !== "CASHIER" && (
+                      <td className="px-4 py-2 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => {
+                              setActiveTab("existing")
+                              setSelectedProductId(product.id)
+                              setIsModalOpen(true)
+                            }}
+                            className="p-1.5 text-blue-600 hover:bg-blue-100 rounded-md transition-colors"
+                            title="Add Stock"
+                          >
+                            <Send className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              setActiveTab("edit")
+                              setEditingProduct(product)
+                              setIsModalOpen(true)
+                            }}
+                            className="p-1.5 text-orange-500 hover:bg-orange-100 rounded-md transition-colors"
+                            title="Edit"
+                          >
+                            <Save className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(product.id)}
+                            disabled={isLoading}
+                            className="p-1.5 text-red-500 hover:bg-red-100 rounded-md transition-colors disabled:opacity-50"
+                            title="Delete"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
+                    )}
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
 
         {/* Pagination Controls */}
