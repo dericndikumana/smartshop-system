@@ -13,12 +13,10 @@ export default async function POSPage() {
       redirect("/login")
     }
 
-    // Fetch only active products with stock > 0
+    // Fetch all products (including out of stock)
     const products = await prisma.product.findMany({
       where: { 
-        shopId: session.user.shopId,
-        status: "IN_STOCK",
-        quantity: { gt: 0 }
+        shopId: session.user.shopId
       },
       orderBy: { name: 'asc' }
     })
