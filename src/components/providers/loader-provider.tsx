@@ -47,7 +47,7 @@ function LoaderEffect({ setIsLoading }: { setIsLoading: (val: boolean) => void }
             // Show the loader immediately
             setIsLoading(true)
             
-            // Wait 4 seconds as requested, then push to route
+            // Wait 2 seconds as requested, then push to route
             setTimeout(() => {
               router.push(newUrl)
               
@@ -55,7 +55,7 @@ function LoaderEffect({ setIsLoading }: { setIsLoading: (val: boolean) => void }
               setTimeout(() => {
                 setIsLoading(false)
               }, 500)
-            }, 4000)
+            }, 2000)
           }
         }
       }

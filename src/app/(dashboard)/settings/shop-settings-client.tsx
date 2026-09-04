@@ -153,7 +153,7 @@ export function ShopSettingsClient({
               defaultValue={initialPrefix}
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary uppercase" 
             />
-            <p className="text-xs text-muted-foreground">Receipts will look like {initialPrefix}000123</p>
+            <p className="text-xs text-muted-foreground">{t('settings_page.receipt_example').replace('{0}', initialPrefix)}</p>
           </div>
         </div>
 

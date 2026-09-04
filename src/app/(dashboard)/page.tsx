@@ -58,11 +58,31 @@ export default async function DashboardPage() {
       })
     })
 
+    // 2. ALL-TIME REVENUE
+    const allTimeSales = await prisma.sale.findMany({
+      where: {
+        shopId: session.user.shopId,
+        ...(session.user.role === "CASHIER" ? { cashierId: session.user.id } : {})
+      },
+      include: {
+        items: true
+      }
+    })
+
+    const allTimeRevenueByCurrency: Record<string, number> = {}
+    allTimeSales.forEach((sale: SaleWithItems) => {
+      sale.items.forEach((item: SaleItem) => {
+        const itemSubtotalWithVat = item.subtotal + (item.subtotal * (sale.vatRate / 100))
+        allTimeRevenueByCurrency[item.currency] = (allTimeRevenueByCurrency[item.currency] || 0) + itemSubtotalWithVat
+      })
+    })
+
     return (
       <CashierDashboard 
         salesCount={salesCount}
         totalItemsSold={totalItemsSold}
         revenueByCurrency={revenueByCurrency}
+        allTimeRevenueByCurrency={allTimeRevenueByCurrency}
       />
     )
   }

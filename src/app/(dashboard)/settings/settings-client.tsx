@@ -96,7 +96,7 @@ export function SettingsClient({ userRole, initialName, initialEmail, initialPho
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium">Phone Number</label>
+            <label className="text-sm font-medium">{t('settings_page.phone')}</label>
             <div className="flex items-center w-full rounded-md border border-input bg-background focus-within:ring-2 focus-within:ring-primary">
               <select 
                 value={countryCode}

@@ -257,8 +257,8 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
     setIsCheckingOut(true)
     setShowDebtConfirm(false)
 
-    showLoader(5000)
-    await new Promise(resolve => setTimeout(resolve, 5000))
+    showLoader(2000)
+    await new Promise(resolve => setTimeout(resolve, 2000))
 
     const payload = {
       items: cart.map(item => ({

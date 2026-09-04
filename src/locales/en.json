@@ -58,6 +58,8 @@
     "items_sold": "Items Sold",
     "revenue": "Revenue ({0})",
     "no_sales": "No sales registered yet. Head over to the POS to start selling!",
+    "today_summary": "Today's Summary",
+    "all_time_revenue": "All-Time Revenue",
     "admin_title": "Dashboard",
     "admin_subtitle": "Overview of your shop's performance.",
     "total_revenue": "Total Revenue ({0})",
@@ -133,7 +135,9 @@
     "vat_rate": "Standard VAT Rate (%)",
     "receipt_settings": "Receipt Settings",
     "receipt_prefix": "Receipt Prefix",
-    "save_config": "Save Configuration"
+    "receipt_example": "Receipts will look like {0}000123",
+    "save_config": "Save Configuration",
+    "phone": "Phone Number"
   },
   "login_page": {
     "welcome": "Welcome to SmartShop",

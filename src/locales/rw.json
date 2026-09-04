@@ -58,6 +58,8 @@
     "items_sold": "Ibicuruzwa Byagurishijwe",
     "revenue": "Amafaranga ({0})",
     "no_sales": "Nta byagurishijwe. Jya muri POS ugurishe!",
+    "today_summary": "Ibyagurishijwe Uyu Munsi",
+    "all_time_revenue": "Amafaranga Yose Hamwe",
     "admin_title": "Incamake",
     "admin_subtitle": "Incamake y imikorere y iduka ryawe.",
     "total_revenue": "Amafaranga Yose ({0})",
@@ -133,7 +135,9 @@
     "vat_rate": "Igipimo cy Umusoro (%)",
     "receipt_settings": "Igenamiterere ry Inyemezabuguzi",
     "receipt_prefix": "Ibanziriza ry Inyemezabuguzi",
-    "save_config": "Bika Igenamiterere"
+    "receipt_example": "Inyemezabuguzi zizagaragara nka {0}000123",
+    "save_config": "Bika Igenamiterere",
+    "phone": "Numero ya Telefone"
   },
   "login_page": {
     "welcome": "Ikaze kuri SmartShop",
