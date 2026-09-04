@@ -25,7 +25,6 @@ export function SettingsMenuClient({ userRole, userName }: SettingsMenuClientPro
   // Base menu items
   let menuItems = [
     { name: t('sidebar.account_details') || "Account Details", href: "/settings/account", icon: User },
-    { name: t('sidebar.order') || "Order", href: "/pos", icon: ShoppingCart },
     { name: t('sidebar.debt') || "Debt", href: "/dettes", icon: Banknote },
     { name: t('sidebar.loan') || "Loan", href: "/loans", icon: HandCoins },
     { name: t('sidebar.manage_cashiers') || "Manage Cashiers", href: "/staff", icon: Users },
