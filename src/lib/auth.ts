@@ -24,7 +24,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           where: {
             OR: [
               { email: credentials.identifier as string },
-              { name: credentials.identifier as string }
+              { name: credentials.identifier as string },
+              { phone: credentials.identifier as string }
             ]
           },
           include: { role: true, shop: true }

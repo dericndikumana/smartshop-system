@@ -63,6 +63,7 @@ model User {
   id        String   @id @default(cuid())
   name      String
   email     String   @unique
+  phone     String?  @unique
   password  String
   language  String   @default("en") // en or rw
   status    String   @default("ACTIVE") // ACTIVE, BLOCKED, INACTIVE

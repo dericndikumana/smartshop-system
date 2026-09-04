@@ -91,9 +91,20 @@ export async function updateProfileInfoAction(formData: FormData) {
       return { success: false, error: "Email is already taken" }
     }
 
+    if (validated.phone) {
+      const existingPhone = await prisma.user.findUnique({ where: { phone: validated.phone } })
+      if (existingPhone && existingPhone.id !== session.user.id) {
+        return { success: false, error: "Phone number is already registered to another account" }
+      }
+    }
+
     await prisma.user.update({
       where: { id: session.user.id },
-      data: { name: validated.name, email: validated.email }
+      data: { 
+        name: validated.name, 
+        email: validated.email,
+        phone: validated.phone || null
+      }
     })
 
     if (session.user.shopId) {

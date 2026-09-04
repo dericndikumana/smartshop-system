@@ -10,6 +10,7 @@ const createShopSchema = z.object({
   shopName: z.string().min(2, "Shop name must be at least 2 characters"),
   adminName: z.string().min(2, "Admin name must be at least 2 characters"),
   adminEmail: z.string().email("Invalid email address"),
+  adminPhone: z.string().optional(),
   adminPassword: z.string().min(6, "Password must be at least 6 characters"),
 })
 
@@ -24,6 +25,7 @@ export async function createShopAction(formData: FormData) {
       shopName: formData.get("shopName") as string,
       adminName: formData.get("adminName") as string,
       adminEmail: formData.get("adminEmail") as string,
+      adminPhone: formData.get("adminPhone") as string || undefined,
       adminPassword: formData.get("adminPassword") as string,
     }
 
@@ -36,6 +38,15 @@ export async function createShopAction(formData: FormData) {
 
     if (existingUser) {
       return { success: false, error: "Email is already registered to an account." }
+    }
+
+    if (validated.adminPhone) {
+      const existingPhone = await prisma.user.findUnique({
+        where: { phone: validated.adminPhone }
+      })
+      if (existingPhone) {
+        return { success: false, error: "Phone number is already registered to an account." }
+      }
     }
 
     const shopAdminRole = await prisma.role.findUnique({
@@ -65,6 +76,7 @@ export async function createShopAction(formData: FormData) {
         data: {
           name: validated.adminName,
           email: validated.adminEmail,
+          phone: validated.adminPhone || null,
           password: hashedPassword,
           roleId: shopAdminRole.id,
           shopId: shop.id,
@@ -259,6 +271,7 @@ const editShopAdminSchema = z.object({
   userId: z.string(),
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
+  phone: z.string().optional(),
 })
 
 export async function editShopAdminAction(formData: FormData) {
@@ -272,6 +285,7 @@ export async function editShopAdminAction(formData: FormData) {
       userId: formData.get("userId") as string,
       name: formData.get("name") as string,
       email: formData.get("email") as string,
+      phone: formData.get("phone") as string || undefined,
     }
 
     const validated = editShopAdminSchema.parse(data)
@@ -284,9 +298,22 @@ export async function editShopAdminAction(formData: FormData) {
       return { success: false, error: "Email is already taken by another user." }
     }
 
+    if (validated.phone) {
+      const existingPhone = await prisma.user.findUnique({
+        where: { phone: validated.phone }
+      })
+      if (existingPhone && existingPhone.id !== validated.userId) {
+        return { success: false, error: "Phone number is already taken by another user." }
+      }
+    }
+
     await prisma.user.update({
       where: { id: validated.userId },
-      data: { name: validated.name, email: validated.email }
+      data: { 
+        name: validated.name, 
+        email: validated.email,
+        phone: validated.phone || null
+      }
     })
 
     revalidatePath("/superadmin/shops")

@@ -12,6 +12,7 @@ interface Shop {
   adminId: string
   adminName: string
   adminEmail: string
+  adminPhone?: string
   productsCount: number
   salesCount: number
   createdAt: string
@@ -31,6 +32,14 @@ export function ShopsClient({ shops: initialShops }: { shops: Shop[] }) {
   const [activeTab, setActiveTab] = useState<"ACTIVE" | "RECYCLE_BIN">("ACTIVE")
   
   const [isLoading, setIsLoading] = useState(false)
+
+  // Phone states for create shop
+  const [createCountryCode, setCreateCountryCode] = useState("+250")
+  const [createPhoneNumber, setCreatePhoneNumber] = useState("")
+
+  // Phone states for edit admin
+  const [editCountryCode, setEditCountryCode] = useState("+250")
+  const [editPhoneNumber, setEditPhoneNumber] = useState("")
 
   // Actions
   async function handleEditShop(e: React.FormEvent<HTMLFormElement>) {
@@ -245,10 +254,19 @@ export function ShopsClient({ shops: initialShops }: { shops: Shop[] }) {
                         <div>
                           <p className="font-medium">{shop.adminName}</p>
                           <p className="text-muted-foreground text-xs">{shop.adminEmail}</p>
+                          <p className="text-muted-foreground text-xs">{shop.adminPhone}</p>
                         </div>
                         <div className="flex items-center gap-1 opacity-0 group-hover/admin:opacity-100 transition-opacity">
                           <button 
-                            onClick={() => setEditAdmin(shop)}
+                            onClick={() => {
+                              setEditAdmin(shop)
+                              const initialCC = shop.adminPhone && shop.adminPhone.startsWith("+") 
+                                ? (shop.adminPhone.match(/^\+\d{1,4}/) || ["+250"])[0] 
+                                : "+250"
+                              const initialNumber = shop.adminPhone ? shop.adminPhone.replace(initialCC, "") : ""
+                              setEditCountryCode(initialCC)
+                              setEditPhoneNumber(initialNumber)
+                            }}
                             className="p-1.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-md transition-colors"
                             title="Edit Admin"
                           >
@@ -384,6 +402,79 @@ export function ShopsClient({ shops: initialShops }: { shops: Shop[] }) {
                 <input required name="adminEmail" type="email" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="e.g. john@downtowncoffee.com" />
               </div>
               <div className="space-y-2">
+                <label className="text-sm font-medium">Admin Phone</label>
+                <div className="flex items-center w-full rounded-md border border-input bg-background focus-within:ring-2 focus-within:ring-primary">
+                  <select 
+                    value={createCountryCode}
+                    onChange={(e) => setCreateCountryCode(e.target.value)}
+                    className="h-10 bg-transparent border-none text-sm font-medium focus:outline-none pl-2 max-w-[140px] truncate"
+                  >
+                    <option value="+213">+213 (Algeria)</option>
+                    <option value="+244">+244 (Angola)</option>
+                    <option value="+229">+229 (Benin)</option>
+                    <option value="+267">+267 (Botswana)</option>
+                    <option value="+226">+226 (Burkina Faso)</option>
+                    <option value="+257">+257 (Burundi)</option>
+                    <option value="+237">+237 (Cameroon)</option>
+                    <option value="+238">+238 (Cape Verde)</option>
+                    <option value="+236">+236 (Central African Republic)</option>
+                    <option value="+235">+235 (Chad)</option>
+                    <option value="+269">+269 (Comoros)</option>
+                    <option value="+242">+242 (Congo)</option>
+                    <option value="+243">+243 (DR Congo)</option>
+                    <option value="+253">+253 (Djibouti)</option>
+                    <option value="+20">+20 (Egypt)</option>
+                    <option value="+240">+240 (Equatorial Guinea)</option>
+                    <option value="+291">+291 (Eritrea)</option>
+                    <option value="+268">+268 (Eswatini)</option>
+                    <option value="+251">+251 (Ethiopia)</option>
+                    <option value="+241">+241 (Gabon)</option>
+                    <option value="+220">+220 (Gambia)</option>
+                    <option value="+233">+233 (Ghana)</option>
+                    <option value="+224">+224 (Guinea)</option>
+                    <option value="+245">+245 (Guinea-Bissau)</option>
+                    <option value="+225">+225 (Ivory Coast)</option>
+                    <option value="+254">+254 (Kenya)</option>
+                    <option value="+266">+266 (Lesotho)</option>
+                    <option value="+231">+231 (Liberia)</option>
+                    <option value="+218">+218 (Libya)</option>
+                    <option value="+261">+261 (Madagascar)</option>
+                    <option value="+265">+265 (Malawi)</option>
+                    <option value="+223">+223 (Mali)</option>
+                    <option value="+222">+222 (Mauritania)</option>
+                    <option value="+230">+230 (Mauritius)</option>
+                    <option value="+212">+212 (Morocco)</option>
+                    <option value="+258">+258 (Mozambique)</option>
+                    <option value="+264">+264 (Namibia)</option>
+                    <option value="+227">+227 (Niger)</option>
+                    <option value="+234">+234 (Nigeria)</option>
+                    <option value="+250">+250 (Rwanda)</option>
+                    <option value="+239">+239 (Sao Tome and Principe)</option>
+                    <option value="+221">+221 (Senegal)</option>
+                    <option value="+248">+248 (Seychelles)</option>
+                    <option value="+232">+232 (Sierra Leone)</option>
+                    <option value="+252">+252 (Somalia)</option>
+                    <option value="+27">+27 (South Africa)</option>
+                    <option value="+211">+211 (South Sudan)</option>
+                    <option value="+249">+249 (Sudan)</option>
+                    <option value="+255">+255 (Tanzania)</option>
+                    <option value="+228">+228 (Togo)</option>
+                    <option value="+216">+216 (Tunisia)</option>
+                    <option value="+256">+256 (Uganda)</option>
+                    <option value="+260">+260 (Zambia)</option>
+                    <option value="+263">+263 (Zimbabwe)</option>
+                  </select>
+                  <input 
+                    type="tel" 
+                    value={createPhoneNumber}
+                    onChange={(e) => setCreatePhoneNumber(e.target.value)}
+                    placeholder="781234567"
+                    className="flex h-10 w-full bg-transparent px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none" 
+                  />
+                  <input type="hidden" name="adminPhone" value={createPhoneNumber ? `${createCountryCode}${createPhoneNumber}` : ""} />
+                </div>
+              </div>
+              <div className="space-y-2">
                 <label className="text-sm font-medium">Admin Password</label>
                 <input required name="adminPassword" type="password" className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Minimum 6 characters" />
               </div>
@@ -422,6 +513,79 @@ export function ShopsClient({ shops: initialShops }: { shops: Shop[] }) {
               <div className="space-y-2">
                 <label className="text-sm font-medium">Admin Email</label>
                 <input required name="email" type="email" defaultValue={editAdmin.adminEmail} className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Admin Phone</label>
+                <div className="flex items-center w-full rounded-md border border-input bg-background focus-within:ring-2 focus-within:ring-primary">
+                  <select 
+                    value={editCountryCode}
+                    onChange={(e) => setEditCountryCode(e.target.value)}
+                    className="h-10 bg-transparent border-none text-sm font-medium focus:outline-none pl-2 max-w-[140px] truncate"
+                  >
+                    <option value="+213">+213 (Algeria)</option>
+                    <option value="+244">+244 (Angola)</option>
+                    <option value="+229">+229 (Benin)</option>
+                    <option value="+267">+267 (Botswana)</option>
+                    <option value="+226">+226 (Burkina Faso)</option>
+                    <option value="+257">+257 (Burundi)</option>
+                    <option value="+237">+237 (Cameroon)</option>
+                    <option value="+238">+238 (Cape Verde)</option>
+                    <option value="+236">+236 (Central African Republic)</option>
+                    <option value="+235">+235 (Chad)</option>
+                    <option value="+269">+269 (Comoros)</option>
+                    <option value="+242">+242 (Congo)</option>
+                    <option value="+243">+243 (DR Congo)</option>
+                    <option value="+253">+253 (Djibouti)</option>
+                    <option value="+20">+20 (Egypt)</option>
+                    <option value="+240">+240 (Equatorial Guinea)</option>
+                    <option value="+291">+291 (Eritrea)</option>
+                    <option value="+268">+268 (Eswatini)</option>
+                    <option value="+251">+251 (Ethiopia)</option>
+                    <option value="+241">+241 (Gabon)</option>
+                    <option value="+220">+220 (Gambia)</option>
+                    <option value="+233">+233 (Ghana)</option>
+                    <option value="+224">+224 (Guinea)</option>
+                    <option value="+245">+245 (Guinea-Bissau)</option>
+                    <option value="+225">+225 (Ivory Coast)</option>
+                    <option value="+254">+254 (Kenya)</option>
+                    <option value="+266">+266 (Lesotho)</option>
+                    <option value="+231">+231 (Liberia)</option>
+                    <option value="+218">+218 (Libya)</option>
+                    <option value="+261">+261 (Madagascar)</option>
+                    <option value="+265">+265 (Malawi)</option>
+                    <option value="+223">+223 (Mali)</option>
+                    <option value="+222">+222 (Mauritania)</option>
+                    <option value="+230">+230 (Mauritius)</option>
+                    <option value="+212">+212 (Morocco)</option>
+                    <option value="+258">+258 (Mozambique)</option>
+                    <option value="+264">+264 (Namibia)</option>
+                    <option value="+227">+227 (Niger)</option>
+                    <option value="+234">+234 (Nigeria)</option>
+                    <option value="+250">+250 (Rwanda)</option>
+                    <option value="+239">+239 (Sao Tome and Principe)</option>
+                    <option value="+221">+221 (Senegal)</option>
+                    <option value="+248">+248 (Seychelles)</option>
+                    <option value="+232">+232 (Sierra Leone)</option>
+                    <option value="+252">+252 (Somalia)</option>
+                    <option value="+27">+27 (South Africa)</option>
+                    <option value="+211">+211 (South Sudan)</option>
+                    <option value="+249">+249 (Sudan)</option>
+                    <option value="+255">+255 (Tanzania)</option>
+                    <option value="+228">+228 (Togo)</option>
+                    <option value="+216">+216 (Tunisia)</option>
+                    <option value="+256">+256 (Uganda)</option>
+                    <option value="+260">+260 (Zambia)</option>
+                    <option value="+263">+263 (Zimbabwe)</option>
+                  </select>
+                  <input 
+                    type="tel" 
+                    value={editPhoneNumber}
+                    onChange={(e) => setEditPhoneNumber(e.target.value)}
+                    placeholder="781234567"
+                    className="flex h-10 w-full bg-transparent px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none" 
+                  />
+                  <input type="hidden" name="phone" value={editPhoneNumber ? `${editCountryCode}${editPhoneNumber}` : ""} />
+                </div>
               </div>
               
               <div className="flex justify-end gap-3 mt-6">

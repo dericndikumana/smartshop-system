@@ -31,6 +31,7 @@ export default async function ManageShopsPage() {
     adminId: shop.users[0]?.id || "",
     adminName: shop.users[0]?.name || "No Admin",
     adminEmail: shop.users[0]?.email || "N/A",
+    adminPhone: shop.users[0]?.phone || "N/A",
     productsCount: shop._count.products,
     salesCount: shop._count.sales,
     createdAt: shop.createdAt.toISOString()

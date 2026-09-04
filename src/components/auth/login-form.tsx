@@ -58,7 +58,7 @@ export default function LoginForm({ initialSuspended }: { initialSuspended?: boo
 
       <div className="space-y-2">
         <label className="text-sm font-medium leading-none" htmlFor="identifier">
-          {t('login_page.email')}
+          {t('login_page.email') || 'Email, Username, or Phone'}
         </label>
         <input 
           id="identifier" 
@@ -70,7 +70,7 @@ export default function LoginForm({ initialSuspended }: { initialSuspended?: boo
           }}
           required
           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors" 
-          placeholder="name@example.com or Username" 
+          placeholder="name@example.com, Username, or +250..." 
         />
       </div>
       
