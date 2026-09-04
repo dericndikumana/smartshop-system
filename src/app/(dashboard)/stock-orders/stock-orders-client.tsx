@@ -2,9 +2,8 @@
 
 import { useState } from "react"
 import { processInternalOrder } from "@/app/actions/internal-orders"
-import { Package, Search, CheckCircle, XCircle } from "lucide-react"
+import { Search, CheckCircle, XCircle } from "lucide-react"
 import { toast } from "sonner"
-import { useTranslation } from "@/components/providers/language-provider"
 
 interface OrderItem {
   id: string
@@ -26,7 +25,6 @@ interface Order {
 }
 
 export function StockOrdersClient({ orders, userRole }: { orders: Order[], userRole: string }) {
-  const { t } = useTranslation()
   const [searchTerm, setSearchTerm] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)

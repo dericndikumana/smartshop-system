@@ -5,7 +5,6 @@ import { Users, Plus, Search } from "lucide-react"
 import { createCustomerAction, editCustomerAction, deleteCustomerAction } from "@/app/actions/customers"
 import { toast } from "sonner"
 import { useTranslation } from "@/components/providers/language-provider"
-import { Trash2, Save } from "lucide-react"
 
 interface Customer {
   id: string
