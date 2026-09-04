@@ -423,8 +423,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
             <div className="absolute top-full z-10 w-[calc(100%-2rem)] mt-1 bg-card border rounded-md shadow-lg p-2">
               <input 
                 type="text" 
-                autoFocus
-                placeholder={t('pos_page.search_products')} // reusing translation or "Search customers..."
+                placeholder="Search by name or phone..."
                 value={customerSearchText}
                 onChange={(e) => setCustomerSearchText(e.target.value)}
                 className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary mb-2" 
@@ -746,8 +745,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
             <div className="absolute top-full z-30 w-72 bg-card border rounded-md shadow-xl p-2 mt-1 left-1/2 -translate-x-1/2">
               <input 
                 type="text" 
-                autoFocus
-                placeholder="Search Customer..."
+                placeholder="Search by name or phone..."
                 value={customerSearchText}
                 onChange={e => setCustomerSearchText(e.target.value)}
                 className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary mb-2"
