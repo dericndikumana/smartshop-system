@@ -41,9 +41,14 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
       // Cashier filter
       if (selectedCashier !== "ALL" && t.cashierId !== selectedCashier) return false
       
-      // Customer search filter
-      if (customerSearch.trim() && !t.customerName.toLowerCase().includes(customerSearch.toLowerCase())) {
-        if (!t.receiptNumber.toLowerCase().includes(customerSearch.toLowerCase())) {
+      // Customer, Receipt, or Product search filter
+      const searchLower = customerSearch.trim().toLowerCase()
+      if (searchLower) {
+        if (
+          !t.customerName.toLowerCase().includes(searchLower) &&
+          !t.receiptNumber.toLowerCase().includes(searchLower) &&
+          !(t.itemsSold && t.itemsSold.toLowerCase().includes(searchLower))
+        ) {
           return false
         }
       }
@@ -130,7 +135,7 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
                     setCustomerSearch(e.target.value)
                     setCurrentPage(1)
                   }}
-                  placeholder="Name or receipt..."
+                  placeholder={t("reports_page.search_customer")}
                   className="rounded-md border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary w-full"
                 />
               </div>
@@ -183,7 +188,9 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
           </div>
 
           <div className="rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden print:border-gray-300 print:shadow-none">
-            <table className="w-full text-sm text-left">
+            
+            {/* Desktop Table */}
+            <table className="hidden md:table w-full text-sm text-left">
               <thead className="bg-muted/50 text-muted-foreground uppercase text-[10px] print:bg-gray-100">
                 <tr>
                   <th className="px-6 py-4 font-medium w-12">#</th>
@@ -245,6 +252,42 @@ export function ReportsClient({ transactions, cashiers, userRole }: ReportsClien
                 </tr>
               </tfoot>
             </table>
+
+            {/* Mobile View */}
+            <div className="md:hidden divide-y divide-border/50">
+              {paginatedTransactions.length === 0 ? (
+                <div className="px-6 py-8 text-center text-muted-foreground">
+                  {t('reports_page.no_transactions')}
+                </div>
+              ) : (
+                paginatedTransactions.map((tx) => (
+                  <div key={tx.id} className="p-4 flex flex-col gap-2 bg-card hover:bg-muted/20 transition-colors">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="font-bold text-foreground text-sm">{tx.customerName}</p>
+                        <p className="text-xs text-muted-foreground">{tx.receiptNumber}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-semibold text-foreground text-sm">
+                          {Object.entries(tx.totalsByCurrency).map(([curr, total]) => (
+                            <span key={curr} className="block">{curr} {total.toLocaleString()}</span>
+                          ))}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-xs text-muted-foreground bg-muted/30 p-2 rounded-md">
+                      {tx.itemsSold}
+                    </div>
+                    {userRole === "SHOP_ADMIN" && selectedCashier === "ALL" && (
+                      <div className="text-xs text-muted-foreground flex justify-between">
+                        <span>{t('sales_page.cashier')}:</span>
+                        <span className="font-medium text-foreground">{tx.cashierName}</span>
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
             
             {/* Pagination Controls */}
             {totalPages > 1 && (

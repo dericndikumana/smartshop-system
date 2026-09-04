@@ -50,3 +50,40 @@ export async function payDebtAction(data: z.infer<typeof payDebtSchema>) {
     return { success: false, error: "Failed to process payment" }
   }
 }
+
+export async function payLoanAction(data: z.infer<typeof payDebtSchema>) {
+  try {
+    const session = await auth()
+    if (!session || !session.user.shopId) {
+      return { success: false, error: "Unauthorized" }
+    }
+
+    const validated = payDebtSchema.parse(data)
+
+    await prisma.$transaction(async (tx) => {
+      const customer = await tx.customer.findUnique({
+        where: { id: validated.customerId, shopId: session.user.shopId as string }
+      })
+
+      if (!customer) {
+        throw new Error("Customer not found")
+      }
+
+      await tx.customer.update({
+        where: { id: validated.customerId },
+        data: {
+          balance: { increment: validated.amountPaid } // Balance < 0 means loan. Paying increments it.
+        }
+      })
+    })
+
+    revalidatePath("/dettes")
+    revalidatePath("/loans")
+    revalidatePath("/customers")
+    
+    return { success: true }
+  } catch (error) {
+    console.error("Pay Loan Error:", error)
+    return { success: false, error: "Failed to process loan refund" }
+  }
+}

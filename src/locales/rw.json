@@ -271,5 +271,35 @@
     "total_amount": "Igiteranyo Cyose",
     "no_transactions": "Nta byagurishijwe byabonetse muri aya mahitamo.",
     "total": "Igiteranyo:"
+  },
+  "loans_page": {
+    "title": "Gucunga Imyenda Yanjye",
+    "subtitle": "Cunga abakiriya ufitiye ideni (amafaranga ubarimo).",
+    "search": "Shakisha izina cyangwa telefone...",
+    "no_loans": "Nta bakiriya ufitiye ideni babonetse.",
+    "credit_owe": "Ideni ryabo (Ubarimo)",
+    "refund": "Kwishyura",
+    "process_refund": "Kwishyura Ideni",
+    "refund_desc": "Kwishyura {0}",
+    "current_credit": "Ideni ufite ubu",
+    "refund_amount": "Amafaranga yishyurwa",
+    "cancel": "Kureka",
+    "submit": "Emeza Kwishyura",
+    "processing": "Biri gutunganywa..."
+  },
+  "dettes_page": {
+    "title": "Gucunga Amadeni",
+    "subtitle": "Cunga abakiriya bagufitiye amadeni.",
+    "search": "Shakisha izina cyangwa telefone...",
+    "no_debts": "Nta bakiriya bakurimo amadeni babonetse.",
+    "debt_owes": "Ideni (Akurimo)",
+    "pay": "Kwishyura",
+    "process_payment": "Kwishyura Ideni",
+    "payment_desc": "Emeza ubwishyu bwa {0}",
+    "current_debt": "Ideni afite ubu",
+    "payment_amount": "Amafaranga Yishyurwa",
+    "cancel": "Kureka",
+    "submit": "Emeza Kwishyura",
+    "processing": "Biri gutunganywa..."
   }
 }

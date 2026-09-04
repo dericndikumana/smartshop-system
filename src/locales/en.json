@@ -271,5 +271,35 @@
     "total_amount": "Total Amount",
     "no_transactions": "No transactions found for the selected criteria.",
     "total": "Total:"
+  },
+  "loans_page": {
+    "title": "Loan Management",
+    "subtitle": "Manage customers who have credit balances (you owe them).",
+    "search": "Search by name or phone...",
+    "no_loans": "No customers with loans found.",
+    "credit_owe": "Credit (You Owe)",
+    "refund": "Refund",
+    "process_refund": "Process Refund",
+    "refund_desc": "Refund {0}",
+    "current_credit": "Current Credit (You Owe)",
+    "refund_amount": "Refund Amount",
+    "cancel": "Cancel",
+    "submit": "Submit Refund",
+    "processing": "Processing..."
+  },
+  "dettes_page": {
+    "title": "Debt Management",
+    "subtitle": "Manage customers who owe you money.",
+    "search": "Search by name or phone...",
+    "no_debts": "No customers with debts found.",
+    "debt_owes": "Debt (Owes You)",
+    "pay": "Pay",
+    "process_payment": "Process Payment",
+    "payment_desc": "Record payment for {0}",
+    "current_debt": "Current Debt",
+    "payment_amount": "Payment Amount",
+    "cancel": "Cancel",
+    "submit": "Submit Payment",
+    "processing": "Processing..."
   }
 }
