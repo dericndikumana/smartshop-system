@@ -281,8 +281,13 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
   const handleCheckout = async () => {
     if (cart.length === 0) return
     
+    if (amountReceived === "" || amountReceived === undefined) {
+      toast.error("Please enter the amount paid (Ayo Yishyuye). If they paid nothing, enter 0.")
+      return
+    }
+
     const rawTotal = Object.values(totalsByCurrency).reduce((a, b) => a + b, 0)
-    const amt = amountReceived ? parseFloat(amountReceived) : rawTotal
+    const amt = parseFloat(amountReceived)
     const diff = rawTotal - amt
 
     if (diff !== 0) {
@@ -379,7 +384,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
         </div>
       </div>
 
-      <div className="hidden lg:flex w-96 flex-col bg-card rounded-xl border shadow-sm overflow-hidden h-[500px] shrink-0">
+      <div className="hidden lg:flex w-96 flex-col bg-card rounded-xl border shadow-sm h-[500px] shrink-0">
         <div className="p-4 border-b bg-muted/10 flex items-center justify-between">
           <h2 className="font-semibold flex items-center gap-2">
             <ShoppingCart className="h-5 w-5 text-primary" />
@@ -622,6 +627,8 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
                 <div className="flex-1 flex items-center justify-end relative">
                   <input
                     type="number"
+                    min="0"
+                    step="any"
                     placeholder="Ayo Yishyuye..."
                     value={amountReceived}
                     onChange={(e) => setAmountReceived(e.target.value)}
@@ -911,6 +918,8 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
             <div className="flex-1 flex items-center justify-end relative">
               <input
                 type="number"
+                min="0"
+                step="any"
                 placeholder="Ayo Yishyuye..."
                 value={amountReceived}
                 onChange={(e) => setAmountReceived(e.target.value)}
