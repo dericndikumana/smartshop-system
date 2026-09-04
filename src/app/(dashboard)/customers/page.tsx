@@ -17,5 +17,5 @@ export default async function CustomersPage() {
     orderBy: { fullName: 'asc' }
   })
 
-  return <CustomersClient customers={customers} />
+  return <CustomersClient customers={customers} userRole={session.user.role} />
 }

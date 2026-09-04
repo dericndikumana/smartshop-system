@@ -25,7 +25,7 @@ const getInitialsColor = (name: string) => {
   return colors[index % colors.length]
 }
 
-export function CustomersClient({ customers }: { customers: Customer[] }) {
+export function CustomersClient({ customers, userRole }: { customers: Customer[], userRole: string }) {
   const { t } = useTranslation()
   const [searchTerm, setSearchTerm] = useState("")
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -149,38 +149,40 @@ export function CustomersClient({ customers }: { customers: Customer[] }) {
                   <p className="text-sm text-muted-foreground truncate">{customer.phone || "No phone"}</p>
                 </div>
               </div>
-              <div className="flex items-center justify-end gap-2 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 mt-2 sm:mt-0">
-                <button
-                  onClick={() => {
-                    setEditingCustomer(customer)
-                    setActiveTab("edit")
-                    // Pre-fill country code if possible, default +250
-                    let cCode = "+250"
-                    let phoneNum = customer.phone || ""
-                    if (phoneNum.startsWith("+")) {
-                      const match = phoneNum.match(/^(\+\d{1,4})(.*)$/)
-                      if (match) {
-                        cCode = match[1]
-                        phoneNum = match[2]
+              {userRole !== "CASHIER" && (
+                <div className="flex items-center justify-end gap-2 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 mt-2 sm:mt-0">
+                  <button
+                    onClick={() => {
+                      setEditingCustomer(customer)
+                      setActiveTab("edit")
+                      // Pre-fill country code if possible, default +250
+                      let cCode = "+250"
+                      let phoneNum = customer.phone || ""
+                      if (phoneNum.startsWith("+")) {
+                        const match = phoneNum.match(/^(\+\d{1,4})(.*)$/)
+                        if (match) {
+                          cCode = match[1]
+                          phoneNum = match[2]
+                        }
                       }
-                    }
-                    setCountryCode(cCode)
-                    setIsModalOpen(true)
-                    // The phone input is uncontrolled with defaultValue in the modal
-                  }}
-                  className="text-orange-500 hover:opacity-80 transition-opacity p-2"
-                  title="Edit Customer"
-                >
-                  <Save className="h-5 w-5" />
-                </button>
-                <button
-                  onClick={() => handleDeleteCustomer(customer.id)}
-                  className="text-red-500 hover:opacity-80 transition-opacity p-2"
-                  title="Delete Customer"
-                >
-                  <Trash2 className="h-5 w-5" />
-                </button>
-              </div>
+                      setCountryCode(cCode)
+                      setIsModalOpen(true)
+                      // The phone input is uncontrolled with defaultValue in the modal
+                    }}
+                    className="text-orange-500 hover:opacity-80 transition-opacity p-2"
+                    title="Edit Customer"
+                  >
+                    <Save className="h-5 w-5" />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteCustomer(customer.id)}
+                    className="text-red-500 hover:opacity-80 transition-opacity p-2"
+                    title="Delete Customer"
+                  >
+                    <Trash2 className="h-5 w-5" />
+                  </button>
+                </div>
+              )}
             </div>
           ))
         )}

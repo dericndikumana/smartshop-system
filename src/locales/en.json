@@ -44,7 +44,11 @@
     "settings": "Settings",
     "my_receipts": "Sales & Receipts",
     "my_settings": "Settings",
-    "dashboard": "Dashboard"
+    "dashboard": "Dashboard",
+    "account_details": "Account Details",
+    "order": "Order",
+    "debt": "Debt",
+    "loan": "Loan"
   },
   "dashboard": {
     "total_sales": "Total Sales",

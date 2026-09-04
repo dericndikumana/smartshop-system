@@ -111,7 +111,17 @@ export function SalesClient({ sales: initialSales }: { sales: Sale[] }) {
                   <span className="font-bold text-primary">{sale.primaryCurrency} {(sale.totalsByCurrency[sale.primaryCurrency] || 0).toLocaleString()}</span>
                   <div className="flex items-center gap-2">
                     <a
-                      href={`https://wa.me/?text=${encodeURIComponent(`Receipt: ${sale.receiptNumber}\nTotal: ${sale.primaryCurrency} ${(sale.totalsByCurrency[sale.primaryCurrency] || 0).toLocaleString()}\nItems:\n${sale.items.map(i => `- ${i.quantity}x ${i.name}`).join('\n')}`)}`}
+                      href={`https://wa.me/?text=${encodeURIComponent(
+                        `*Receipt: ${sale.receiptNumber}*\n` +
+                        `Shop: ${sale.shopName}\n` +
+                        (sale.shopPhone ? `Phone: ${sale.shopPhone}\n` : '') +
+                        `Date: ${new Date(sale.createdAt).toLocaleString()}\n` +
+                        `Cashier: ${sale.cashierName}\n` +
+                        `Customer: ${sale.customerName || 'Walk-in'}\n\n` +
+                        `*Items:*\n${sale.items.map(i => `- ${i.name} (x${i.quantity}): ${i.currency} ${(i.subtotal + i.subtotal * sale.vatRate / 100).toLocaleString()}`).join('\n')}\n\n` +
+                        `*Totals:*\n` +
+                        Object.entries(sale.totalsByCurrency).map(([curr, total]) => `${curr} ${total.toLocaleString()}`).join('\n')
+                      )}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="p-2 text-green-600 bg-green-50 hover:bg-green-100 rounded-md transition-colors"

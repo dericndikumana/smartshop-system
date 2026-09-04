@@ -257,8 +257,8 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
     setIsCheckingOut(true)
     setShowDebtConfirm(false)
 
-    showLoader(2000)
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    showLoader(1000)
+    await new Promise(resolve => setTimeout(resolve, 1000))
 
     const payload = {
       items: cart.map(item => ({
@@ -278,6 +278,7 @@ export function POSClient({ products, customers, vatRate, heldCarts = [], cashie
     if (result.error) {
       toast.error(result.error)
     } else {
+      // Clear cart
       setCart([])
       // Don't reset customer search since it's prefilled with cashier name
       setCustomerPhone("")

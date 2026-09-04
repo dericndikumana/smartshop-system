@@ -44,7 +44,11 @@
     "settings": "Igenamiterere",
     "my_receipts": "Ibyagurishijwe byanjye",
     "my_settings": "Igenamiterere",
-    "dashboard": "Incamake"
+    "dashboard": "Incamake",
+    "account_details": "Umwirondoro w'Konti",
+    "order": "Kugurisha (POS)",
+    "debt": "Imyenda",
+    "loan": "Inguzanyo"
   },
   "dashboard": {
     "total_sales": "Ibyagurishijwe Byose",

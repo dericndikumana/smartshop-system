@@ -39,11 +39,11 @@ export default function LoginForm({ initialSuspended }: { initialSuspended?: boo
            setErrorMessage("Invalid credentials.")
         }
       } else {
-        showLoader(2000)
+        showLoader(1000)
         setTimeout(() => {
           router.push("/")
           router.refresh()
-        }, 2000)
+        }, 1000)
       }
     } catch {
       setErrorMessage("An unexpected error occurred.")
